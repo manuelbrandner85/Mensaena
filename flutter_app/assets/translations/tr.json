@@ -2700,7 +2700,8 @@
     "publishFailed": "Yayınlama başarısız oldu.",
     "publishedNoCover": "Makale yayınlandı — ancak kapak görseli yüklenemedi.",
     "emptyAll": "Henüz makale yok.",
-    "emptyFiltered": "Makale bulunamadı."
+    "emptyFiltered": "Makale bulunamadı.",
+    "publicVisibleHint": "Giriş yapmamış ziyaretçilere de görünür."
   },
   "air": {
     "title": "Hava kalitesi",

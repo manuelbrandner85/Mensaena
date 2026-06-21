@@ -2700,7 +2700,8 @@
     "publishFailed": "Veröffentlichung fehlgeschlagen.",
     "publishedNoCover": "Artikel veröffentlicht — das Titelbild konnte aber nicht hochgeladen werden.",
     "emptyAll": "Noch keine Artikel.",
-    "emptyFiltered": "Keine Artikel gefunden."
+    "emptyFiltered": "Keine Artikel gefunden.",
+    "publicVisibleHint": "Auch für nicht eingeloggte Besucher sichtbar."
   },
   "air": {
     "title": "Luftqualität",

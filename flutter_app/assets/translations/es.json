@@ -2701,7 +2701,8 @@
     "publishFailed": "Error al publicar.",
     "publishedNoCover": "Artículo publicado — pero no se pudo subir la imagen de portada.",
     "emptyAll": "Aún no hay artículos.",
-    "emptyFiltered": "No se encontraron artículos."
+    "emptyFiltered": "No se encontraron artículos.",
+    "publicVisibleHint": "Visible también para visitantes no registrados."
   },
   "air": {
     "title": "Calidad del aire",

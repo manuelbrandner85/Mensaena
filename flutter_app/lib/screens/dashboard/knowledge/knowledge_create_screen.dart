@@ -13,12 +13,9 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/knowledge_repository.dart';
 import '../../../services/supabase_service.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
-import '../../../widgets/shared/editorial_module_header.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/shared/tag_suggestion_field.dart';
-import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 import '../../../utils/form_validators.dart';
 
 /// SKILL: mensaena-features
@@ -360,30 +357,21 @@ class _KnowledgeCreateScreenState
   // ── Build ─────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
-    return DashboardScaffold(
-      title: 'knowledge.createArticle'.tr(),
-      currentRoute: widget.routePath,
-      body: SafeArea(
-        child: ReadableWidth(
-            child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
-          children: [
-            EditorialModuleHeader(
-              metaIndex: '✦ Neu',
-              metaCategory: 'WISSEN',
-              title: 'knowledge.createArticle'.tr(),
-              subtitle:
-                  'Teile dein Wissen mit der Community — Schritt-fuer-Schritt-Anleitung, Tipp oder Erklaerung.',
-            ),
-            const SizedBox(height: 12),
-
-            // 1) Cover-Image
-            _sectionLabel('knowledge.coverImage'.tr()),
-            const SizedBox(height: 6),
-            _CoverPickerBox(
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: CreatePostScaffold(
+        title: 'knowledge.createArticle'.tr(),
+        subtitle: 'create.descriptions.knowledge'.tr(),
+        accent: AppColors.bronze,
+        icon: LucideIcons.bookOpen,
+        returnRoute: widget.routePath,
+        sections: [
+          // ── Titelbild ───────────────────────────────────────────────
+          CreateCard(
+            title: 'knowledge.coverImage'.tr(),
+            icon: LucideIcons.image,
+            child: _CoverPickerBox(
               file: _coverImage,
               onTap: _pickCover,
               onRemove: () => setState(() {
@@ -391,51 +379,51 @@ class _KnowledgeCreateScreenState
                 _uploadedImageUrl = null;
               }),
             ),
-            const SizedBox(height: 16),
+          ),
 
-            // 2) Titel
-            _sectionLabel('knowledge.titleField'.tr()),
-            const SizedBox(height: 6),
-            AnimatedEntrance(
-              index: 0,
-              child: TextFormField(
-                controller: _titleCtrl,
-                maxLength: 200,
-                validator: FormValidators.lengthBetween(5, 200),
-                style: AppTypography.body(size: 15, color: AppColors.ink),
-                decoration: const InputDecoration(
-                  counterText: '',
+          // ── Titel & Zusammenfassung ─────────────────────────────────
+          CreateCard(
+            title: 'create.sectionDetails'.tr(),
+            icon: LucideIcons.fileText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _titleCtrl,
+                  maxLength: 200,
+                  validator: FormValidators.lengthBetween(5, 200),
+                  style: AppTypography.body(size: 15, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'knowledge.titleField'.tr(),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: _summaryCtrl,
+                  maxLines: 2,
+                  maxLength: 200,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'knowledge.summary'.tr(),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 14),
+          ),
 
-            // 3) Summary
-            _sectionLabel('knowledge.summary'.tr()),
-            const SizedBox(height: 6),
-            TextField(
-              controller: _summaryCtrl,
-              maxLines: 2,
-              maxLength: 200,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                alignLabelWithHint: true,
-                counterText: '',
-              ),
-            ),
-            const SizedBox(height: 14),
-
-            // 4) Kategorie-Picker
-            _sectionLabel('knowledge.category'.tr()),
-            const SizedBox(height: 6),
-            InkWell(
+          // ── Kategorie ───────────────────────────────────────────────
+          CreateCard(
+            title: 'knowledge.category'.tr(),
+            icon: LucideIcons.layoutGrid,
+            child: InkWell(
               onTap: _pickCategory,
               borderRadius: BorderRadius.circular(10),
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
                 decoration: BoxDecoration(
-                  color: AppColors.elevated,
+                  color: AppColors.surface.withValues(alpha: 0.5),
                   border: Border.all(color: AppColors.line),
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -444,8 +432,8 @@ class _KnowledgeCreateScreenState
                     Expanded(
                       child: Text(
                         _currentCategoryLabel(),
-                        style: AppTypography.body(
-                            size: 14, color: AppColors.ink),
+                        style:
+                            AppTypography.body(size: 14, color: AppColors.ink),
                       ),
                     ),
                     const Icon(LucideIcons.chevronDown,
@@ -454,12 +442,13 @@ class _KnowledgeCreateScreenState
                 ),
               ),
             ),
-            const SizedBox(height: 14),
+          ),
 
-            // 5) Tags
-            _sectionLabel('knowledge.tags'.tr()),
-            const SizedBox(height: 6),
-            TagSuggestionField(
+          // ── Tags ────────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionTags'.tr(),
+            icon: LucideIcons.tag,
+            child: TagSuggestionField(
               controller: _tagsCtrl,
               suggestions: const [
                 'anleitung',
@@ -472,144 +461,142 @@ class _KnowledgeCreateScreenState
                 'finanzen',
               ],
             ),
-            const SizedBox(height: 14),
+          ),
 
-            // 6) Content (Markdown)
-            _sectionLabel('knowledge.content'.tr()),
-            const SizedBox(height: 6),
-            TextFormField(
-              controller: _contentCtrl,
-              maxLines: 18,
-              minLines: 10,
-              validator: FormValidators.lengthBetween(50, 100000),
-              style: AppTypography.mono(
-                size: 13,
-                color: AppColors.ink,
-              ),
-              onChanged: (_) {
-                if (_livePreview) setState(() {});
-              },
-              decoration: InputDecoration(
-                alignLabelWithHint: true,
-                hintText: 'knowledge.markdownHint'.tr(),
-                hintStyle: AppTypography.body(
-                  size: 12,
-                  color: AppColors.mute,
-                  height: 1.4,
+          // ── Inhalt (Markdown) ───────────────────────────────────────
+          CreateCard(
+            title: 'knowledge.content'.tr(),
+            icon: LucideIcons.alignLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _contentCtrl,
+                  maxLines: 18,
+                  minLines: 10,
+                  validator: FormValidators.lengthBetween(50, 100000),
+                  style: AppTypography.mono(size: 13, color: AppColors.ink),
+                  onChanged: (_) {
+                    if (_livePreview) setState(() {});
+                  },
+                  decoration: InputDecoration(
+                    alignLabelWithHint: true,
+                    hintText: 'knowledge.markdownHint'.tr(),
+                    hintStyle: AppTypography.body(
+                      size: 12,
+                      color: AppColors.mute,
+                      height: 1.4,
+                    ),
+                  ),
                 ),
-              ),
+                SwitchListTile(
+                  value: _livePreview,
+                  onChanged: (v) => setState(() => _livePreview = v),
+                  activeColor: AppColors.amber,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('knowledge.livePreview'.tr(),
+                      style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.inkSoft,
+                        weight: FontWeight.w600,
+                      )),
+                ),
+                if (_livePreview && _contentCtrl.text.trim().isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  Container(
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface.withValues(alpha: 0.5),
+                      border: Border.all(color: AppColors.line),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: MarkdownBody(
+                      data: _contentCtrl.text,
+                      styleSheet: _markdownStyles(context),
+                    ),
+                  ),
+                ],
+              ],
             ),
-            const SizedBox(height: 10),
+          ),
 
-            // 7) Live-Preview-Toggle
-            SwitchListTile(
-              value: _livePreview,
-              onChanged: (v) => setState(() => _livePreview = v),
-              activeColor: AppColors.amber,
-              contentPadding: EdgeInsets.zero,
-              title: Text('knowledge.livePreview'.tr(),
-                  style: AppTypography.body(
-                    size: 13,
-                    color: AppColors.inkSoft,
-                    weight: FontWeight.w600,
-                  )),
+          // ── Optionen ────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionOptions'.tr(),
+            icon: LucideIcons.settings2,
+            child: Column(
+              children: [
+                SwitchListTile(
+                  value: _isPublic,
+                  onChanged: (v) => setState(() => _isPublic = v),
+                  activeColor: AppColors.bronze,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('knowledge.publicVisible'.tr(),
+                      style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.inkSoft,
+                        weight: FontWeight.w600,
+                      )),
+                  subtitle: Text('knowledge.publicVisibleHint'.tr(),
+                      style: AppTypography.caption()),
+                ),
+                SwitchListTile(
+                  value: _isFeatured,
+                  onChanged: (v) => setState(() => _isFeatured = v),
+                  activeColor: AppColors.amber,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('knowledge.featuredToggle'.tr(),
+                      style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.inkSoft,
+                        weight: FontWeight.w600,
+                      )),
+                  secondary: const Icon(LucideIcons.star,
+                      color: AppColors.amber, size: 18),
+                ),
+              ],
             ),
-            if (_livePreview && _contentCtrl.text.trim().isNotEmpty) ...[
-              const SizedBox(height: 6),
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.5),
-                  border: Border.all(color: AppColors.line),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: MarkdownBody(
-                  data: _contentCtrl.text,
-                  styleSheet: _markdownStyles(context),
-                ),
+          ),
+
+          if (_error != null)
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.herzrot.withValues(alpha: 0.10),
+                border: Border.all(
+                    color: AppColors.herzrot.withValues(alpha: 0.4)),
+                borderRadius: BorderRadius.circular(10),
               ),
-            ],
-            const SizedBox(height: 8),
-
-            // 8) Sichtbarkeit
-            SwitchListTile(
-              value: _isPublic,
-              onChanged: (v) => setState(() => _isPublic = v),
-              activeColor: AppColors.bronze,
-              contentPadding: EdgeInsets.zero,
-              title: Text('knowledge.publicVisible'.tr(),
+              child: Text(_error!,
                   style: AppTypography.body(
-                    size: 13,
-                    color: AppColors.inkSoft,
-                    weight: FontWeight.w600,
-                  )),
-              subtitle: Text(
-                  'Auch für nicht eingeloggte Besucher sichtbar.',
-                  style: AppTypography.caption()),
+                      size: 13, color: AppColors.herzrotWarm)),
             ),
-
-            // 9) Featured
-            SwitchListTile(
-              value: _isFeatured,
-              onChanged: (v) => setState(() => _isFeatured = v),
-              activeColor: AppColors.amber,
-              contentPadding: EdgeInsets.zero,
-              title: Text('knowledge.featuredToggle'.tr(),
-                  style: AppTypography.body(
-                    size: 13,
-                    color: AppColors.inkSoft,
-                    weight: FontWeight.w600,
-                  )),
-              secondary: const Icon(LucideIcons.star,
-                  color: AppColors.amber, size: 18),
-            ),
-
-            // Error
-            if (_error != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: AppColors.herzrot.withValues(alpha: 0.10),
-                  border: Border.all(
-                      color: AppColors.herzrot.withValues(alpha: 0.4)),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(_error!,
-                    style: AppTypography.body(
-                        size: 13, color: AppColors.herzrotWarm)),
+        ],
+        footer: Column(
+          children: [
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.amber,
+                foregroundColor: AppColors.voidColor,
+                minimumSize: const Size(double.infinity, 56),
               ),
-            ],
-
-            const SizedBox(height: 20),
-
-            // 10) Submit
-            AnimatedEntrance(
-              index: 1,
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.amber,
-                  foregroundColor: AppColors.voidColor,
-                  minimumSize: const Size(double.infinity, 60),
-                ),
-                onPressed: _submitting ? null : _submit,
-                icon: _submitting
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.voidColor,
-                        ),
-                      )
-                    : const Icon(LucideIcons.send, size: 16),
-                label: Text(
-                  'knowledge.publish'.tr(),
-                  style: AppTypography.body(
-                      size: 14,
-                      color: AppColors.voidColor,
-                      weight: FontWeight.w700),
-                ),
+              onPressed: _submitting ? null : _submit,
+              icon: _submitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.voidColor,
+                      ),
+                    )
+                  : const Icon(LucideIcons.send, size: 16),
+              label: Text(
+                'knowledge.publish'.tr(),
+                style: AppTypography.body(
+                    size: 14,
+                    color: AppColors.voidColor,
+                    weight: FontWeight.w700),
               ),
             ),
             const SizedBox(height: 10),
@@ -623,15 +610,10 @@ class _KnowledgeCreateScreenState
               child: Text('common.cancel'.tr()),
             ),
           ],
-        ))),
+        ),
       ),
     );
   }
-
-  Widget _sectionLabel(String text) => Text(
-        text,
-        style: AppTypography.label(size: 10, color: AppColors.bronzeSoft),
-      );
 }
 
 // ── Cover Picker Box ──────────────────────────────────────────────

@@ -2701,7 +2701,8 @@
     "publishFailed": "Publishing failed.",
     "publishedNoCover": "Article published — but the cover image could not be uploaded.",
     "emptyAll": "No articles yet.",
-    "emptyFiltered": "No articles found."
+    "emptyFiltered": "No articles found.",
+    "publicVisibleHint": "Also visible to logged-out visitors."
   },
   "air": {
     "title": "Air quality",
