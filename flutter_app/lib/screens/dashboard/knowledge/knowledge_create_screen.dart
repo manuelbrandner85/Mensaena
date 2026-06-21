@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,6 +18,8 @@ import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/tag_suggestion_field.dart';
 import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 /// SKILL: mensaena-features
 /// Knowledge-Create-Screen — Markdown-Editor mit Live-Vorschau,
@@ -36,6 +39,7 @@ class KnowledgeCreateScreen extends ConsumerStatefulWidget {
 
 class _KnowledgeCreateScreenState
     extends ConsumerState<KnowledgeCreateScreen> {
+  final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
   final _summaryCtrl = TextEditingController();
   final _contentCtrl = TextEditingController();
@@ -252,12 +256,9 @@ class _KnowledgeCreateScreenState
 
   // ── Submit ────────────────────────────────────────────────────
   Future<void> _submit() async {
-    if (_titleCtrl.text.trim().length < 5) {
-      setState(() => _error = 'knowledge.validationTitle'.tr());
-      return;
-    }
-    if (_contentCtrl.text.trim().length < 50) {
-      setState(() => _error = 'knowledge.validationContent'.tr());
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      HapticFeedback.mediumImpact();
+      setState(() => _error = null);
       return;
     }
     final uid = SupabaseService.currentUser?.id;
@@ -364,7 +365,10 @@ class _KnowledgeCreateScreenState
       currentRoute: widget.routePath,
       body: SafeArea(
         child: ReadableWidth(
-            child: ListView(
+            child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
           children: [
             EditorialModuleHeader(
@@ -392,12 +396,16 @@ class _KnowledgeCreateScreenState
             // 2) Titel
             _sectionLabel('knowledge.titleField'.tr()),
             const SizedBox(height: 6),
-            TextField(
-              controller: _titleCtrl,
-              maxLength: 200,
-              style: AppTypography.body(size: 15, color: AppColors.ink),
-              decoration: const InputDecoration(
-                counterText: '',
+            AnimatedEntrance(
+              index: 0,
+              child: TextFormField(
+                controller: _titleCtrl,
+                maxLength: 200,
+                validator: FormValidators.lengthBetween(5, 200),
+                style: AppTypography.body(size: 15, color: AppColors.ink),
+                decoration: const InputDecoration(
+                  counterText: '',
+                ),
               ),
             ),
             const SizedBox(height: 14),
@@ -469,10 +477,11 @@ class _KnowledgeCreateScreenState
             // 6) Content (Markdown)
             _sectionLabel('knowledge.content'.tr()),
             const SizedBox(height: 6),
-            TextField(
+            TextFormField(
               controller: _contentCtrl,
               maxLines: 18,
               minLines: 10,
+              validator: FormValidators.lengthBetween(50, 100000),
               style: AppTypography.mono(
                 size: 13,
                 color: AppColors.ink,
@@ -575,29 +584,32 @@ class _KnowledgeCreateScreenState
             const SizedBox(height: 20),
 
             // 10) Submit
-            FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: AppColors.amber,
-                foregroundColor: AppColors.voidColor,
-                minimumSize: const Size(double.infinity, 60),
-              ),
-              onPressed: _submitting ? null : _submit,
-              icon: _submitting
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.voidColor,
-                      ),
-                    )
-                  : const Icon(LucideIcons.send, size: 16),
-              label: Text(
-                'knowledge.publish'.tr(),
-                style: AppTypography.body(
-                    size: 14,
-                    color: AppColors.voidColor,
-                    weight: FontWeight.w700),
+            AnimatedEntrance(
+              index: 1,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: AppColors.amber,
+                  foregroundColor: AppColors.voidColor,
+                  minimumSize: const Size(double.infinity, 60),
+                ),
+                onPressed: _submitting ? null : _submit,
+                icon: _submitting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.voidColor,
+                        ),
+                      )
+                    : const Icon(LucideIcons.send, size: 16),
+                label: Text(
+                  'knowledge.publish'.tr(),
+                  style: AppTypography.body(
+                      size: 14,
+                      color: AppColors.voidColor,
+                      weight: FontWeight.w700),
+                ),
               ),
             ),
             const SizedBox(height: 10),
@@ -611,7 +623,7 @@ class _KnowledgeCreateScreenState
               child: Text('common.cancel'.tr()),
             ),
           ],
-        )),
+        ))),
       ),
     );
   }
