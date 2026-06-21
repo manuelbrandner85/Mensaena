@@ -286,8 +286,9 @@ class _AboutTab extends StatelessWidget {
           ),
           const SizedBox(height: 18),
         ],
-        _StatsGrid(profile: p),
-        const SizedBox(height: 18),
+        // Aktivität zuletzt (dicht, sekundär). Detail-Stats (Impact/Points/
+        // Spenden) entfernt: Spenden = goldenes Herz im Header, Impact/Points
+        // im Badges-Tab + Leaderboard — eine ruhige Stats-Bar genügt.
         ActivityHeatmapWidget(userId: p.id),
         const SizedBox(height: 18),
         if (isMe) ...[
@@ -1526,67 +1527,6 @@ class _TrustBreakdownSheetState extends State<_TrustBreakdownSheet> {
   }
 }
 
-class _StatsGrid extends StatelessWidget {
-  const _StatsGrid({required this.profile});
-  final Profile profile;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: _Stat(
-            icon: LucideIcons.zap,
-            label: 'profile.stats.impact'.tr(),
-            value: '${profile.impactScore}',
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _Stat(
-            icon: LucideIcons.trophy,
-            label: 'profile.stats.points'.tr(),
-            value: '${profile.points}',
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: _Stat(
-            icon: LucideIcons.heart,
-            label: 'profile.stats.donations'.tr(),
-            value: '${profile.donationCount}',
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _Stat extends StatelessWidget {
-  const _Stat({required this.icon, required this.label, required this.value});
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface.withValues(alpha: 0.4),
-        border: Border.all(color: AppColors.line),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 14, color: AppColors.amber),
-          const SizedBox(height: 8),
-          Text(value, style: AppTypography.mono(size: 18)),
-          const SizedBox(height: 2),
-          Text(label, style: AppTypography.label(size: 9)),
-        ],
-      ),
-    );
-  }
-}
+// _StatsGrid + _Stat entfernt (Profil-Entschlackung): die Detail-Stats
+// (Impact/Points/Spenden) waren redundant zur Stats-Bar; Spenden zeigt jetzt
+// das goldene Herz im Header, Impact/Points sind im Badges-Tab + Leaderboard.
