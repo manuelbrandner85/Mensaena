@@ -353,6 +353,21 @@ class DashboardWidgetConfig {
     'affirmation',
     'books',
     'weekly_digest',
+    // Release-Declutter 2 (User-Feedback „Dashboard sehr überfordernd"):
+    // Engagement-/Discovery-Karten standardmäßig aus → ruhiges Start-Dashboard
+    // (Pflicht-Widgets + Quick-Actions + „In deiner Nähe"). Jederzeit über den
+    // Bearbeiten-/Widgets-Modus wieder einblendbar.
+    'smart_match',
+    'trust_score',
+    'thanks',
+    'community_pulse',
+    'activity_feed',
+    'mini_map',
+    'weekly_challenge',
+    'rating_prompt',
+    'holiday_badge',
+    'success_story',
+    'bot_tip',
   };
 
   static DashboardWidgetConfig get defaultConfig => DashboardWidgetConfig(
