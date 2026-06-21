@@ -10,10 +10,8 @@ import '../../../repositories/skills_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
-import '../../../widgets/shared/readable_width.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 import '../../../utils/form_validators.dart';
 
 class SkillsCreateScreen extends ConsumerStatefulWidget {
@@ -127,21 +125,24 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardScaffold(
-      title: 'skills.create.screenTitle'.tr(),
-      currentRoute: '/dashboard/skills',
-      body: SafeArea(
-        child: ReadableWidth(
-          child: Form(
-            key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              // ── Titel ───────────────────────────────────────────────────
-              AnimatedEntrance(
-                index: 0,
-                child: TextFormField(
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: CreatePostScaffold(
+        title: 'skills.create.screenTitle'.tr(),
+        subtitle: 'create.descriptions.skills'.tr(),
+        accent: AppColors.bronze,
+        icon: LucideIcons.wrench,
+        returnRoute: '/dashboard/skills',
+        sections: [
+          // ── Titel & Beschreibung ────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionDetails'.tr(),
+            icon: LucideIcons.fileText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
                   controller: _titleCtrl,
                   maxLength: 120,
                   textInputAction: TextInputAction.next,
@@ -149,15 +150,10 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
                   style: AppTypography.body(size: 15, color: AppColors.ink),
                   decoration: InputDecoration(
                     labelText: 'create.title'.tr(),
-                    counterText: '',
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              // ── Beschreibung ────────────────────────────────────────────
-              AnimatedEntrance(
-                index: 1,
-                child: TextFormField(
+                const SizedBox(height: 8),
+                TextFormField(
                   controller: _descCtrl,
                   maxLines: 4,
                   validator: FormValidators.lengthBetween(10, 2000),
@@ -167,128 +163,166 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
                     alignLabelWithHint: true,
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              // ── Kategorie ───────────────────────────────────────────────
-              DropdownButtonFormField<String>(
-                value: _category,
-                decoration:
-                    InputDecoration(labelText: 'skills.create.category'.tr()),
-                dropdownColor: AppColors.surface,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                items: [
-                  DropdownMenuItem(
-                    value: null,
-                    child: Text('skills.create.categoryNone'.tr(),
-                        style: AppTypography.body(
-                            size: 14, color: AppColors.inkSoft)),
-                  ),
-                  ..._categories.entries.map((e) => DropdownMenuItem(
-                      value: e.key, child: Text(e.value.tr()))),
-                ],
-                onChanged: (v) => setState(() => _category = v),
-              ),
-              const SizedBox(height: 10),
-              // ── Niveau ──────────────────────────────────────────────────
-              DropdownButtonFormField<String>(
-                value: _level,
-                decoration:
-                    InputDecoration(labelText: 'skills.create.level'.tr()),
-                dropdownColor: AppColors.surface,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                items: [
-                  DropdownMenuItem(
-                    value: null,
-                    child: Text('skills.create.levelNone'.tr(),
-                        style: AppTypography.body(
-                            size: 14, color: AppColors.inkSoft)),
-                  ),
-                  ..._levels.entries.map((e) => DropdownMenuItem(
-                      value: e.key, child: Text(e.value.tr()))),
-                ],
-                onChanged: (v) => setState(() => _level = v),
-              ),
-              const SizedBox(height: 4),
-              // ── Gratis-Toggle ───────────────────────────────────────────
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                activeColor: AppColors.primary500,
-                value: _isFree,
-                onChanged: (v) => setState(() => _isFree = v),
-                title: Text('skills.create.isFree'.tr(),
-                    style: AppTypography.body(size: 14, color: AppColors.ink)),
-              ),
-              if (!_isFree) ...[
-                TextFormField(
-                  controller: _rateCtrl,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  validator: FormValidators.positiveNumberOptional,
-                  style: AppTypography.body(size: 14, color: AppColors.ink),
+              ],
+            ),
+          ),
+
+          // ── Kategorie & Niveau ──────────────────────────────────────
+          CreateCard(
+            title: 'skills.create.category'.tr(),
+            icon: LucideIcons.layoutGrid,
+            child: Column(
+              children: [
+                DropdownButtonFormField<String>(
+                  value: _category,
                   decoration: InputDecoration(
-                    labelText: 'skills.create.hourlyRate'.tr(),
-                    prefixIcon:
-                        const Icon(LucideIcons.euro, size: 16),
-                  ),
+                      labelText: 'skills.create.category'.tr()),
+                  dropdownColor: AppColors.surface,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  items: [
+                    DropdownMenuItem(
+                      value: null,
+                      child: Text('skills.create.categoryNone'.tr(),
+                          style: AppTypography.body(
+                              size: 14, color: AppColors.inkSoft)),
+                    ),
+                    ..._categories.entries.map((e) => DropdownMenuItem(
+                        value: e.key, child: Text(e.value.tr()))),
+                  ],
+                  onChanged: (v) => setState(() => _category = v),
                 ),
-                const SizedBox(height: 6),
-              ],
-              // ── Online-Toggle ───────────────────────────────────────────
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                activeColor: AppColors.primary500,
-                value: _isOnline,
-                onChanged: (v) => setState(() => _isOnline = v),
-                title: Text('skills.create.isOnline'.tr(),
-                    style: AppTypography.body(size: 14, color: AppColors.ink)),
-                subtitle: Text('skills.create.isOnlineHint'.tr(),
-                    style:
-                        AppTypography.body(size: 12, color: AppColors.inkSoft)),
-              ),
-              const SizedBox(height: 4),
-              // ── Standort ────────────────────────────────────────────────
-              TextField(
-                controller: _locationCtrl,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.location'.tr(),
-                  suffixIcon: IconButton(
-                    onPressed: _locating ? null : _useGps,
-                    tooltip: 'marketplace.useGps'.tr(),
-                    icon: _locating
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2, color: AppColors.primary500),
-                          )
-                        : const Icon(LucideIcons.locate,
-                            size: 18, color: AppColors.inkSoft),
-                  ),
-                ),
-              ),
-              if (_error != null) ...[
                 const SizedBox(height: 10),
-                Text(
-                  _error!,
-                  style: AppTypography.body(
-                      size: 13, color: AppColors.herzrotWarm),
+                DropdownButtonFormField<String>(
+                  value: _level,
+                  decoration:
+                      InputDecoration(labelText: 'skills.create.level'.tr()),
+                  dropdownColor: AppColors.surface,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  items: [
+                    DropdownMenuItem(
+                      value: null,
+                      child: Text('skills.create.levelNone'.tr(),
+                          style: AppTypography.body(
+                              size: 14, color: AppColors.inkSoft)),
+                    ),
+                    ..._levels.entries.map((e) => DropdownMenuItem(
+                        value: e.key, child: Text(e.value.tr()))),
+                  ],
+                  onChanged: (v) => setState(() => _level = v),
                 ),
               ],
-              const SizedBox(height: 20),
-              AnimatedEntrance(
-                index: 2,
-                child: ElevatedButton.icon(
-                  onPressed: _submitting ? null : _submit,
-                  icon: const Icon(LucideIcons.plus, size: 16),
-                  label: Text(_submitting
-                      ? 'skills.create.saving'.tr()
-                      : 'skills.create.submitButton'.tr()),
+            ),
+          ),
+
+          // ── Standort ────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionLocation'.tr(),
+            icon: LucideIcons.mapPin,
+            child: TextField(
+              controller: _locationCtrl,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: InputDecoration(
+                labelText: 'create.location'.tr(),
+                suffixIcon: IconButton(
+                  onPressed: _locating ? null : _useGps,
+                  tooltip: 'marketplace.useGps'.tr(),
+                  icon: _locating
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.primary500),
+                        )
+                      : const Icon(LucideIcons.locate,
+                          size: 18, color: AppColors.inkSoft),
                 ),
               ),
-            ],
+            ),
           ),
+
+          // ── Optionen (Gratis/Preis, Online) ─────────────────────────
+          CreateCard(
+            title: 'create.sectionOptions'.tr(),
+            icon: LucideIcons.settings2,
+            child: Column(
+              children: [
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: AppColors.primary500,
+                  value: _isFree,
+                  onChanged: (v) => setState(() => _isFree = v),
+                  title: Text('skills.create.isFree'.tr(),
+                      style:
+                          AppTypography.body(size: 14, color: AppColors.ink)),
+                ),
+                if (!_isFree) ...[
+                  TextFormField(
+                    controller: _rateCtrl,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    validator: FormValidators.positiveNumberOptional,
+                    style: AppTypography.body(size: 14, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      labelText: 'skills.create.hourlyRate'.tr(),
+                      prefixIcon: const Icon(LucideIcons.euro, size: 16),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                ],
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: AppColors.primary500,
+                  value: _isOnline,
+                  onChanged: (v) => setState(() => _isOnline = v),
+                  title: Text('skills.create.isOnline'.tr(),
+                      style:
+                          AppTypography.body(size: 14, color: AppColors.ink)),
+                  subtitle: Text('skills.create.isOnlineHint'.tr(),
+                      style: AppTypography.body(
+                          size: 12, color: AppColors.inkSoft)),
+                ),
+              ],
+            ),
           ),
+
+          if (_error != null)
+            Text(
+              _error!,
+              style:
+                  AppTypography.body(size: 13, color: AppColors.herzrotWarm),
+            ),
+        ],
+        footer: Column(
+          children: [
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.bronze,
+                foregroundColor: AppColors.voidColor,
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              onPressed: _submitting ? null : _submit,
+              icon: _submitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.voidColor),
+                    )
+                  : const Icon(LucideIcons.plus, size: 16),
+              label: Text(_submitting
+                  ? 'skills.create.saving'.tr()
+                  : 'skills.create.submitButton'.tr()),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.inkSoft,
+                side: const BorderSide(color: AppColors.line),
+              ),
+              onPressed: () => context.go('/dashboard/skills'),
+              child: Text('common.cancel'.tr()),
+            ),
+          ],
         ),
       ),
     );
