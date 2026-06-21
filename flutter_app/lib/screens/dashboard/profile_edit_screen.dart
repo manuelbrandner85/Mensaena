@@ -1137,7 +1137,14 @@ class _Hero extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Stack(
+        SizedBox(
+          // Höhe = Cover (220) + Avatar-Überhang (44). Damit liegt der GESAMTE
+          // Avatar innerhalb der Stack-Grenzen und ist voll antippbar. Vorher
+          // hing er per bottom:-44 heraus → der untere Teil inkl. Kamera-Badge
+          // war nicht klickbar (Flutter macht kein Hit-Test außerhalb der
+          // Parent-Bounds, auch bei Clip.none).
+          height: 264,
+          child: Stack(
           clipBehavior: Clip.none,
           children: [
             GestureDetector(
@@ -1199,10 +1206,13 @@ class _Hero extends StatelessWidget {
             Positioned(
               left: 0,
               right: 0,
-              bottom: -44,
+              // bottom:0 → Avatar sitzt am unteren Stack-Rand (innerhalb der
+              // 264px), überlappt das Cover und bleibt vollständig antippbar.
+              bottom: 0,
               child: Center(
                 child: GestureDetector(
                   onTap: onPickAvatar,
+                  behavior: HitTestBehavior.opaque,
                   child: Stack(
                     children: [
                       Container(
@@ -1269,8 +1279,9 @@ class _Hero extends StatelessWidget {
               ),
             ),
           ],
+          ),
         ),
-        const SizedBox(height: 54),
+        const SizedBox(height: 20),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Row(
