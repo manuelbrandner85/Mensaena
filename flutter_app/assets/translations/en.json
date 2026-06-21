@@ -1853,7 +1853,13 @@
       "everyday": "Clothing",
       "sharing": "Items"
     },
-    "backToModule": "Back to module"
+    "backToModule": "Back to module",
+    "sectionType": "Type & category",
+    "sectionDetails": "Title & description",
+    "sectionImages": "Images",
+    "sectionLocation": "Location",
+    "sectionTags": "Tags",
+    "sectionOptions": "Options"
   },
   "crisis": {
     "error": "Error: {error}",

@@ -22,16 +22,13 @@ import '../../../services/rate_limit_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show FileOptions;
 
 import '../../../services/supabase_service.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/effects/celebrate_burst.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
 import '../../../widgets/shared/tag_suggestion_field.dart';
-import '../../../widgets/shared/editorial_module_header.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import 'module_create_config.dart';
-import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/form_error_box.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 import '../../../utils/form_validators.dart';
 
 /// SKILL: mensaena-features
@@ -415,397 +412,97 @@ class _ModuleCreatePostScreenState
     }
   }
 
+  /// Index des aktuell gewählten Typs (für CreateTypeGrid). -1 wenn keiner.
+  int _selectedTypeIndex() {
+    final types = widget.config.createTypes;
+    for (var i = 0; i < types.length; i++) {
+      final t = types[i];
+      if (t.value == _type && (t.category == null || t.category == _category)) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = widget.config;
-    return DashboardScaffold(
-      title: c.title.tr(),
-      currentRoute: c.returnRoute,
-      body: SafeArea(
-        child: ReadableWidth(
-            child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Editorial-Header mit Modul-Akzent
-            Row(
-              children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        c.accentColor.withValues(alpha: 0.25),
-                        c.accentColor.withValues(alpha: 0.08),
-                      ],
-                    ),
-                    border: Border.all(
-                      color: c.accentColor.withValues(alpha: 0.4),
-                    ),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Icon(c.icon,
-                      size: 22, color: c.accentColor),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: EditorialModuleHeader(
-                    metaIndex: '✦ Neu',
-                    metaCategory: c.moduleKey.toUpperCase(),
-                    title: c.title.tr(),
-                    subtitle: c.description.tr(),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
+    final selIdx = _selectedTypeIndex();
+    final activeType = selIdx >= 0 ? c.createTypes[selIdx] : null;
+    // Kategorie-Auswahl nur zeigen, wenn der gewählte Typ sie nicht sperrt
+    // (Web verbirgt die Kategorie bei festem Typ).
+    final showCategory =
+        c.categories.length > 1 && (activeType?.category == null);
 
-            // Type-Auswahl (whitelisted)
-            Text('create.kind'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 6),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: CreatePostScaffold(
+        title: c.title.tr(),
+        subtitle: c.description.tr(),
+        accent: c.accentColor,
+        icon: c.icon,
+        returnRoute: c.returnRoute,
+        sections: [
+          // ── Art & Kategorie ─────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionType'.tr(),
+            icon: LucideIcons.layoutGrid,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                for (final t in c.createTypes)
-                  ChoiceChip(
-                    label: Text('${t.emoji} ${t.label.tr()}',
-                        style: AppTypography.label(size: 10)),
-                    selected: _type == t.value &&
-                        (t.category == null || _category == t.category),
-                    onSelected: (_) => setState(() {
+                CreateTypeGrid(
+                  options: [
+                    for (var i = 0; i < c.createTypes.length; i++)
+                      CreateTypeOption(
+                        value: '$i',
+                        label:
+                            '${c.createTypes[i].emoji} ${c.createTypes[i].label.tr()}',
+                      ),
+                  ],
+                  selected: selIdx >= 0 ? '$selIdx' : null,
+                  accent: c.accentColor,
+                  onSelect: (s) {
+                    final t = c.createTypes[int.parse(s)];
+                    setState(() {
                       _type = t.value;
                       if (t.category != null) _category = t.category;
-                    }),
-                    selectedColor:
-                        c.accentColor.withValues(alpha: 0.3),
-                    backgroundColor: AppColors.elevated,
-                  ),
-              ],
-            ),
-            const SizedBox(height: 14),
-
-            // Kategorie (nur wenn nicht durch Type fest)
-            if (c.categories.length > 1) ...[
-              Text('create.category'.tr(), style: AppTypography.label(size: 10)),
-              const SizedBox(height: 6),
-              Wrap(
-                spacing: 6,
-                runSpacing: 6,
-                children: [
-                  for (final cat in c.categories)
-                    ChoiceChip(
-                      label: Text(cat.label.tr(),
-                          style: AppTypography.label(size: 10)),
-                      selected: _category == cat.value,
-                      onSelected: (_) =>
-                          setState(() => _category = cat.value),
-                      selectedColor:
-                          c.accentColor.withValues(alpha: 0.3),
-                      backgroundColor: AppColors.elevated,
-                    ),
-                ],
-              ),
-              const SizedBox(height: 14),
-            ],
-
-            // Titel (Pflichtfeld, echte Live-Validierung + Einblend-Animation)
-            AnimatedEntrance(
-              index: 0,
-              child: TextFormField(
-                controller: _titleCtrl,
-                maxLength: 120,
-                textInputAction: TextInputAction.next,
-                validator: FormValidators.lengthBetween(3, 120),
-                style: AppTypography.body(size: 15, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.title'.tr(),
-                  counterText: '',
+                    });
+                  },
                 ),
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Beschreibung (optional, mit Längen-Validierung)
-            AnimatedEntrance(
-              index: 1,
-              child: TextFormField(
-                controller: _descCtrl,
-                maxLines: 6,
-                minLines: 3,
-                maxLength: 2000,
-                validator: FormValidators.lengthBetween(0, 2000,
-                    requiredField: false),
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.descriptionOptional'.tr(),
-                  alignLabelWithHint: true,
-                ),
-              ),
-            ),
-            // A) KI-Texthilfe: Stichworte -> klarer Beitrag (Nutzer übernimmt/verwirft).
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton.icon(
-                onPressed: _aiImproving ? null : _improveWithAi,
-                icon: _aiImproving
-                    ? const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: AppColors.bronze),
-                      )
-                    : const Icon(Icons.auto_awesome,
-                        size: 16, color: AppColors.bronze),
-                label: Text('assistant.improve_button'.tr(),
-                    style: AppTypography.label(size: 12, color: AppColors.bronze)),
-              ),
-            ),
-            const SizedBox(height: 6),
-
-            // Bilder
-            Row(
-              children: [
-                Text('create.imagesMax5'.tr(),
-                    style: AppTypography.label(size: 10)),
-                const Spacer(),
-                IconButton(
-                  tooltip: 'events.add_photo'.tr(),
-                  onPressed: _pickImage,
-                  icon: Icon(LucideIcons.imagePlus,
-                      size: 18, color: c.accentColor),
-                ),
-              ],
-            ),
-            if (_images.isNotEmpty)
-              SizedBox(
-                height: 80,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: _images.length,
-                  separatorBuilder: (_, __) =>
-                      const SizedBox(width: 8),
-                  itemBuilder: (context, i) => Stack(
+                if (showCategory) ...[
+                  const SizedBox(height: 14),
+                  Text('create.category'.tr(),
+                      style: AppTypography.label(size: 10)),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
                     children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.file(_images[i],
-                            width: 80,
-                            height: 80,
-                            fit: BoxFit.cover,
-                            cacheWidth: 160,
-                            cacheHeight: 160),
-                      ),
-                      Positioned(
-                        top: 2,
-                        right: 2,
-                        child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _images.removeAt(i)),
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(LucideIcons.x,
-                                size: 11,
-                                color: Colors.white),
-                          ),
+                      for (final cat in c.categories)
+                        ChoiceChip(
+                          label: Text(cat.label.tr(),
+                              style: AppTypography.label(size: 10)),
+                          selected: _category == cat.value,
+                          onSelected: (_) =>
+                              setState(() => _category = cat.value),
+                          selectedColor: c.accentColor.withValues(alpha: 0.3),
+                          backgroundColor: AppColors.elevated,
                         ),
-                      ),
                     ],
                   ),
-                ),
-              ),
-            const SizedBox(height: 14),
-
-            // Standort
-            Row(
-              children: [
-                Expanded(
-                  child: AddressAutocompleteField(
-                    controller: _locationCtrl,
-                    label: 'create.place'.tr(),
-                    onSelected: (s) => setState(() {
-                      _lat = s.lat;
-                      _lng = s.lng;
-                      _shareExactLocation = true;
-                    }),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Padding(
-                  padding: const EdgeInsets.only(top: 6),
-                  child: OutlinedButton.icon(
-                    onPressed: _useGps,
-                    icon: const Icon(LucideIcons.locate, size: 14),
-                    label: const Text('GPS'),
-                  ),
-                ),
+                ],
               ],
             ),
-            // Datenschutz-Checkbox genauen Standort
-            InkWell(
-              onTap: () =>
-                  setState(() => _shareExactLocation = !_shareExactLocation),
-              borderRadius: BorderRadius.circular(8),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Checkbox(
-                      value: _shareExactLocation,
-                      onChanged: (v) =>
-                          setState(() => _shareExactLocation = v ?? false),
-                      activeColor: AppColors.teal,
-                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      visualDensity: VisualDensity.compact,
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        'create.shareExactLocation'.tr(),
-                        style: AppTypography.body(
-                            size: 12, color: AppColors.inkSoft),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
+          ),
 
-            // Tags mit antippbaren Vorschlägen
-            TagSuggestionField(
-              controller: _tagsCtrl,
-              label: 'create.tagsCommaSeparated'.tr(),
-              suggestions: const [
-                'dringend',
-                'lokal',
-                'kostenlos',
-                'hilfe',
-                'nachbarschaft',
-                'vegan',
-                'familie',
-                'tiere',
-              ],
-            ),
-            const SizedBox(height: 14),
-
-            // Kontakt-Optional
-            Text('create.contactOptional'.tr(),
-                style: AppTypography.label(size: 10)),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: _phoneCtrl,
-              keyboardType: TextInputType.phone,
-              textInputAction: TextInputAction.next,
-              validator: FormValidators.phoneOptional,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                labelText: 'create.phone'.tr(),
-                isDense: true,
-              ),
-            ),
-            SwitchListTile(
-              value: _privacyPhone,
-              onChanged: (v) => setState(() => _privacyPhone = v),
-              activeColor: c.accentColor,
-              contentPadding: EdgeInsets.zero,
-              title: Text('create.phoneOnlyInterested'.tr(),
-                  style: AppTypography.caption()),
-            ),
-            const SizedBox(height: 6),
-            TextFormField(
-              controller: _emailCtrl,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              validator: FormValidators.emailOptional,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                labelText: 'create.emailOptional'.tr(),
-                isDense: true,
-              ),
-            ),
-            SwitchListTile(
-              value: _privacyEmail,
-              onChanged: (v) => setState(() => _privacyEmail = v),
-              activeColor: c.accentColor,
-              contentPadding: EdgeInsets.zero,
-              title: Text('create.emailOnlyInterested'.tr(),
-                  style: AppTypography.caption()),
-            ),
-            const SizedBox(height: 6),
-            // FIX (User-Request): WhatsApp + Treffpunkt fehlten in der UI
-            // obwohl _whatsappCtrl im State existierte.
-            TextFormField(
-              controller: _whatsappCtrl,
-              keyboardType: TextInputType.phone,
-              textInputAction: TextInputAction.next,
-              validator: FormValidators.phoneOptional,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: const InputDecoration(
-                labelText: 'WhatsApp',
-                hintText: '+49 …',
-                isDense: true,
-              ),
-            ),
-            const SizedBox(height: 6),
-            TextField(
-              controller: _meetingCtrl,
-              textInputAction: TextInputAction.next,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                labelText: 'create.meetingPoint'.tr(),
-                isDense: true,
-              ),
-            ),
-            // Zeitbank-Bezug: nur sinnvoll bei Hilfe-Posts.
-            if (_type == 'sharing' ||
-                _type == 'rescue' ||
-                _type == 'community') ...[
-              const SizedBox(height: 6),
-              TextFormField(
-                controller: _timeHoursCtrl,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                textInputAction: TextInputAction.done,
-                validator: FormValidators.positiveNumberOptional,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.timebankHours'.tr(),
-                  hintText: 'create.timebankHoursHint'.tr(),
-                  isDense: true,
-                ),
-              ),
-            ],
-            const SizedBox(height: 6),
-            // Anonym
-            SwitchListTile(
-              value: _isAnonymous,
-              onChanged: (v) => setState(() => _isAnonymous = v),
-              activeColor: c.accentColor,
-              contentPadding: EdgeInsets.zero,
-              title: Text('create.postAnonymously'.tr(),
-                  style: AppTypography.body(
-                      size: 13,
-                      color: AppColors.inkSoft,
-                      weight: FontWeight.w600)),
-              subtitle: Text('create.noProfileVisible'.tr(),
-                  style: AppTypography.caption()),
-            ),
-
-            // Dringlichkeit
-            const SizedBox(height: 14),
-            Text('create.urgency'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 6),
-            Wrap(
+          // ── Dringlichkeit ───────────────────────────────────────────
+          CreateCard(
+            title: 'create.urgency'.tr(),
+            icon: LucideIcons.alertTriangle,
+            child: Wrap(
               spacing: 6,
+              runSpacing: 6,
               children: [
                 for (var i = 1; i <= 5; i++)
                   ChoiceChip(
@@ -826,36 +523,342 @@ class _ModuleCreatePostScreenState
                   ),
               ],
             ),
+          ),
 
-            if (_error != null) ...[
-              const SizedBox(height: 16),
-              FormErrorBox(_error!),
-            ],
-
-            const SizedBox(height: 20),
-
-            // Submit
-            AnimatedEntrance(
-              index: 2,
-              child: FilledButton.icon(
-                style: FilledButton.styleFrom(
-                  backgroundColor: c.accentColor,
-                  foregroundColor: AppColors.voidColor,
-                  minimumSize: const Size(double.infinity, 50),
+          // ── Titel & Beschreibung ────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionDetails'.tr(),
+            icon: LucideIcons.fileText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _titleCtrl,
+                  maxLength: 120,
+                  textInputAction: TextInputAction.next,
+                  validator: FormValidators.lengthBetween(3, 120),
+                  style: AppTypography.body(size: 15, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.title'.tr(),
+                  ),
                 ),
-                onPressed: _submitting ? null : _submit,
-                icon: _submitting
-                    ? const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.voidColor,
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _descCtrl,
+                  maxLines: 6,
+                  minLines: 3,
+                  maxLength: 2000,
+                  validator: FormValidators.lengthBetween(0, 2000,
+                      requiredField: false),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.descriptionOptional'.tr(),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                // KI-Texthilfe: Stichworte -> klarer Beitrag (Nutzer übernimmt/verwirft).
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: _aiImproving ? null : _improveWithAi,
+                    icon: _aiImproving
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.bronze),
+                          )
+                        : const Icon(Icons.auto_awesome,
+                            size: 16, color: AppColors.bronze),
+                    label: Text('assistant.improve_button'.tr(),
+                        style: AppTypography.label(
+                            size: 12, color: AppColors.bronze)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Bilder ──────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionImages'.tr(),
+            icon: LucideIcons.image,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text('create.imagesMax5'.tr(),
+                        style: AppTypography.label(size: 10)),
+                    const Spacer(),
+                    IconButton(
+                      tooltip: 'events.add_photo'.tr(),
+                      onPressed: _pickImage,
+                      icon: Icon(LucideIcons.imagePlus,
+                          size: 18, color: c.accentColor),
+                    ),
+                  ],
+                ),
+                if (_images.isNotEmpty)
+                  SizedBox(
+                    height: 80,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _images.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (context, i) => Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.file(_images[i],
+                                width: 80,
+                                height: 80,
+                                fit: BoxFit.cover,
+                                cacheWidth: 160,
+                                cacheHeight: 160),
+                          ),
+                          Positioned(
+                            top: 2,
+                            right: 2,
+                            child: GestureDetector(
+                              onTap: () =>
+                                  setState(() => _images.removeAt(i)),
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.black54,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(LucideIcons.x,
+                                    size: 11, color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+
+          // ── Standort ────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionLocation'.tr(),
+            icon: LucideIcons.mapPin,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: AddressAutocompleteField(
+                        controller: _locationCtrl,
+                        label: 'create.place'.tr(),
+                        onSelected: (s) => setState(() {
+                          _lat = s.lat;
+                          _lng = s.lng;
+                          _shareExactLocation = true;
+                        }),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: OutlinedButton.icon(
+                        onPressed: _useGps,
+                        icon: const Icon(LucideIcons.locate, size: 14),
+                        label: const Text('GPS'),
+                      ),
+                    ),
+                  ],
+                ),
+                InkWell(
+                  onTap: () => setState(
+                      () => _shareExactLocation = !_shareExactLocation),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Row(
+                      children: [
+                        Checkbox(
+                          value: _shareExactLocation,
+                          onChanged: (v) => setState(
+                              () => _shareExactLocation = v ?? false),
+                          activeColor: AppColors.teal,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
                         ),
-                      )
-                    : const Icon(LucideIcons.send, size: 16),
-                label: Text('create.publish'.tr()),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            'create.shareExactLocation'.tr(),
+                            style: AppTypography.body(
+                                size: 12, color: AppColors.inkSoft),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Tags ────────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionTags'.tr(),
+            icon: LucideIcons.tag,
+            child: TagSuggestionField(
+              controller: _tagsCtrl,
+              label: 'create.tagsCommaSeparated'.tr(),
+              suggestions: const [
+                'dringend',
+                'lokal',
+                'kostenlos',
+                'hilfe',
+                'nachbarschaft',
+                'vegan',
+                'familie',
+                'tiere',
+              ],
+            ),
+          ),
+
+          // ── Kontakt (optional) ──────────────────────────────────────
+          CreateCard(
+            title: 'create.contactOptional'.tr(),
+            icon: LucideIcons.phone,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _phoneCtrl,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.next,
+                  validator: FormValidators.phoneOptional,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.phone'.tr(),
+                    isDense: true,
+                  ),
+                ),
+                SwitchListTile(
+                  value: _privacyPhone,
+                  onChanged: (v) => setState(() => _privacyPhone = v),
+                  activeColor: c.accentColor,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('create.phoneOnlyInterested'.tr(),
+                      style: AppTypography.caption()),
+                ),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: _emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.next,
+                  validator: FormValidators.emailOptional,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.emailOptional'.tr(),
+                    isDense: true,
+                  ),
+                ),
+                SwitchListTile(
+                  value: _privacyEmail,
+                  onChanged: (v) => setState(() => _privacyEmail = v),
+                  activeColor: c.accentColor,
+                  contentPadding: EdgeInsets.zero,
+                  title: Text('create.emailOnlyInterested'.tr(),
+                      style: AppTypography.caption()),
+                ),
+                const SizedBox(height: 6),
+                TextFormField(
+                  controller: _whatsappCtrl,
+                  keyboardType: TextInputType.phone,
+                  textInputAction: TextInputAction.next,
+                  validator: FormValidators.phoneOptional,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: const InputDecoration(
+                    labelText: 'WhatsApp',
+                    hintText: '+49 …',
+                    isDense: true,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                TextField(
+                  controller: _meetingCtrl,
+                  textInputAction: TextInputAction.next,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.meetingPoint'.tr(),
+                    isDense: true,
+                  ),
+                ),
+                // Zeitbank-Bezug: nur sinnvoll bei Hilfe-Posts.
+                if (_type == 'sharing' ||
+                    _type == 'rescue' ||
+                    _type == 'community') ...[
+                  const SizedBox(height: 6),
+                  TextFormField(
+                    controller: _timeHoursCtrl,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    textInputAction: TextInputAction.done,
+                    validator: FormValidators.positiveNumberOptional,
+                    style: AppTypography.body(size: 14, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      labelText: 'create.timebankHours'.tr(),
+                      hintText: 'create.timebankHoursHint'.tr(),
+                      isDense: true,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          // ── Optionen ────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionOptions'.tr(),
+            icon: LucideIcons.settings2,
+            child: SwitchListTile(
+              value: _isAnonymous,
+              onChanged: (v) => setState(() => _isAnonymous = v),
+              activeColor: c.accentColor,
+              contentPadding: EdgeInsets.zero,
+              title: Text('create.postAnonymously'.tr(),
+                  style: AppTypography.body(
+                      size: 13,
+                      color: AppColors.inkSoft,
+                      weight: FontWeight.w600)),
+              subtitle: Text('create.noProfileVisible'.tr(),
+                  style: AppTypography.caption()),
+            ),
+          ),
+
+          if (_error != null) FormErrorBox(_error!),
+        ],
+        footer: Column(
+          children: [
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: c.accentColor,
+                foregroundColor: AppColors.voidColor,
+                minimumSize: const Size(double.infinity, 50),
               ),
+              onPressed: _submitting ? null : _submit,
+              icon: _submitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.voidColor,
+                      ),
+                    )
+                  : const Icon(LucideIcons.send, size: 16),
+              label: Text('create.publish'.tr()),
             ),
             const SizedBox(height: 10),
             OutlinedButton(
@@ -867,7 +870,7 @@ class _ModuleCreatePostScreenState
               child: Text('common.cancel'.tr()),
             ),
           ],
-        ))),
+        ),
       ),
     );
   }

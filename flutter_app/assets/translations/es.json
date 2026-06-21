@@ -1853,7 +1853,13 @@
       "everyday": "Ropa",
       "sharing": "Objetos"
     },
-    "backToModule": "Volver al módulo"
+    "backToModule": "Volver al módulo",
+    "sectionType": "Tipo y categoría",
+    "sectionDetails": "Título y descripción",
+    "sectionImages": "Imágenes",
+    "sectionLocation": "Ubicación",
+    "sectionTags": "Etiquetas",
+    "sectionOptions": "Opciones"
   },
   "crisis": {
     "error": "Error: {error}",

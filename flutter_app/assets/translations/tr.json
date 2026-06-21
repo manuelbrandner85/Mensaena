@@ -1852,7 +1852,13 @@
       "everyday": "Giysi",
       "sharing": "Eşya"
     },
-    "backToModule": "Modüle dön"
+    "backToModule": "Modüle dön",
+    "sectionType": "Tür ve kategori",
+    "sectionDetails": "Başlık ve açıklama",
+    "sectionImages": "Görseller",
+    "sectionLocation": "Konum",
+    "sectionTags": "Etiketler",
+    "sectionOptions": "Seçenekler"
   },
   "crisis": {
     "error": "Hata: {error}",

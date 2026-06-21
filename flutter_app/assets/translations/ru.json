@@ -1852,7 +1852,13 @@
       "everyday": "Одежда",
       "sharing": "Вещи"
     },
-    "backToModule": "Назад к модулю"
+    "backToModule": "Назад к модулю",
+    "sectionType": "Тип и категория",
+    "sectionDetails": "Заголовок и описание",
+    "sectionImages": "Изображения",
+    "sectionLocation": "Местоположение",
+    "sectionTags": "Теги",
+    "sectionOptions": "Опции"
   },
   "crisis": {
     "error": "Ошибка: {error}",
