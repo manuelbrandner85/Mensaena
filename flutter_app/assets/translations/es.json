@@ -4815,5 +4815,15 @@
     "day": "Hola, vecino",
     "evening": "Buenas tardes",
     "night": "Buenas noches"
+  },
+  "validate": {
+    "required": "Campo obligatorio",
+    "tooShort": "Al menos {n} caracteres",
+    "tooLong": "Máximo {n} caracteres",
+    "email": "Correo electrónico no válido",
+    "phone": "Número de teléfono no válido",
+    "url": "URL no válida",
+    "number": "Introduce un número",
+    "positive": "Debe ser positivo"
   }
 }

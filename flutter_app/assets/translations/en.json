@@ -4812,5 +4812,15 @@
     "day": "Hello, neighbour",
     "evening": "Good evening",
     "night": "Good night"
+  },
+  "validate": {
+    "required": "Required",
+    "tooShort": "At least {n} characters",
+    "tooLong": "At most {n} characters",
+    "email": "Invalid email address",
+    "phone": "Invalid phone number",
+    "url": "Invalid URL",
+    "number": "Please enter a number",
+    "positive": "Must be positive"
   }
 }

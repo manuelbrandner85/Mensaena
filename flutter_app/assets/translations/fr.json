@@ -4815,5 +4815,15 @@
     "day": "Bonjour, voisin",
     "evening": "Bonsoir",
     "night": "Bonne nuit"
+  },
+  "validate": {
+    "required": "Champ obligatoire",
+    "tooShort": "Au moins {n} caractères",
+    "tooLong": "Au plus {n} caractères",
+    "email": "Adresse e-mail invalide",
+    "phone": "Numéro de téléphone invalide",
+    "url": "URL invalide",
+    "number": "Veuillez saisir un nombre",
+    "positive": "Doit être positif"
   }
 }

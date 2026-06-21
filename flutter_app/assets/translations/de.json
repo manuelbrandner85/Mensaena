@@ -4811,5 +4811,15 @@
     "day": "Hallo, Nachbar",
     "evening": "Guten Abend",
     "night": "Gute Nacht"
+  },
+  "validate": {
+    "required": "Pflichtfeld",
+    "tooShort": "Mindestens {n} Zeichen",
+    "tooLong": "Höchstens {n} Zeichen",
+    "email": "Ungültige E-Mail-Adresse",
+    "phone": "Ungültige Telefonnummer",
+    "url": "Ungültige URL",
+    "number": "Bitte eine Zahl eingeben",
+    "positive": "Muss positiv sein"
   }
 }

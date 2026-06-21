@@ -4815,5 +4815,15 @@
     "day": "Ciao, vicino",
     "evening": "Buonasera",
     "night": "Buonanotte"
+  },
+  "validate": {
+    "required": "Campo obbligatorio",
+    "tooShort": "Almeno {n} caratteri",
+    "tooLong": "Al massimo {n} caratteri",
+    "email": "Indirizzo email non valido",
+    "phone": "Numero di telefono non valido",
+    "url": "URL non valido",
+    "number": "Inserisci un numero",
+    "positive": "Deve essere positivo"
   }
 }

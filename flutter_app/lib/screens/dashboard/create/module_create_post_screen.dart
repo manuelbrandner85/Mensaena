@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
@@ -30,6 +31,8 @@ import 'module_create_config.dart';
 import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/form_error_box.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 /// SKILL: mensaena-features
 /// 1:1-Pendant zu Web `src/components/shared/CreatePostPage.tsx`.
@@ -54,6 +57,7 @@ class _ModuleCreatePostScreenState
     extends ConsumerState<ModuleCreatePostScreen> {
   String? _type;
   String? _category;
+  final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _locationCtrl = TextEditingController();
@@ -73,7 +77,6 @@ class _ModuleCreatePostScreenState
   double? _lng;
   bool _submitting = false;
   bool _aiImproving = false;
-  bool _titleError = false;
   String? _error;
   Timer? _draftTimer;
 
@@ -303,12 +306,14 @@ class _ModuleCreatePostScreenState
     // Doppel-Submit-Schutz: schneller Doppel-Tap könnte zwei identische
     // Posts erzeugen, bevor das _submitting-Flag den Button disabled.
     if (_submitting) return;
-    final titleEmpty = _titleCtrl.text.trim().isEmpty;
-    if (_type == null || titleEmpty) {
-      setState(() {
-        _titleError = titleEmpty;
-        _error = 'create.fillTypeAndTitle'.tr();
-      });
+    if (_type == null) {
+      setState(() => _error = 'create.fillTypeAndTitle'.tr());
+      return;
+    }
+    // Echte Form-Validierung (Titel-Länge, E-Mail-/Telefon-Format, Zahlen).
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      HapticFeedback.mediumImpact();
+      setState(() => _error = null);
       return;
     }
     setState(() {
@@ -418,7 +423,10 @@ class _ModuleCreatePostScreenState
       currentRoute: c.returnRoute,
       body: SafeArea(
         child: ReadableWidth(
-            child: ListView(
+            child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
             // Editorial-Header mit Modul-Akzent
@@ -505,32 +513,38 @@ class _ModuleCreatePostScreenState
               const SizedBox(height: 14),
             ],
 
-            // Titel (Pflichtfeld — inline-Fehler bei Submit-Versuch)
-            TextField(
-              controller: _titleCtrl,
-              maxLength: 120,
-              style: AppTypography.body(size: 15, color: AppColors.ink),
-              onChanged: _titleError
-                  ? (_) => setState(() => _titleError = false)
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'create.title'.tr(),
-                counterText: '',
-                errorText: _titleError ? 'create.titleRequired'.tr() : null,
+            // Titel (Pflichtfeld, echte Live-Validierung + Einblend-Animation)
+            AnimatedEntrance(
+              index: 0,
+              child: TextFormField(
+                controller: _titleCtrl,
+                maxLength: 120,
+                textInputAction: TextInputAction.next,
+                validator: FormValidators.lengthBetween(3, 120),
+                style: AppTypography.body(size: 15, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'create.title'.tr(),
+                  counterText: '',
+                ),
               ),
             ),
             const SizedBox(height: 12),
 
-            // Beschreibung
-            TextField(
-              controller: _descCtrl,
-              maxLines: 6,
-              minLines: 3,
-              maxLength: 2000,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                labelText: 'create.descriptionOptional'.tr(),
-                alignLabelWithHint: true,
+            // Beschreibung (optional, mit Längen-Validierung)
+            AnimatedEntrance(
+              index: 1,
+              child: TextFormField(
+                controller: _descCtrl,
+                maxLines: 6,
+                minLines: 3,
+                maxLength: 2000,
+                validator: FormValidators.lengthBetween(0, 2000,
+                    requiredField: false),
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'create.descriptionOptional'.tr(),
+                  alignLabelWithHint: true,
+                ),
               ),
             ),
             // A) KI-Texthilfe: Stichworte -> klarer Beitrag (Nutzer übernimmt/verwirft).
@@ -687,10 +701,11 @@ class _ModuleCreatePostScreenState
             Text('create.contactOptional'.tr(),
                 style: AppTypography.label(size: 10)),
             const SizedBox(height: 8),
-            TextField(
+            TextFormField(
               controller: _phoneCtrl,
               keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.next,
+              validator: FormValidators.phoneOptional,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: InputDecoration(
                 labelText: 'create.phone'.tr(),
@@ -706,10 +721,11 @@ class _ModuleCreatePostScreenState
                   style: AppTypography.caption()),
             ),
             const SizedBox(height: 6),
-            TextField(
+            TextFormField(
               controller: _emailCtrl,
               keyboardType: TextInputType.emailAddress,
               textInputAction: TextInputAction.next,
+              validator: FormValidators.emailOptional,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: InputDecoration(
                 labelText: 'create.emailOptional'.tr(),
@@ -727,10 +743,11 @@ class _ModuleCreatePostScreenState
             const SizedBox(height: 6),
             // FIX (User-Request): WhatsApp + Treffpunkt fehlten in der UI
             // obwohl _whatsappCtrl im State existierte.
-            TextField(
+            TextFormField(
               controller: _whatsappCtrl,
               keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.next,
+              validator: FormValidators.phoneOptional,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: const InputDecoration(
                 labelText: 'WhatsApp',
@@ -753,11 +770,12 @@ class _ModuleCreatePostScreenState
                 _type == 'rescue' ||
                 _type == 'community') ...[
               const SizedBox(height: 6),
-              TextField(
+              TextFormField(
                 controller: _timeHoursCtrl,
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 textInputAction: TextInputAction.done,
+                validator: FormValidators.positiveNumberOptional,
                 style: AppTypography.body(size: 14, color: AppColors.ink),
                 decoration: InputDecoration(
                   labelText: 'create.timebankHours'.tr(),
@@ -817,24 +835,27 @@ class _ModuleCreatePostScreenState
             const SizedBox(height: 20),
 
             // Submit
-            FilledButton.icon(
-              style: FilledButton.styleFrom(
-                backgroundColor: c.accentColor,
-                foregroundColor: AppColors.voidColor,
-                minimumSize: const Size(double.infinity, 50),
+            AnimatedEntrance(
+              index: 2,
+              child: FilledButton.icon(
+                style: FilledButton.styleFrom(
+                  backgroundColor: c.accentColor,
+                  foregroundColor: AppColors.voidColor,
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+                onPressed: _submitting ? null : _submit,
+                icon: _submitting
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.voidColor,
+                        ),
+                      )
+                    : const Icon(LucideIcons.send, size: 16),
+                label: Text('create.publish'.tr()),
               ),
-              onPressed: _submitting ? null : _submit,
-              icon: _submitting
-                  ? const SizedBox(
-                      width: 16,
-                      height: 16,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.voidColor,
-                      ),
-                    )
-                  : const Icon(LucideIcons.send, size: 16),
-              label: Text('create.publish'.tr()),
             ),
             const SizedBox(height: 10),
             OutlinedButton(
@@ -846,7 +867,7 @@ class _ModuleCreatePostScreenState
               child: Text('common.cancel'.tr()),
             ),
           ],
-        )),
+        ))),
       ),
     );
   }

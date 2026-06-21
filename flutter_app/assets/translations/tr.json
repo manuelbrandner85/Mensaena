@@ -4814,5 +4814,15 @@
     "day": "Merhaba, komşu",
     "evening": "İyi akşamlar",
     "night": "İyi geceler"
+  },
+  "validate": {
+    "required": "Zorunlu alan",
+    "tooShort": "En az {n} karakter",
+    "tooLong": "En fazla {n} karakter",
+    "email": "Geçersiz e-posta adresi",
+    "phone": "Geçersiz telefon numarası",
+    "url": "Geçersiz URL",
+    "number": "Lütfen bir sayı girin",
+    "positive": "Pozitif olmalı"
   }
 }
