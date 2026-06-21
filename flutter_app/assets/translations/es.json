@@ -4785,5 +4785,29 @@
       "saturday": "Sábado",
       "sunday": "Domingo"
     }
+  },
+  "intro": {
+    "c1": {
+      "eyebrow": "Llegar",
+      "title": "Una calle.\nCien puertas.",
+      "body": "Detrás de cada una, una persona que puede dar algo — o que ahora necesita ayuda."
+    },
+    "c2": {
+      "eyebrow": "Conectar",
+      "title": "Encuentra ayuda.\nEn minutos.",
+      "body": "Ofrece, pide, responde — justo en tu barrio. Sin burocracia, sin esperas."
+    },
+    "c3": {
+      "eyebrow": "Crecer",
+      "title": "Los vecinos se vuelven\ncomunidad.",
+      "body": "De los pequeños gestos nace la confianza. De la confianza, un lugar donde nadie queda solo."
+    },
+    "c4": {
+      "eyebrow": "Participa",
+      "title": "Tu barrio,\nreinventado.",
+      "body": "Gratis. Sin ánimo de lucro. Sostenido por la comunidad."
+    },
+    "skip": "Saltar",
+    "cta": "Únete ahora"
   }
 }

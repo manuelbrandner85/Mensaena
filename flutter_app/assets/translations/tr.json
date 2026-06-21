@@ -4784,5 +4784,29 @@
       "saturday": "Cumartesi",
       "sunday": "Pazar"
     }
+  },
+  "intro": {
+    "c1": {
+      "eyebrow": "Varış",
+      "title": "Bir sokak.\nYüz kapı.",
+      "body": "Her birinin ardında verecek bir şeyi olan — ya da tam şimdi yardıma ihtiyacı olan biri var."
+    },
+    "c2": {
+      "eyebrow": "Bağlan",
+      "title": "Yardımı bul.\nDakikalar içinde.",
+      "body": "Sun, iste, yanıtla — tam senin mahallende. Bürokrasi yok, bekleme yok."
+    },
+    "c3": {
+      "eyebrow": "Büyü",
+      "title": "Komşulardan\ntopluluk doğar.",
+      "body": "Küçük jestlerden güven doğar. Güvenden kimsenin yalnız kalmadığı bir yer."
+    },
+    "c4": {
+      "eyebrow": "Katıl",
+      "title": "Mahallen,\nyeniden düşünüldü.",
+      "body": "Ücretsiz. Kâr amacı gütmez. Toplulukça taşınır."
+    },
+    "skip": "Atla",
+    "cta": "Hemen katıl"
   }
 }

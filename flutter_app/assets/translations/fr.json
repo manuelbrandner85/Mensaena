@@ -4785,5 +4785,29 @@
       "saturday": "Samedi",
       "sunday": "Dimanche"
     }
+  },
+  "intro": {
+    "c1": {
+      "eyebrow": "Arriver",
+      "title": "Une rue.\nCent portes.",
+      "body": "Derrière chacune, une personne qui a quelque chose à offrir — ou qui en a besoin maintenant."
+    },
+    "c2": {
+      "eyebrow": "Connecter",
+      "title": "Trouver de l'aide.\nEn quelques minutes.",
+      "body": "Proposer, demander, répondre — juste à côté de chez vous. Sans bureaucratie, sans attente."
+    },
+    "c3": {
+      "eyebrow": "Grandir",
+      "title": "Les voisins deviennent\nune communauté.",
+      "body": "Des petits gestes naît la confiance. De la confiance, un lieu où personne ne reste seul."
+    },
+    "c4": {
+      "eyebrow": "Participer",
+      "title": "Votre quartier,\nrepensé.",
+      "body": "Gratuit. À but non lucratif. Porté par la communauté."
+    },
+    "skip": "Passer",
+    "cta": "Participer"
   }
 }

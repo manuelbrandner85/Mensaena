@@ -4781,5 +4781,29 @@
       "saturday": "Samstag",
       "sunday": "Sonntag"
     }
+  },
+  "intro": {
+    "c1": {
+      "eyebrow": "Ankommen",
+      "title": "Eine Straße.\nHundert Türen.",
+      "body": "Hinter jeder ein Mensch, der etwas geben kann — oder gerade etwas braucht."
+    },
+    "c2": {
+      "eyebrow": "Verbinden",
+      "title": "Hilfe finden.\nIn Minuten.",
+      "body": "Anbieten, anfragen, antworten — direkt in deiner Nähe. Keine Bürokratie, keine Wartezeit."
+    },
+    "c3": {
+      "eyebrow": "Wachsen",
+      "title": "Aus Nachbarn wird\nGemeinschaft.",
+      "body": "Aus kleinen Gesten wird Vertrauen. Aus Vertrauen ein Ort, an dem niemand allein bleibt."
+    },
+    "c4": {
+      "eyebrow": "Mitmachen",
+      "title": "Dein Viertel,\nneu gedacht.",
+      "body": "Kostenlos. Gemeinnützig. Von der Gemeinschaft getragen."
+    },
+    "skip": "Überspringen",
+    "cta": "Jetzt mitmachen"
   }
 }

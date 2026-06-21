@@ -126,7 +126,7 @@ import '../../screens/dashboard/warnungen/warnungen_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
-import '../../screens/public/onboarding_tour_screen.dart';
+import '../../screens/public/cinematic_intro_screen.dart';
 import '../../screens/public/splash_screen.dart';
 import '../../services/memory_watchdog_service.dart';
 import '../../services/supabase_service.dart';
@@ -195,11 +195,12 @@ final goRouterProvider = Provider<GoRouter>((ref) {
           child: const SplashScreen(),
         ),
       ),
+      // ── Onboarding = cineastisches Dorf-Intro (ersetzt die alte Tour) ──
       GoRoute(
         path: '/onboarding',
         pageBuilder: (_, state) => mensaenaTransition<void>(
           key: state.pageKey,
-          child: const OnboardingTourScreen(),
+          child: const CinematicIntroScreen(),
         ),
       ),
       // ── Public ─────────────────────────────────────────────

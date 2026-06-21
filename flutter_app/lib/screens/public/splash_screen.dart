@@ -9,7 +9,7 @@ import 'package:video_player/video_player.dart';
 import '../../config/theme/app_colors.dart';
 import '../../services/audio_feedback_service.dart';
 import '../../services/supabase_service.dart';
-import 'onboarding_tour_screen.dart';
+import 'cinematic_intro_screen.dart';
 
 /// SKILL: mensaena-design (Higgsfield-Cinematic)
 /// Splash-Screen v2 — „Bewusstsein" im Unreal-Engine-Stil.
@@ -102,12 +102,13 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _navigate() async {
     if (!mounted) return;
     if (!SupabaseService.isLoggedIn) {
-      context.go('/auth');
+      // Erster Start: immersives Dorf-Intro (= das einzige Onboarding) zeigen.
+      final showIntro = await CinematicIntroScreen.shouldShow();
+      if (!mounted) return;
+      context.go(showIntro ? '/onboarding' : '/auth');
       return;
     }
-    final shouldOnboard = await OnboardingTourScreen.shouldShow();
-    if (!mounted) return;
-    context.go(shouldOnboard ? '/onboarding' : '/dashboard');
+    context.go('/dashboard');
   }
 
   @override

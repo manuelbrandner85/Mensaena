@@ -4785,5 +4785,29 @@
       "saturday": "Sabato",
       "sunday": "Domenica"
     }
+  },
+  "intro": {
+    "c1": {
+      "eyebrow": "Arrivare",
+      "title": "Una strada.\nCento porte.",
+      "body": "Dietro ognuna una persona che può dare qualcosa — o che ne ha bisogno proprio ora."
+    },
+    "c2": {
+      "eyebrow": "Connettere",
+      "title": "Trova aiuto.\nIn pochi minuti.",
+      "body": "Offri, chiedi, rispondi — proprio nel tuo quartiere. Niente burocrazia, niente attese."
+    },
+    "c3": {
+      "eyebrow": "Crescere",
+      "title": "I vicini diventano\ncomunità.",
+      "body": "Dai piccoli gesti nasce la fiducia. Dalla fiducia un luogo dove nessuno resta solo."
+    },
+    "c4": {
+      "eyebrow": "Partecipa",
+      "title": "Il tuo quartiere,\nripensato.",
+      "body": "Gratis. No-profit. Sostenuto dalla comunità."
+    },
+    "skip": "Salta",
+    "cta": "Partecipa ora"
   }
 }
