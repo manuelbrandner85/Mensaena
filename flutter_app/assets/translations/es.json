@@ -4809,5 +4809,11 @@
     },
     "skip": "Saltar",
     "cta": "Únete ahora"
+  },
+  "dorfhero": {
+    "morning": "Buenos días",
+    "day": "Hola, vecino",
+    "evening": "Buenas tardes",
+    "night": "Buenas noches"
   }
 }

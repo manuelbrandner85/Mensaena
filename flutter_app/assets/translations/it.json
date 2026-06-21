@@ -4809,5 +4809,11 @@
     },
     "skip": "Salta",
     "cta": "Partecipa ora"
+  },
+  "dorfhero": {
+    "morning": "Buongiorno",
+    "day": "Ciao, vicino",
+    "evening": "Buonasera",
+    "night": "Buonanotte"
   }
 }

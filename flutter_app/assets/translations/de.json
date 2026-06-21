@@ -4805,5 +4805,11 @@
     },
     "skip": "Überspringen",
     "cta": "Jetzt mitmachen"
+  },
+  "dorfhero": {
+    "morning": "Guten Morgen",
+    "day": "Hallo, Nachbar",
+    "evening": "Guten Abend",
+    "night": "Gute Nacht"
   }
 }

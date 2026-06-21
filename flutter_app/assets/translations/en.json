@@ -4806,5 +4806,11 @@
     },
     "skip": "Skip",
     "cta": "Join now"
+  },
+  "dorfhero": {
+    "morning": "Good morning",
+    "day": "Hello, neighbour",
+    "evening": "Good evening",
+    "night": "Good night"
   }
 }

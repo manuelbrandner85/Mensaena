@@ -4809,5 +4809,11 @@
     },
     "skip": "Passer",
     "cta": "Participer"
+  },
+  "dorfhero": {
+    "morning": "Bonjour",
+    "day": "Bonjour, voisin",
+    "evening": "Bonsoir",
+    "night": "Bonne nuit"
   }
 }

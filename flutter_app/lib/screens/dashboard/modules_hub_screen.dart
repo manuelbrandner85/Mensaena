@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/effects/tilt_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/pressable.dart';
@@ -249,7 +250,10 @@ class ModulesHubScreen extends ConsumerWidget {
                 itemCount: bySection[sectionKey]!.length,
                 itemBuilder: (_, i) {
                   final m = bySection[sectionKey]![i];
-                  return _ModuleCard(tile: m);
+                  return AnimatedEntrance(
+                    index: i,
+                    child: _ModuleCard(tile: m),
+                  );
                 },
               ),
             ],

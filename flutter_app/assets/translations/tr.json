@@ -4808,5 +4808,11 @@
     },
     "skip": "Atla",
     "cta": "Hemen katıl"
+  },
+  "dorfhero": {
+    "morning": "Günaydın",
+    "day": "Merhaba, komşu",
+    "evening": "İyi akşamlar",
+    "night": "İyi geceler"
   }
 }

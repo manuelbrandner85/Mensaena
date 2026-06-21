@@ -31,6 +31,7 @@ import '../../../services/permissions_gate.dart';
 import '../../../widgets/dashboard/activity_feed_widget.dart';
 import '../../../widgets/dashboard/alerts_badge_widget.dart';
 import '../../../widgets/dashboard/dashboard_section.dart';
+import '../../../widgets/dashboard/dashboard_dorf_header.dart';
 // v2.1: Books-Widget entfernt — Import bleibt aus damit Linter mahnt
 // wenn jemand das aus Versehen wieder einbaut.
 // import '../../../widgets/dashboard/books_widget.dart';
@@ -1102,6 +1103,7 @@ class _DashboardScrollBody extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
+          const DashboardDorfHeader(),
           const DashboardOnboardingTooltip(),
           ...buildChildren(cfg, data, loading),
         ],
