@@ -4825,5 +4825,19 @@
     "url": "URL invalide",
     "number": "Veuillez saisir un nombre",
     "positive": "Doit être positif"
+  },
+  "pollen": {
+    "title": "Pollens",
+    "grass": "Graminées",
+    "birch": "Bouleau",
+    "alder": "Aulne",
+    "mugwort": "Armoise",
+    "olive": "Olivier",
+    "ragweed": "Ambroisie",
+    "level0": "Aucun",
+    "level1": "Faible",
+    "level2": "Modéré",
+    "level3": "Élevé",
+    "level4": "Très élevé"
   }
 }

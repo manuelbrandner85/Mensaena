@@ -4821,5 +4821,19 @@
     "url": "Ungültige URL",
     "number": "Bitte eine Zahl eingeben",
     "positive": "Muss positiv sein"
+  },
+  "pollen": {
+    "title": "Pollenflug",
+    "grass": "Gräser",
+    "birch": "Birke",
+    "alder": "Erle",
+    "mugwort": "Beifuß",
+    "olive": "Olive",
+    "ragweed": "Ambrosia",
+    "level0": "Keine",
+    "level1": "Niedrig",
+    "level2": "Mäßig",
+    "level3": "Hoch",
+    "level4": "Sehr hoch"
   }
 }

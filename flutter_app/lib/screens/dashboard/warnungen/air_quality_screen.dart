@@ -11,6 +11,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../services/air_quality_service.dart';
+import '../../../services/pollen_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
@@ -23,6 +24,7 @@ class AirQualityScreen extends ConsumerStatefulWidget {
 
 class _AirQualityScreenState extends ConsumerState<AirQualityScreen> {
   List<AirQualitySample>? _samples;
+  List<PollenSample> _pollen = const [];
   bool _loading = true;
   String? _error;
 
@@ -44,9 +46,15 @@ class _AirQualityScreenState extends ConsumerState<AirQualityScreen> {
         lng: pos.longitude,
         radiusKm: 25,
       );
+      // Pollen zusätzlich laden (non-fatal: leer = Sektion wird ausgeblendet).
+      final pollen = await PollenService.current(
+        lat: pos.latitude,
+        lng: pos.longitude,
+      );
       if (!mounted) return;
       setState(() {
         _samples = samples;
+        _pollen = pollen;
         _loading = false;
       });
       return;
@@ -86,6 +94,81 @@ class _AirQualityScreenState extends ConsumerState<AirQualityScreen> {
     'air.levelBad',
     'air.levelHazardous',
   ];
+
+  static const _pollenLabels = {
+    'grass': 'pollen.grass',
+    'birch': 'pollen.birch',
+    'alder': 'pollen.alder',
+    'mugwort': 'pollen.mugwort',
+    'olive': 'pollen.olive',
+    'ragweed': 'pollen.ragweed',
+  };
+  static const _pollenLevelKeys = [
+    'pollen.level0',
+    'pollen.level1',
+    'pollen.level2',
+    'pollen.level3',
+    'pollen.level4',
+  ];
+
+  /// Pollen-Sektion (nur Typen mit Wert > 0, stärkste zuerst). Leer → [].
+  List<Widget> _pollenWidgets() {
+    final p = _pollen.where((e) => e.value > 0).toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    if (p.isEmpty) return const [];
+    return [
+      const SizedBox(height: 18),
+      Row(
+        children: [
+          const Icon(Icons.local_florist, size: 18, color: AppColors.tealSoft),
+          const SizedBox(width: 8),
+          Text('pollen.title'.tr(),
+              style: AppTypography.display(size: 16, color: AppColors.ink)),
+        ],
+      ),
+      const SizedBox(height: 10),
+      ...p.map((s) => Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.elevated,
+              border: Border.all(color: AppColors.line),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 6,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: _levelColors[s.level],
+                    borderRadius: BorderRadius.circular(3),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text((_pollenLabels[s.type] ?? s.type).tr(),
+                          style: AppTypography.body(
+                              size: 14,
+                              color: AppColors.ink,
+                              weight: FontWeight.w700)),
+                      const SizedBox(height: 2),
+                      Text(
+                        '${s.value.toStringAsFixed(0)} ${s.unit} · ${_pollenLevelKeys[s.level].tr()}',
+                        style: AppTypography.label(
+                            size: 10, color: AppColors.inkSoft),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          )),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -193,9 +276,10 @@ class _AirQualityScreenState extends ConsumerState<AirQualityScreen> {
               color: _levelColors[sample.whoLevel],
               levelLabel: _levelLabels[sample.whoLevel].tr(),
             )),
+        ..._pollenWidgets(),
         const SizedBox(height: 20),
         Text(
-          'Quelle: OpenAQ Open Data',
+          'Quelle: Open-Meteo (Luft & Pollen)',
           style: AppTypography.label(size: 9, color: AppColors.mute),
         ),
       ],

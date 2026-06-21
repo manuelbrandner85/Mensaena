@@ -4825,5 +4825,19 @@
     "url": "URL non valido",
     "number": "Inserisci un numero",
     "positive": "Deve essere positivo"
+  },
+  "pollen": {
+    "title": "Pollini",
+    "grass": "Graminacee",
+    "birch": "Betulla",
+    "alder": "Ontano",
+    "mugwort": "Artemisia",
+    "olive": "Olivo",
+    "ragweed": "Ambrosia",
+    "level0": "Nessuno",
+    "level1": "Basso",
+    "level2": "Moderato",
+    "level3": "Alto",
+    "level4": "Molto alto"
   }
 }

@@ -4825,5 +4825,19 @@
     "url": "URL no válida",
     "number": "Introduce un número",
     "positive": "Debe ser positivo"
+  },
+  "pollen": {
+    "title": "Polen",
+    "grass": "Gramíneas",
+    "birch": "Abedul",
+    "alder": "Aliso",
+    "mugwort": "Artemisa",
+    "olive": "Olivo",
+    "ragweed": "Ambrosía",
+    "level0": "Ninguno",
+    "level1": "Bajo",
+    "level2": "Moderado",
+    "level3": "Alto",
+    "level4": "Muy alto"
   }
 }

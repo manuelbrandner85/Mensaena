@@ -4822,5 +4822,19 @@
     "url": "Invalid URL",
     "number": "Please enter a number",
     "positive": "Must be positive"
+  },
+  "pollen": {
+    "title": "Pollen count",
+    "grass": "Grass",
+    "birch": "Birch",
+    "alder": "Alder",
+    "mugwort": "Mugwort",
+    "olive": "Olive",
+    "ragweed": "Ragweed",
+    "level0": "None",
+    "level1": "Low",
+    "level2": "Moderate",
+    "level3": "High",
+    "level4": "Very high"
   }
 }

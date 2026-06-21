@@ -4824,5 +4824,19 @@
     "url": "Geçersiz URL",
     "number": "Lütfen bir sayı girin",
     "positive": "Pozitif olmalı"
+  },
+  "pollen": {
+    "title": "Polen",
+    "grass": "Çimen",
+    "birch": "Huş",
+    "alder": "Kızılağaç",
+    "mugwort": "Pelin",
+    "olive": "Zeytin",
+    "ragweed": "Ambrozya",
+    "level0": "Yok",
+    "level1": "Düşük",
+    "level2": "Orta",
+    "level3": "Yüksek",
+    "level4": "Çok yüksek"
   }
 }
