@@ -2513,7 +2513,8 @@
     "eventDescription": "Descrizione (facoltativo)",
     "eventSave": "Crea evento",
     "empty": "Ancora nessun gruppo.",
-    "emptyHint": "Fonda il primo gruppo!"
+    "emptyHint": "Fonda il primo gruppo!",
+    "createSubtitle": "Unisci il tuo vicinato"
   },
   "board": {
     "title": "Nota",

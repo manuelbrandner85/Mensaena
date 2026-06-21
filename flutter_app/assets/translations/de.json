@@ -2512,7 +2512,8 @@
     "eventDescription": "Beschreibung (optional)",
     "eventSave": "Termin anlegen",
     "empty": "Noch keine Gruppen.",
-    "emptyHint": "Gründe die erste Gruppe!"
+    "emptyHint": "Gründe die erste Gruppe!",
+    "createSubtitle": "Bringe deine Nachbarschaft zusammen"
   },
   "board": {
     "title": "Notiz",

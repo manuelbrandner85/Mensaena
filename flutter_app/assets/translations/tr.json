@@ -2512,7 +2512,8 @@
     "eventDescription": "Açıklama (isteğe bağlı)",
     "eventSave": "Etkinlik oluştur",
     "empty": "Henüz grup yok.",
-    "emptyHint": "İlk grubu sen kur!"
+    "emptyHint": "İlk grubu sen kur!",
+    "createSubtitle": "Mahalleni bir araya getir"
   },
   "board": {
     "title": "Not",

@@ -2513,7 +2513,8 @@
     "eventDescription": "Description (optional)",
     "eventSave": "Create event",
     "empty": "No groups yet.",
-    "emptyHint": "Start the first group!"
+    "emptyHint": "Start the first group!",
+    "createSubtitle": "Bring your neighbourhood together"
   },
   "board": {
     "title": "Note",

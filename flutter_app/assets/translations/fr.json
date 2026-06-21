@@ -2513,7 +2513,8 @@
     "eventDescription": "Description (facultatif)",
     "eventSave": "Créer l’événement",
     "empty": "Pas encore de groupes.",
-    "emptyHint": "Crée le premier groupe !"
+    "emptyHint": "Crée le premier groupe !",
+    "createSubtitle": "Rassemble ton voisinage"
   },
   "board": {
     "title": "Note",

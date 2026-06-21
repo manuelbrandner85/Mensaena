@@ -13,11 +13,9 @@ import '../../../repositories/groups_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
 import '../../../widgets/shared/app_snackbar.dart';
-import '../../../widgets/shared/readable_width.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 import '../../../utils/form_validators.dart';
 
 class GroupCreateScreen extends ConsumerStatefulWidget {
@@ -145,19 +143,21 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardScaffold(
-      title: 'create.groupCreateTitle'.tr(),
-      currentRoute: '/dashboard/groups',
-      body: SafeArea(
-        child: ReadableWidth(
-            child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            // Titelbild — gibt der Gruppe sofort Charakter.
-            GestureDetector(
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: CreatePostScaffold(
+        title: 'create.groupCreateTitle'.tr(),
+        subtitle: 'groups.createSubtitle'.tr(),
+        accent: AppColors.amber,
+        icon: LucideIcons.users,
+        returnRoute: '/dashboard/groups',
+        sections: [
+          // ── Titelbild ───────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionImages'.tr(),
+            icon: LucideIcons.image,
+            child: GestureDetector(
               onTap: _pickCover,
               child: Container(
                 height: 132,
@@ -181,7 +181,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
                             child: Container(
                               padding: const EdgeInsets.all(4),
                               decoration: const BoxDecoration(
-                                color: Color(0xCC000000),
+                                color: Colors.black54,
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(LucideIcons.x,
@@ -202,42 +202,47 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
                       ),
               ),
             ),
-            const SizedBox(height: 16),
-            AnimatedEntrance(
-              index: 0,
-              child: TextFormField(
-                controller: _name,
-                maxLength: 60,
-                textInputAction: TextInputAction.next,
-                validator: FormValidators.lengthBetween(3, 60),
-                style: AppTypography.body(size: 15, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.groupName'.tr(),
-                  counterText: '',
+          ),
+
+          // ── Name & Beschreibung ─────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionDetails'.tr(),
+            icon: LucideIcons.fileText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _name,
+                  maxLength: 60,
+                  textInputAction: TextInputAction.next,
+                  validator: FormValidators.lengthBetween(3, 60),
+                  style: AppTypography.body(size: 15, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.groupName'.tr(),
+                  ),
                 ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            AnimatedEntrance(
-              index: 1,
-              child: TextFormField(
-                controller: _desc,
-                maxLines: 4,
-                maxLength: 500,
-                validator:
-                    FormValidators.lengthBetween(0, 500, requiredField: false),
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.description'.tr(),
-                  alignLabelWithHint: true,
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _desc,
+                  maxLines: 4,
+                  maxLength: 500,
+                  validator: FormValidators.lengthBetween(0, 500,
+                      requiredField: false),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.description'.tr(),
+                    alignLabelWithHint: true,
+                  ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: 14),
-            Text('groups.categoryLabel'.tr(),
-                style: AppTypography.label(size: 10)),
-            const SizedBox(height: 6),
-            Wrap(
+          ),
+
+          // ── Kategorie ───────────────────────────────────────────────
+          CreateCard(
+            title: 'groups.categoryLabel'.tr(),
+            icon: LucideIcons.layoutGrid,
+            child: Wrap(
               spacing: 6,
               runSpacing: 6,
               children: _categories.map((c) {
@@ -245,8 +250,8 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
                 return GestureDetector(
                   onTap: () => setState(() => _category = c.value),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: active
                           ? AppColors.amber.withValues(alpha: 0.2)
@@ -265,9 +270,8 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
                           c.i18n.tr(),
                           style: AppTypography.label(
                             size: 10,
-                            color: active
-                                ? AppColors.amber
-                                : AppColors.inkSoft,
+                            color:
+                                active ? AppColors.amber : AppColors.inkSoft,
                           ),
                         ),
                       ],
@@ -276,100 +280,134 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 16),
-            // Standort (optional) — lokale Gruppen besser auffindbar machen.
-            Text('groups.location'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 8),
-            AddressAutocompleteField(
-              controller: _location,
-              label: 'groups.location'.tr(),
-              hint: 'groups.locationHint'.tr(),
-              onSelected: (s) => setState(() {
-                _lat = s.lat;
-                _lng = s.lng;
-              }),
-            ),
-            if (_lat != null) ...[
-              const SizedBox(height: 14),
-              Row(
-                children: [
-                  Text('groups.radius'.tr(),
-                      style: AppTypography.label(size: 10)),
-                  const Spacer(),
-                  Text(_radiusKm == 0 ? '–' : '$_radiusKm km',
-                      style: AppTypography.mono(
-                          size: 12, color: AppColors.bronze)),
-                ],
-              ),
-              Slider(
-                value: _radiusKm.toDouble(),
-                min: 0,
-                max: 100,
-                divisions: 20,
-                activeColor: AppColors.bronze,
-                onChanged: (v) => setState(() => _radiusKm = v.round()),
-              ),
-            ],
-            const SizedBox(height: 6),
-            // Maximale Mitglieder (optional).
-            Row(
+          ),
+
+          // ── Standort (optional) ─────────────────────────────────────
+          CreateCard(
+            title: 'groups.location'.tr(),
+            icon: LucideIcons.mapPin,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('groups.maxMembers'.tr(),
-                    style: AppTypography.label(size: 10)),
-                const SizedBox(width: 8),
-                Text('groups.maxMembersHint'.tr(),
-                    style: AppTypography.caption()),
-                const Spacer(),
-                Text(_maxMembers == 0 ? '∞' : '$_maxMembers',
-                    style: AppTypography.mono(
-                        size: 13, color: AppColors.ink)),
+                AddressAutocompleteField(
+                  controller: _location,
+                  label: 'groups.location'.tr(),
+                  hint: 'groups.locationHint'.tr(),
+                  onSelected: (s) => setState(() {
+                    _lat = s.lat;
+                    _lng = s.lng;
+                  }),
+                ),
+                if (_lat != null) ...[
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Text('groups.radius'.tr(),
+                          style: AppTypography.label(size: 10)),
+                      const Spacer(),
+                      Text(_radiusKm == 0 ? '–' : '$_radiusKm km',
+                          style: AppTypography.mono(
+                              size: 12, color: AppColors.bronze)),
+                    ],
+                  ),
+                  Slider(
+                    value: _radiusKm.toDouble(),
+                    min: 0,
+                    max: 100,
+                    divisions: 20,
+                    activeColor: AppColors.bronze,
+                    onChanged: (v) => setState(() => _radiusKm = v.round()),
+                  ),
+                ],
               ],
             ),
-            Slider(
-              value: _maxMembers.toDouble(),
-              min: 0,
-              max: 200,
-              divisions: 40,
-              activeColor: AppColors.amber,
-              onChanged: (v) => setState(() => _maxMembers = v.round()),
-            ),
-            SwitchListTile(
-              contentPadding: EdgeInsets.zero,
-              activeColor: AppColors.amber,
-              value: _isPrivate,
-              onChanged: (v) => setState(() => _isPrivate = v),
-              title: Text(
-                'groups.privateTitle'.tr(),
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-              ),
-              subtitle: Text(
-                'groups.privateHint'.tr(),
-                style: AppTypography.caption(),
-              ),
-            ),
-            if (_error != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                _error!,
-                style: AppTypography.body(
-                  size: 13,
-                  color: AppColors.herzrotWarm,
+          ),
+
+          // ── Optionen (Max-Mitglieder, Privat) ───────────────────────
+          CreateCard(
+            title: 'create.sectionOptions'.tr(),
+            icon: LucideIcons.settings2,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text('groups.maxMembers'.tr(),
+                        style: AppTypography.label(size: 10)),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text('groups.maxMembersHint'.tr(),
+                          style: AppTypography.caption()),
+                    ),
+                    const Spacer(),
+                    Text(_maxMembers == 0 ? '∞' : '$_maxMembers',
+                        style:
+                            AppTypography.mono(size: 13, color: AppColors.ink)),
+                  ],
                 ),
+                Slider(
+                  value: _maxMembers.toDouble(),
+                  min: 0,
+                  max: 200,
+                  divisions: 40,
+                  activeColor: AppColors.amber,
+                  onChanged: (v) => setState(() => _maxMembers = v.round()),
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: AppColors.amber,
+                  value: _isPrivate,
+                  onChanged: (v) => setState(() => _isPrivate = v),
+                  title: Text(
+                    'groups.privateTitle'.tr(),
+                    style: AppTypography.body(size: 14, color: AppColors.ink),
+                  ),
+                  subtitle: Text(
+                    'groups.privateHint'.tr(),
+                    style: AppTypography.caption(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          if (_error != null)
+            Text(
+              _error!,
+              style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
+            ),
+        ],
+        footer: Column(
+          children: [
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.amber,
+                foregroundColor: AppColors.voidColor,
+                minimumSize: const Size(double.infinity, 50),
               ),
-            ],
-            const SizedBox(height: 16),
-            AnimatedEntrance(
-              index: 2,
-              child: ElevatedButton.icon(
-                onPressed: _submitting ? null : _submit,
-                icon: const Icon(LucideIcons.plus, size: 16),
-                label: Text(_submitting
-                    ? 'groups.saving'.tr()
-                    : 'groups.createButton'.tr()),
+              onPressed: _submitting ? null : _submit,
+              icon: _submitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.voidColor),
+                    )
+                  : const Icon(LucideIcons.plus, size: 16),
+              label: Text(_submitting
+                  ? 'groups.saving'.tr()
+                  : 'groups.createButton'.tr()),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.inkSoft,
+                side: const BorderSide(color: AppColors.line),
               ),
+              onPressed: () => context.go('/dashboard/groups'),
+              child: Text('common.cancel'.tr()),
             ),
           ],
-        ))),
+        ),
       ),
     );
   }
