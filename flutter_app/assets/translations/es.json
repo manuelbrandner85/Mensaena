@@ -2196,7 +2196,8 @@
     "reportTitle": "Denunciar anuncio",
     "editListing": "Editar",
     "deleteListing": "Eliminar anuncio",
-    "deleteListingDescription": "El anuncio se eliminará definitivamente y no será visible para otros."
+    "deleteListingDescription": "El anuncio se eliminará definitivamente y no será visible para otros.",
+    "createSubtitle": "Comprar · Vender · Intercambiar · Regalar"
   },
   "trust": {
     "rate": "Valora a {name}",
@@ -2367,7 +2368,8 @@
     "suggestions": {
       "title": "Sugerencias",
       "prefillHint": "Festivo prerrellenado – ajusta los detalles como quieras."
-    }
+    },
+    "createSubtitle": "Invita a tus vecinos"
   },
   "challenges": {
     "create": "Crear reto",
@@ -2549,7 +2551,8 @@
     "location": "Ubicación (opcional)",
     "locationHint": "Lugar o barrio",
     "saving": "Guardando…",
-    "createButton": "Fijar nota"
+    "createButton": "Fijar nota",
+    "createSubtitle": "Comparte una nota con el vecindario"
   },
   "messages": {
     "title": "Chat",

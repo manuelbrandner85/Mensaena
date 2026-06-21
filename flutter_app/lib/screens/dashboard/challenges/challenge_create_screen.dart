@@ -14,10 +14,8 @@ import '../../../config/theme/app_typography.dart';
 import '../../../repositories/challenges_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../widgets/effects/mini_confetti.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
-import '../../../widgets/shared/readable_width.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 
 class ChallengeCreateScreen extends ConsumerStatefulWidget {
   const ChallengeCreateScreen({super.key});
@@ -94,33 +92,30 @@ class _ChallengeCreateScreenState
 
   @override
   Widget build(BuildContext context) {
-    return DashboardScaffold(
-      title: 'challenges.create'.tr(),
-      currentRoute: '/dashboard/challenges/create',
-      body: SafeArea(
-        child: ReadableWidth(
-            child: Form(
-          key: _form,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-            children: [
-              Text('challenges.newChallenge'.tr(),
-                  style: AppTypography.display(
-                      size: 22, color: AppColors.ink)),
-              const SizedBox(height: 4),
-              Text('challenges.motivate'.tr(),
-                  style: AppTypography.body(
-                      size: 13, color: AppColors.mute)),
-              const SizedBox(height: 20),
-              AnimatedEntrance(
-                index: 0,
-                child: TextFormField(
+    return Form(
+      key: _form,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: CreatePostScaffold(
+        title: 'challenges.newChallenge'.tr(),
+        subtitle: 'challenges.motivate'.tr(),
+        accent: AppColors.amber,
+        icon: LucideIcons.trophy,
+        returnRoute: '/dashboard/challenges',
+        sections: [
+          // ── Titel & Beschreibung ────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionDetails'.tr(),
+            icon: LucideIcons.fileText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
                   controller: _title,
                   style: AppTypography.body(size: 14, color: AppColors.ink),
                   maxLength: 80,
                   decoration: _input(
-                      'challenges.fieldTitle'.tr(), 'challenges.titleHint'.tr()),
+                      'challenges.fieldTitle'.tr(),
+                      'challenges.titleHint'.tr()),
                   validator: (v) {
                     final t = v?.trim() ?? '';
                     if (t.length < 5) return 'challenges.minChars'.tr();
@@ -128,11 +123,8 @@ class _ChallengeCreateScreenState
                     return null;
                   },
                 ),
-              ),
-              const SizedBox(height: 12),
-              AnimatedEntrance(
-                index: 1,
-                child: TextFormField(
+                const SizedBox(height: 12),
+                TextFormField(
                   controller: _desc,
                   style: AppTypography.body(size: 14, color: AppColors.ink),
                   maxLength: 500,
@@ -140,128 +132,133 @@ class _ChallengeCreateScreenState
                   decoration: _input('challenges.fieldDescOpt'.tr(),
                       'challenges.descHint'.tr()),
                 ),
-              ),
-              const SizedBox(height: 18),
-              Text('challenges.fieldCategory'.tr(),
-                  style: AppTypography.label(
-                      size: 10, color: AppColors.mute)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: _categories.entries
-                    .map((e) => _ChoiceChip(
-                          label: e.value,
-                          selected: _category == e.key,
-                          onTap: () => setState(() => _category = e.key),
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 18),
-              Text('challenges.fieldDifficulty'.tr(),
-                  style: AppTypography.label(
-                      size: 10, color: AppColors.mute)),
-              const SizedBox(height: 8),
-              Row(
-                children: _difficulties.entries
-                    .map((e) => Expanded(
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.symmetric(horizontal: 4),
-                            child: _ChoiceChip(
-                              label: e.value,
-                              selected: _difficulty == e.key,
-                              onTap: () =>
-                                  setState(() => _difficulty = e.key),
-                              expanded: true,
-                            ),
-                          ),
-                        ))
-                    .toList(),
-              ),
-              const SizedBox(height: 18),
-              _slider(
-                label: 'challenges.pointsLabel'.tr(),
-                value: _points.toDouble(),
-                min: 10,
-                max: 500,
-                divisions: 49,
-                suffix: 'challenges.pointsSuffix'.tr(),
-                onChanged: (v) => setState(() => _points = v.round()),
-              ),
-              const SizedBox(height: 12),
-              _slider(
-                label: 'challenges.durationLabel'.tr(),
-                value: _days.toDouble(),
-                min: 1,
-                max: 90,
-                divisions: 89,
-                suffix: 'challenges.daysSuffix'.tr(),
-                onChanged: (v) => setState(() => _days = v.round()),
-              ),
-              const SizedBox(height: 12),
-              // Maximale Teilnehmer (0 = unbegrenzt).
-              Row(
-                children: [
-                  Expanded(
-                    child: Text('challenges.maxParticipants'.tr(),
-                        style: AppTypography.label(
-                            size: 10, color: AppColors.mute)),
-                  ),
-                  Text(
-                    _maxParticipants == 0
-                        ? 'challenges.unlimited'.tr()
-                        : '$_maxParticipants',
-                    style:
-                        AppTypography.mono(size: 13, color: AppColors.bronze),
-                  ),
-                ],
-              ),
-              Slider(
-                value: _maxParticipants.toDouble(),
-                min: 0,
-                max: 500,
-                divisions: 50,
-                activeColor: AppColors.bronze,
-                inactiveColor: AppColors.line,
-                onChanged: (v) =>
-                    setState(() => _maxParticipants = v.round()),
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                activeColor: AppColors.amber,
-                value: _isWeekly,
-                onChanged: (v) => setState(() => _isWeekly = v),
-                title: Text('challenges.weeklyChallenge'.tr(),
-                    style:
-                        AppTypography.body(size: 14, color: AppColors.ink)),
-                subtitle: Text('challenges.weeklyHint'.tr(),
-                    style: AppTypography.caption()),
-              ),
-              const SizedBox(height: 28),
-              AnimatedEntrance(
-                index: 2,
-                child: FilledButton.icon(
-                  onPressed: _busy ? null : _submit,
-                  icon: _busy
-                      ? const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: AppColors.voidColor),
-                        )
-                      : const Icon(LucideIcons.trophy, size: 16),
-                  label: Text('challenges.start'.tr()),
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.amber,
-                    foregroundColor: AppColors.voidColor,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-        )),
+
+          // ── Kategorie ───────────────────────────────────────────────
+          CreateCard(
+            title: 'challenges.fieldCategory'.tr(),
+            icon: LucideIcons.layoutGrid,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: _categories.entries
+                  .map((e) => _ChoiceChip(
+                        label: e.value,
+                        selected: _category == e.key,
+                        onTap: () => setState(() => _category = e.key),
+                      ))
+                  .toList(),
+            ),
+          ),
+
+          // ── Schwierigkeit ───────────────────────────────────────────
+          CreateCard(
+            title: 'challenges.fieldDifficulty'.tr(),
+            icon: Icons.speed,
+            child: Row(
+              children: _difficulties.entries
+                  .map((e) => Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: _ChoiceChip(
+                            label: e.value,
+                            selected: _difficulty == e.key,
+                            onTap: () => setState(() => _difficulty = e.key),
+                            expanded: true,
+                          ),
+                        ),
+                      ))
+                  .toList(),
+            ),
+          ),
+
+          // ── Punkte, Dauer & Optionen ────────────────────────────────
+          CreateCard(
+            title: 'create.sectionOptions'.tr(),
+            icon: LucideIcons.settings2,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _slider(
+                  label: 'challenges.pointsLabel'.tr(),
+                  value: _points.toDouble(),
+                  min: 10,
+                  max: 500,
+                  divisions: 49,
+                  suffix: 'challenges.pointsSuffix'.tr(),
+                  onChanged: (v) => setState(() => _points = v.round()),
+                ),
+                const SizedBox(height: 12),
+                _slider(
+                  label: 'challenges.durationLabel'.tr(),
+                  value: _days.toDouble(),
+                  min: 1,
+                  max: 90,
+                  divisions: 89,
+                  suffix: 'challenges.daysSuffix'.tr(),
+                  onChanged: (v) => setState(() => _days = v.round()),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('challenges.maxParticipants'.tr(),
+                          style: AppTypography.label(
+                              size: 10, color: AppColors.mute)),
+                    ),
+                    Text(
+                      _maxParticipants == 0
+                          ? 'challenges.unlimited'.tr()
+                          : '$_maxParticipants',
+                      style: AppTypography.mono(
+                          size: 13, color: AppColors.bronze),
+                    ),
+                  ],
+                ),
+                Slider(
+                  value: _maxParticipants.toDouble(),
+                  min: 0,
+                  max: 500,
+                  divisions: 50,
+                  activeColor: AppColors.bronze,
+                  inactiveColor: AppColors.line,
+                  onChanged: (v) =>
+                      setState(() => _maxParticipants = v.round()),
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: AppColors.amber,
+                  value: _isWeekly,
+                  onChanged: (v) => setState(() => _isWeekly = v),
+                  title: Text('challenges.weeklyChallenge'.tr(),
+                      style:
+                          AppTypography.body(size: 14, color: AppColors.ink)),
+                  subtitle: Text('challenges.weeklyHint'.tr(),
+                      style: AppTypography.caption()),
+                ),
+              ],
+            ),
+          ),
+        ],
+        footer: FilledButton.icon(
+          onPressed: _busy ? null : _submit,
+          icon: _busy
+              ? const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.voidColor),
+                )
+              : const Icon(LucideIcons.trophy, size: 16),
+          label: Text('challenges.start'.tr()),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.amber,
+            foregroundColor: AppColors.voidColor,
+            minimumSize: const Size(double.infinity, 50),
+          ),
+        ),
       ),
     );
   }

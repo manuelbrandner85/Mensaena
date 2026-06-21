@@ -2195,7 +2195,8 @@
     "reportTitle": "Inserat melden",
     "editListing": "Bearbeiten",
     "deleteListing": "Inserat löschen",
-    "deleteListingDescription": "Das Inserat wird unwiderruflich gelöscht und ist für andere nicht mehr sichtbar."
+    "deleteListingDescription": "Das Inserat wird unwiderruflich gelöscht und ist für andere nicht mehr sichtbar.",
+    "createSubtitle": "Kaufen · Verkaufen · Tauschen · Verschenken"
   },
   "trust": {
     "rate": "Bewerte {name}",
@@ -2366,7 +2367,8 @@
     "suggestions": {
       "title": "Vorschläge",
       "prefillHint": "Feiertag vorbefüllt – Details nach Wunsch anpassen."
-    }
+    },
+    "createSubtitle": "Lade deine Nachbarn ein"
   },
   "challenges": {
     "create": "Challenge erstellen",
@@ -2548,7 +2550,8 @@
     "location": "Standort (optional)",
     "locationHint": "Ort oder Stadtteil",
     "saving": "Speichere…",
-    "createButton": "Notiz anpinnen"
+    "createButton": "Notiz anpinnen",
+    "createSubtitle": "Teile eine Notiz mit der Nachbarschaft"
   },
   "messages": {
     "title": "Chat",

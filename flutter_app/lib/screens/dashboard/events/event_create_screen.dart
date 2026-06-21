@@ -15,10 +15,8 @@ import '../../../services/haptics.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
-import '../../../widgets/shared/readable_width.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 import '../../../utils/form_validators.dart';
 
 /// SKILL: mensaena-features
@@ -56,6 +54,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   bool _isOnline = false;
   bool _isFree = true;
   bool _isRecurring = false;
+  bool _noTradeConfirmed = false;
   String _recurringPattern = 'weekly';
   double? _lat;
   double? _lng;
@@ -272,6 +271,12 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       setState(() => _error = 'events.validationEndAfterStart'.tr());
       return;
     }
+    // Pflicht-Bestätigung „Kein Handel/Geldgeschäft" (§4 AGB) — Web-Parität.
+    if (!_noTradeConfirmed) {
+      Haptics.error();
+      setState(() => _error = 'create.noTradeRequired'.tr());
+      return;
+    }
 
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) {
@@ -353,42 +358,43 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardScaffold(
-      title: 'events.createTitle'.tr(),
-      currentRoute: '/dashboard/events',
-      body: SafeArea(
-        child: Stack(
-          children: [
-            ReadableWidth(
-                child: Form(
-                key: _formKey,
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-              children: [
-                if (_prefilled) _prefilledBanner(),
-                _sectionCover(),
-                AnimatedEntrance(index: 0, child: _sectionTitleDesc()),
-                _sectionCategory(),
-                _sectionStartDateTime(),
-                _sectionAllDayToggle(),
-                _sectionEndDateTime(),
-                _sectionOnlineToggle(),
-                if (!_isOnline) _sectionLocation(),
-                _sectionMaxAttendees(),
-                _sectionCost(),
-                _sectionWhatToBring(),
-                _sectionContact(),
-                _sectionRecurring(),
-                if (_error != null) _errorBox(_error!),
-                const SizedBox(height: 16),
-                AnimatedEntrance(index: 1, child: _submitButton()),
-                const SizedBox(height: 16),
-              ],
-            ))),
-            if (_submitting || _uploading) _loadingOverlay(),
-          ],
-        ),
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: Stack(
+        children: [
+          CreatePostScaffold(
+            title: 'events.createTitle'.tr(),
+            subtitle: 'events.createSubtitle'.tr(),
+            accent: AppColors.amber,
+            icon: LucideIcons.calendar,
+            returnRoute: '/dashboard/events',
+            sections: [
+              if (_prefilled) _prefilledBanner(),
+              _sectionCover(),
+              _sectionTitleDesc(),
+              _sectionCategory(),
+              _sectionStartDateTime(),
+              _sectionAllDayToggle(),
+              _sectionEndDateTime(),
+              _sectionOnlineToggle(),
+              if (!_isOnline) _sectionLocation(),
+              _sectionMaxAttendees(),
+              _sectionCost(),
+              _sectionWhatToBring(),
+              _sectionContact(),
+              _sectionRecurring(),
+              // Pflicht-Bestätigung „Kein Handel/Geldgeschäft"
+              NoTradeConfirmCard(
+                value: _noTradeConfirmed,
+                onChanged: (v) => setState(() => _noTradeConfirmed = v),
+              ),
+              if (_error != null) _errorBox(_error!),
+            ],
+            footer: _submitButton(),
+          ),
+          if (_submitting || _uploading) _loadingOverlay(),
+        ],
       ),
     );
   }
@@ -421,7 +427,6 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
 
   Widget _sectionWrap({required Widget child}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,

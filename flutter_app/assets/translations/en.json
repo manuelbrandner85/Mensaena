@@ -2196,7 +2196,8 @@
     "reportTitle": "Report listing",
     "editListing": "Edit",
     "deleteListing": "Delete listing",
-    "deleteListingDescription": "The listing will be permanently deleted and no longer visible to others."
+    "deleteListingDescription": "The listing will be permanently deleted and no longer visible to others.",
+    "createSubtitle": "Buy · Sell · Swap · Give away"
   },
   "trust": {
     "rate": "Rate {name}",
@@ -2367,7 +2368,8 @@
     "suggestions": {
       "title": "Suggestions",
       "prefillHint": "Holiday pre-filled – adjust details as you like."
-    }
+    },
+    "createSubtitle": "Invite your neighbours"
   },
   "challenges": {
     "create": "Create challenge",
@@ -2549,7 +2551,8 @@
     "location": "Location (optional)",
     "locationHint": "Place or district",
     "saving": "Saving…",
-    "createButton": "Pin note"
+    "createButton": "Pin note",
+    "createSubtitle": "Share a note with the neighbourhood"
   },
   "messages": {
     "title": "Chat",

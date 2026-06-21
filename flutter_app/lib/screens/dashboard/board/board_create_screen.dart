@@ -14,11 +14,9 @@ import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/form_error_box.dart';
-import '../../../widgets/shared/readable_width.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 import '../../../utils/form_validators.dart';
 
 class BoardCreateScreen extends ConsumerStatefulWidget {
@@ -167,20 +165,21 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return DashboardScaffold(
-      title: 'create.pinTitle'.tr(),
-      currentRoute: '/dashboard/board',
-      body: SafeArea(
-        child: ReadableWidth(
-            child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            Text('board.categoryLabel'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 6),
-            Wrap(
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: CreatePostScaffold(
+        title: 'create.pinTitle'.tr(),
+        subtitle: 'board.createSubtitle'.tr(),
+        accent: AppColors.amber,
+        icon: LucideIcons.stickyNote,
+        returnRoute: '/dashboard/board',
+        sections: [
+          // ── Kategorie ───────────────────────────────────────────────
+          CreateCard(
+            title: 'board.categoryLabel'.tr(),
+            icon: LucideIcons.layoutGrid,
+            child: Wrap(
               spacing: 6,
               runSpacing: 6,
               children: _categories.map((c) {
@@ -188,8 +187,8 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
                 return GestureDetector(
                   onTap: () => setState(() => _category = c.value),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: active
                           ? AppColors.amber.withValues(alpha: 0.2)
@@ -208,9 +207,8 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
                           c.i18n.tr(),
                           style: AppTypography.label(
                             size: 10,
-                            color: active
-                                ? AppColors.amber
-                                : AppColors.inkSoft,
+                            color:
+                                active ? AppColors.amber : AppColors.inkSoft,
                           ),
                         ),
                       ],
@@ -219,14 +217,15 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 14),
-            Text('board.colorLabel'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 6),
-            Row(
+          ),
+
+          // ── Farbe ───────────────────────────────────────────────────
+          CreateCard(
+            title: 'board.colorLabel'.tr(),
+            icon: Icons.palette,
+            child: Wrap(
               children: _colors.entries.map((e) {
                 final active = e.key == _color;
-                // 36dp-Kreis bleibt das Visual, die Tap-Fläche ist 48dp
-                // (A11y-Minimum für Touch-Targets).
                 return GestureDetector(
                   onTap: () => setState(() => _color = e.key),
                   behavior: HitTestBehavior.opaque,
@@ -251,170 +250,184 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
                 );
               }).toList(),
             ),
-            const SizedBox(height: 14),
-            AnimatedEntrance(
-              index: 0,
-              child: TextFormField(
-                controller: _content,
-                maxLines: 6,
-                maxLength: 1000,
-                validator: FormValidators.lengthBetween(3, 1000),
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.pinNote'.tr(),
-                  alignLabelWithHint: true,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _contactInfo,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                labelText: 'create.contactOptional'.tr(),
-                hintText: 'create.pinContactHint'.tr(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            // Bild (optional) — z.B. Foto des gefundenen Schlüssels.
-            Text('board.image'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 8),
-            if (_image != null)
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.file(_image!,
-                        height: 140,
-                        width: double.infinity,
-                        fit: BoxFit.cover),
+          ),
+
+          // ── Notiz & Kontakt ─────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionDetails'.tr(),
+            icon: LucideIcons.fileText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _content,
+                  maxLines: 6,
+                  maxLength: 1000,
+                  validator: FormValidators.lengthBetween(3, 1000),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.pinNote'.tr(),
+                    alignLabelWithHint: true,
                   ),
-                  Positioned(
-                    right: 8,
-                    top: 8,
-                    child: GestureDetector(
-                      onTap: () => setState(() => _image = null),
-                      child: Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Color(0xCC000000),
-                          shape: BoxShape.circle,
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _contactInfo,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.contactOptional'.tr(),
+                    hintText: 'create.pinContactHint'.tr(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Bild (optional) ─────────────────────────────────────────
+          CreateCard(
+            title: 'board.image'.tr(),
+            icon: LucideIcons.image,
+            child: _image != null
+                ? Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(_image!,
+                            height: 140,
+                            width: double.infinity,
+                            fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _image = null),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.black54,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(LucideIcons.x,
+                                size: 16, color: Colors.white),
+                          ),
                         ),
-                        child: const Icon(LucideIcons.x,
-                            size: 16, color: Colors.white),
+                      ),
+                    ],
+                  )
+                : GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface.withValues(alpha: 0.5),
+                        border: Border.all(color: AppColors.line),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(LucideIcons.camera,
+                              color: AppColors.bronze, size: 20),
+                          const SizedBox(width: 8),
+                          Text('board.addImage'.tr(),
+                              style: AppTypography.caption()),
+                        ],
                       ),
                     ),
                   ),
-                ],
-              )
-            else
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  height: 64,
-                  decoration: BoxDecoration(
-                    color: AppColors.surface.withValues(alpha: 0.5),
-                    border: Border.all(color: AppColors.line),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(LucideIcons.camera,
-                          color: AppColors.bronze, size: 20),
-                      const SizedBox(width: 8),
-                      Text('board.addImage'.tr(),
-                          style: AppTypography.caption()),
-                    ],
-                  ),
-                ),
-              ),
-            const SizedBox(height: 16),
-            // Ablaufdatum (optional) — Notiz verschwindet automatisch.
-            Row(
+          ),
+
+          // ── Optionen (Ablauf, Standort) ─────────────────────────────
+          CreateCard(
+            title: 'create.sectionOptions'.tr(),
+            icon: LucideIcons.settings2,
+            child: Column(
               children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: _pickExpiry,
-                    icon: const Icon(LucideIcons.calendarClock, size: 16),
-                    label: Text(
-                      _expiresAt == null
-                          ? 'board.setExpiry'.tr()
-                          : 'board.expiresOn'.tr(namedArgs: {
-                              'date':
-                                  '${_expiresAt!.day}.${_expiresAt!.month}.${_expiresAt!.year}'
-                            }),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _pickExpiry,
+                        icon: const Icon(LucideIcons.calendarClock, size: 16),
+                        label: Text(
+                          _expiresAt == null
+                              ? 'board.setExpiry'.tr()
+                              : 'board.expiresOn'.tr(namedArgs: {
+                                  'date':
+                                      '${_expiresAt!.day}.${_expiresAt!.month}.${_expiresAt!.year}'
+                                }),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.inkSoft,
+                          side: const BorderSide(color: AppColors.line),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
                     ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.inkSoft,
-                      side: const BorderSide(color: AppColors.line),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                    ),
+                    if (_expiresAt != null)
+                      IconButton(
+                        onPressed: () => setState(() => _expiresAt = null),
+                        icon: const Icon(LucideIcons.x, size: 16),
+                        color: AppColors.mute,
+                        tooltip: 'board.noExpiry'.tr(),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                OutlinedButton.icon(
+                  onPressed: _locating ? null : _useGps,
+                  icon: _locating
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.bronze),
+                        )
+                      : Icon(
+                          _lat != null
+                              ? LucideIcons.mapPin
+                              : LucideIcons.locate,
+                          size: 16,
+                          color: _lat != null
+                              ? AppColors.bronze
+                              : AppColors.inkSoft,
+                        ),
+                  label: Text(
+                    _lat != null
+                        ? '${_lat!.toStringAsFixed(3)}, ${_lng!.toStringAsFixed(3)}'
+                        : 'board.location'.tr(),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor:
+                        _lat != null ? AppColors.bronze : AppColors.inkSoft,
+                    side: BorderSide(
+                        color: _lat != null
+                            ? AppColors.bronze.withValues(alpha: 0.5)
+                            : AppColors.line),
+                    minimumSize: const Size(double.infinity, 48),
                   ),
                 ),
-                if (_expiresAt != null)
-                  IconButton(
-                    onPressed: () => setState(() => _expiresAt = null),
-                    icon: const Icon(LucideIcons.x, size: 16),
-                    color: AppColors.mute,
-                    tooltip: 'board.noExpiry'.tr(),
-                  ),
               ],
             ),
-            const SizedBox(height: 10),
-            // Standort (optional) — z.B. Fundort.
-            OutlinedButton.icon(
-              onPressed: _locating ? null : _useGps,
-              icon: _locating
-                  ? const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: AppColors.bronze),
-                    )
-                  : Icon(
-                      _lat != null
-                          ? LucideIcons.mapPin
-                          : LucideIcons.locate,
-                      size: 16,
-                      color: _lat != null
-                          ? AppColors.bronze
-                          : AppColors.inkSoft,
-                    ),
-              label: Text(
-                _lat != null
-                    ? '${_lat!.toStringAsFixed(3)}, ${_lng!.toStringAsFixed(3)}'
-                    : 'board.location'.tr(),
-              ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor:
-                    _lat != null ? AppColors.bronze : AppColors.inkSoft,
-                side: BorderSide(
-                    color: _lat != null
-                        ? AppColors.bronze.withValues(alpha: 0.5)
-                        : AppColors.line),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-              ),
-            ),
-            if (_error != null) ...[
-              const SizedBox(height: 10),
-              FormErrorBox(_error!),
-            ],
-            const SizedBox(height: 18),
-            AnimatedEntrance(
-              index: 1,
-              child: ElevatedButton.icon(
-                onPressed: _submitting ? null : _submit,
-                icon: const Icon(LucideIcons.stickyNote, size: 16),
-                label: Text(_submitting
-                    ? 'board.saving'.tr()
-                    : 'board.createButton'.tr()),
-              ),
-            ),
-          ],
-        ))),
+          ),
+
+          if (_error != null) FormErrorBox(_error!),
+        ],
+        footer: FilledButton.icon(
+          onPressed: _submitting ? null : _submit,
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.amber,
+            foregroundColor: AppColors.voidColor,
+            minimumSize: const Size(double.infinity, 50),
+          ),
+          icon: const Icon(LucideIcons.stickyNote, size: 16),
+          label: Text(_submitting
+              ? 'board.saving'.tr()
+              : 'board.createButton'.tr()),
+        ),
       ),
     );
   }

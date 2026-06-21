@@ -2195,7 +2195,8 @@
     "reportTitle": "İlanı bildir",
     "editListing": "Düzenle",
     "deleteListing": "İlanı sil",
-    "deleteListingDescription": "İlan kalıcı olarak silinecek ve başkaları tarafından artık görülmeyecek."
+    "deleteListingDescription": "İlan kalıcı olarak silinecek ve başkaları tarafından artık görülmeyecek.",
+    "createSubtitle": "Al · Sat · Takas · Bağışla"
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",
@@ -2366,7 +2367,8 @@
     "suggestions": {
       "title": "Öneriler",
       "prefillHint": "Resmi tatil önceden dolduruldu – ayrıntıları istediğiniz gibi düzenleyin."
-    }
+    },
+    "createSubtitle": "Komşularını davet et"
   },
   "challenges": {
     "create": "Meydan okuma oluştur",
@@ -2548,7 +2550,8 @@
     "location": "Konum (isteğe bağlı)",
     "locationHint": "Yer veya mahalle",
     "saving": "Kaydediliyor…",
-    "createButton": "Notu sabitle"
+    "createButton": "Notu sabitle",
+    "createSubtitle": "Mahalleyle bir not paylaş"
   },
   "messages": {
     "title": "Sohbet",

@@ -2196,7 +2196,8 @@
     "reportTitle": "Signaler l’annonce",
     "editListing": "Modifier",
     "deleteListing": "Supprimer l’annonce",
-    "deleteListingDescription": "L’annonce sera définitivement supprimée et ne sera plus visible par les autres."
+    "deleteListingDescription": "L’annonce sera définitivement supprimée et ne sera plus visible par les autres.",
+    "createSubtitle": "Acheter · Vendre · Échanger · Donner"
   },
   "trust": {
     "rate": "Évaluer {name}",
@@ -2367,7 +2368,8 @@
     "suggestions": {
       "title": "Suggestions",
       "prefillHint": "Jour férié pré-rempli – ajustez les détails à votre convenance."
-    }
+    },
+    "createSubtitle": "Invite tes voisins"
   },
   "challenges": {
     "create": "Créer un défi",
@@ -2549,7 +2551,8 @@
     "location": "Lieu (facultatif)",
     "locationHint": "Lieu ou quartier",
     "saving": "Enregistrement…",
-    "createButton": "Épingler la note"
+    "createButton": "Épingler la note",
+    "createSubtitle": "Partage une note avec le voisinage"
   },
   "messages": {
     "title": "Chat",

@@ -18,10 +18,8 @@ import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../services/open_food_facts_service.dart';
 import '../../../services/supabase_service.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../shared/barcode_scanner_screen.dart';
-import '../../../widgets/shared/readable_width.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 import '../../../utils/form_validators.dart';
 
 class MarketplaceCreateScreen extends ConsumerStatefulWidget {
@@ -316,104 +314,115 @@ class _MarketplaceCreateScreenState
 
   @override
   Widget build(BuildContext context) {
-    return DashboardScaffold(
-      title: 'create.marketplaceTitle'.tr(),
-      currentRoute: '/dashboard/marketplace',
-      body: SafeArea(
-        child: ReadableWidth(
-            child: Form(
-          key: _formKey,
-          autovalidateMode: AutovalidateMode.onUserInteraction,
-          child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            Text('marketplace.type'.tr(), style: AppTypography.label(size: 10)),
-            const SizedBox(height: 6),
-            Wrap(
-              spacing: 6,
-              children: _types.map((t) {
-                final active = t.value == _listingType;
-                return GestureDetector(
-                  onTap: () => setState(() => _listingType = t.value),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: active
-                          ? AppColors.amber.withValues(alpha: 0.2)
-                          : AppColors.surface.withValues(alpha: 0.5),
-                      border: Border.all(
-                        color: active ? AppColors.amber : AppColors.line,
-                      ),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(t.emoji, style: const TextStyle(fontSize: 13)),
-                        const SizedBox(width: 4),
-                        Text(
-                          t.i18n.tr(),
-                          style: AppTypography.label(
-                            size: 10,
-                            color: active
-                                ? AppColors.amber
-                                : AppColors.inkSoft,
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: CreatePostScaffold(
+        title: 'create.marketplaceTitle'.tr(),
+        subtitle: 'marketplace.createSubtitle'.tr(),
+        accent: AppColors.amber,
+        icon: Icons.storefront,
+        returnRoute: '/dashboard/marketplace',
+        sections: [
+          // ── Art + Barcode-Scan ──────────────────────────────────────
+          CreateCard(
+            title: 'marketplace.type'.tr(),
+            icon: LucideIcons.layoutGrid,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: _types.map((t) {
+                    final active = t.value == _listingType;
+                    return GestureDetector(
+                      onTap: () => setState(() => _listingType = t.value),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: active
+                              ? AppColors.amber.withValues(alpha: 0.2)
+                              : AppColors.surface.withValues(alpha: 0.5),
+                          border: Border.all(
+                            color: active ? AppColors.amber : AppColors.line,
                           ),
+                          borderRadius: BorderRadius.circular(999),
                         ),
-                      ],
-                    ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(t.emoji,
+                                style: const TextStyle(fontSize: 13)),
+                            const SizedBox(width: 4),
+                            Text(
+                              t.i18n.tr(),
+                              style: AppTypography.label(
+                                size: 10,
+                                color:
+                                    active ? AppColors.amber : AppColors.inkSoft,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton.icon(
+                  onPressed: _scanAndFillFromFood,
+                  icon: const Icon(LucideIcons.scanLine, size: 16),
+                  label: Text('marketplace.scanBarcode'.tr()),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.bronze,
+                    side: BorderSide(
+                        color: AppColors.bronze.withValues(alpha: 0.5)),
+                    minimumSize: const Size.fromHeight(44),
                   ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton.icon(
-              onPressed: _scanAndFillFromFood,
-              icon: const Icon(LucideIcons.scanLine, size: 16),
-              label: Text('marketplace.scanBarcode'.tr()),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.bronze,
-                side: BorderSide(
-                    color: AppColors.bronze.withValues(alpha: 0.5)),
-                minimumSize: const Size.fromHeight(44),
-              ),
-            ),
-            const SizedBox(height: 10),
-            AnimatedEntrance(
-              index: 0,
-              child: TextFormField(
-                controller: _title,
-                maxLength: 120,
-                textInputAction: TextInputAction.next,
-                validator: FormValidators.lengthBetween(3, 120),
-                style: AppTypography.body(size: 15, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.title'.tr(),
-                  counterText: '',
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: 10),
-            AnimatedEntrance(
-              index: 1,
-              child: TextFormField(
-                controller: _desc,
-                maxLines: 4,
-                validator: FormValidators.lengthBetween(10, 2000),
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.description'.tr(),
-                  alignLabelWithHint: true,
+          ),
+
+          // ── Titel & Beschreibung ────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionDetails'.tr(),
+            icon: LucideIcons.fileText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _title,
+                  maxLength: 120,
+                  textInputAction: TextInputAction.next,
+                  validator: FormValidators.lengthBetween(3, 120),
+                  style: AppTypography.body(size: 15, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.title'.tr(),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _desc,
+                  maxLines: 4,
+                  validator: FormValidators.lengthBetween(10, 2000),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.description'.tr(),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            // ── Bilder (max 5) ──────────────────────────────────────────
-            Text('marketplace.create.images'.tr(),
-                style: AppTypography.label(size: 10)),
-            const SizedBox(height: 8),
-            Wrap(
+          ),
+
+          // ── Bilder (max 5) ──────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionImages'.tr(),
+            icon: LucideIcons.image,
+            child: Wrap(
               spacing: 8,
               runSpacing: 8,
               children: [
@@ -438,8 +447,7 @@ class _MarketplaceCreateScreenState
                         top: -4,
                         right: -4,
                         child: GestureDetector(
-                          onTap: () =>
-                              setState(() => _images.removeAt(i)),
+                          onTap: () => setState(() => _images.removeAt(i)),
                           child: Container(
                             decoration: BoxDecoration(
                               color: AppColors.herzrot,
@@ -491,54 +499,70 @@ class _MarketplaceCreateScreenState
                   ),
               ],
             ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              value: _category,
-              decoration: InputDecoration(labelText: 'create.categoryLabel'.tr()),
-              dropdownColor: AppColors.surface,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              items: _categories.entries
-                  .map((e) => DropdownMenuItem(
-                      value: e.key, child: Text(e.value.tr())))
-                  .toList(),
-              onChanged: (v) => setState(() => _category = v ?? _category),
-            ),
-            const SizedBox(height: 10),
-            DropdownButtonFormField<String>(
-              value: _condition,
-              decoration: InputDecoration(labelText: 'create.condition'.tr()),
-              dropdownColor: AppColors.surface,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              items: _conditions.entries
-                  .map((e) => DropdownMenuItem(
-                      value: e.key, child: Text(e.value.tr())))
-                  .toList(),
-              onChanged: (v) => setState(() => _condition = v ?? _condition),
-            ),
-            if (_listingType == 'verkaufen') ...[
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: _price,
-                keyboardType: const TextInputType.numberWithOptions(
-                  decimal: true,
+          ),
+
+          // ── Kategorie, Zustand & Preis ──────────────────────────────
+          CreateCard(
+            title: 'create.categoryLabel'.tr(),
+            icon: LucideIcons.tag,
+            child: Column(
+              children: [
+                DropdownButtonFormField<String>(
+                  value: _category,
+                  decoration:
+                      InputDecoration(labelText: 'create.categoryLabel'.tr()),
+                  dropdownColor: AppColors.surface,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  items: _categories.entries
+                      .map((e) => DropdownMenuItem(
+                          value: e.key, child: Text(e.value.tr())))
+                      .toList(),
+                  onChanged: (v) => setState(() => _category = v ?? _category),
                 ),
-                validator: FormValidators.positiveNumberOptional,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(labelText: 'create.priceEuro'.tr()),
-              ),
-              SwitchListTile(
-                contentPadding: EdgeInsets.zero,
-                activeColor: AppColors.amber,
-                value: _negotiable,
-                onChanged: (v) => setState(() => _negotiable = v),
-                title: Text('marketplace.priceNegotiable'.tr(),
-                    style:
-                        AppTypography.body(size: 14, color: AppColors.ink)),
-              ),
-            ],
-            const SizedBox(height: 10),
-            // Schlagwörter — bessere Auffindbarkeit über die Suche.
-            TextField(
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  value: _condition,
+                  decoration:
+                      InputDecoration(labelText: 'create.condition'.tr()),
+                  dropdownColor: AppColors.surface,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  items: _conditions.entries
+                      .map((e) => DropdownMenuItem(
+                          value: e.key, child: Text(e.value.tr())))
+                      .toList(),
+                  onChanged: (v) =>
+                      setState(() => _condition = v ?? _condition),
+                ),
+                if (_listingType == 'verkaufen') ...[
+                  const SizedBox(height: 10),
+                  TextFormField(
+                    controller: _price,
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    validator: FormValidators.positiveNumberOptional,
+                    style: AppTypography.body(size: 14, color: AppColors.ink),
+                    decoration:
+                        InputDecoration(labelText: 'create.priceEuro'.tr()),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    activeColor: AppColors.amber,
+                    value: _negotiable,
+                    onChanged: (v) => setState(() => _negotiable = v),
+                    title: Text('marketplace.priceNegotiable'.tr(),
+                        style: AppTypography.body(
+                            size: 14, color: AppColors.ink)),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          // ── Tags ────────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionTags'.tr(),
+            icon: LucideIcons.tag,
+            child: TextField(
               controller: _tags,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: InputDecoration(
@@ -547,8 +571,13 @@ class _MarketplaceCreateScreenState
                 prefixIcon: const Icon(LucideIcons.tag, size: 18),
               ),
             ),
-            const SizedBox(height: 10),
-            TextField(
+          ),
+
+          // ── Standort ────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionLocation'.tr(),
+            icon: LucideIcons.mapPin,
+            child: TextField(
               controller: _location,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: InputDecoration(
@@ -575,48 +604,61 @@ class _MarketplaceCreateScreenState
                 ),
               ),
             ),
-            if (_error != null) ...[
-              const SizedBox(height: 10),
-              Text(
-                _error!,
-                style: AppTypography.body(
-                  size: 13,
-                  color: AppColors.herzrotWarm,
+          ),
+
+          if (_error != null)
+            Text(
+              _error!,
+              style: AppTypography.body(size: 13, color: AppColors.herzrotWarm),
+            ),
+          if (_uploading)
+            Row(
+              children: [
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.amber),
                 ),
+                const SizedBox(width: 10),
+                Text('marketplace.create.uploading'.tr(),
+                    style:
+                        AppTypography.body(size: 13, color: AppColors.inkSoft)),
+              ],
+            ),
+        ],
+        footer: Column(
+          children: [
+            FilledButton.icon(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.amber,
+                foregroundColor: AppColors.voidColor,
+                minimumSize: const Size(double.infinity, 50),
               ),
-            ],
-            if (_uploading) ...[
-              const SizedBox(height: 12),
-              Row(
-                children: [
-                  const SizedBox(
-                    width: 14,
-                    height: 14,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: AppColors.amber,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Text('marketplace.create.uploading'.tr(),
-                      style: AppTypography.body(
-                          size: 13, color: AppColors.inkSoft)),
-                ],
+              onPressed: _submitting ? null : _submit,
+              icon: _submitting
+                  ? const SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: AppColors.voidColor),
+                    )
+                  : const Icon(LucideIcons.plus, size: 16),
+              label: Text(_submitting
+                  ? 'marketplace.saving'.tr()
+                  : 'marketplace.createButton'.tr()),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.inkSoft,
+                side: const BorderSide(color: AppColors.line),
               ),
-            ],
-            const SizedBox(height: 16),
-            AnimatedEntrance(
-              index: 2,
-              child: ElevatedButton.icon(
-                onPressed: _submitting ? null : _submit,
-                icon: const Icon(LucideIcons.plus, size: 16),
-                label: Text(_submitting
-                    ? 'marketplace.saving'.tr()
-                    : 'marketplace.createButton'.tr()),
-              ),
+              onPressed: () => context.go('/dashboard/marketplace'),
+              child: Text('common.cancel'.tr()),
             ),
           ],
-        ))),
+        ),
       ),
     );
   }

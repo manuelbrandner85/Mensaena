@@ -2196,7 +2196,8 @@
     "reportTitle": "Segnala annuncio",
     "editListing": "Modifica",
     "deleteListing": "Elimina annuncio",
-    "deleteListingDescription": "L'annuncio verrà eliminato definitivamente e non sarà più visibile agli altri."
+    "deleteListingDescription": "L'annuncio verrà eliminato definitivamente e non sarà più visibile agli altri.",
+    "createSubtitle": "Compra · Vendi · Scambia · Regala"
   },
   "trust": {
     "rate": "Valuta {name}",
@@ -2367,7 +2368,8 @@
     "suggestions": {
       "title": "Suggerimenti",
       "prefillHint": "Festività precompilata – modifica i dettagli come desideri."
-    }
+    },
+    "createSubtitle": "Invita i tuoi vicini"
   },
   "challenges": {
     "create": "Crea sfida",
@@ -2549,7 +2551,8 @@
     "location": "Posizione (facoltativa)",
     "locationHint": "Luogo o quartiere",
     "saving": "Salvataggio…",
-    "createButton": "Appunta nota"
+    "createButton": "Appunta nota",
+    "createSubtitle": "Condividi una nota con il vicinato"
   },
   "messages": {
     "title": "Chat",
