@@ -18,6 +18,8 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 /// SKILL: mensaena-features
 /// Komplette Event-Erstellungs-Maske: Cover, 10 Kategorien, Datum+Zeit,
@@ -60,10 +62,10 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   File? _coverImage;
   String? _uploadedImageUrl;
   bool _submitting = false;
-  bool _titleError = false;
   bool _uploading = false;
   String? _error;
 
+  final _formKey = GlobalKey<FormState>();
   final ImagePicker _picker = ImagePicker();
 
   // Web-Spec: 10 Kategorien mit Emoji + Akzent-Farbe.
@@ -253,11 +255,9 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   // ── Submit ────────────────────────────────────────────────
 
   Future<void> _submit() async {
-    if (_titleCtrl.text.trim().isEmpty) {
-      setState(() {
-        _titleError = true;
-        _error = 'events.validationTitle'.tr();
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      Haptics.error();
+      setState(() => _error = null);
       return;
     }
     if (_startDate == null) {
@@ -360,12 +360,15 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
         child: Stack(
           children: [
             ReadableWidth(
+                child: Form(
+                key: _formKey,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: ListView(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
               children: [
                 if (_prefilled) _prefilledBanner(),
                 _sectionCover(),
-                _sectionTitleDesc(),
+                AnimatedEntrance(index: 0, child: _sectionTitleDesc()),
                 _sectionCategory(),
                 _sectionStartDateTime(),
                 _sectionAllDayToggle(),
@@ -379,10 +382,10 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
                 _sectionRecurring(),
                 if (_error != null) _errorBox(_error!),
                 const SizedBox(height: 16),
-                _submitButton(),
+                AnimatedEntrance(index: 1, child: _submitButton()),
                 const SizedBox(height: 16),
               ],
-            )),
+            ))),
             if (_submitting || _uploading) _loadingOverlay(),
           ],
         ),
@@ -503,17 +506,15 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          TextField(
+          TextFormField(
             controller: _titleCtrl,
             maxLength: 200,
+            validator: FormValidators.lengthBetween(3, 200),
             style: AppTypography.body(size: 15, color: AppColors.ink),
             decoration: InputDecoration(
               labelText: 'create.title'.tr(),
-              errorText: _titleError ? 'create.titleRequired'.tr() : null,
+              counterText: '',
             ),
-            onChanged: (_) => setState(() {
-              if (_titleError) _titleError = false;
-            }),
           ),
           const SizedBox(height: 6),
           TextField(
@@ -936,7 +937,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   }
 
   Widget _submitButton() {
-    final canSubmit = !_submitting && _titleCtrl.text.trim().isNotEmpty;
+    final canSubmit = !_submitting;
     return SizedBox(
       height: 60,
       child: FilledButton.icon(
