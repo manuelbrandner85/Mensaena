@@ -108,7 +108,8 @@
     "mentalSupport": "Supporto mentale",
     "posts": "Post",
     "admin": "Dashboard admin",
-    "safety": "Sicurezza"
+    "safety": "Sicurezza",
+    "electricityPrices": "Prezzi luce"
   },
   "navGroups": {
     "communication": "Comunicazione",
@@ -4839,5 +4840,12 @@
     "level2": "Moderato",
     "level3": "Alto",
     "level4": "Molto alto"
+  },
+  "strompreise": {
+    "title": "Prezzi dell'elettricità",
+    "now": "Ora: {ct} ct/kWh",
+    "cheapest": "Ora più conveniente: {time} ({ct} ct/kWh)",
+    "noData": "Nessun dato di prezzo",
+    "source": "Fonte: Energy-Charts (Fraunhofer ISE) · prezzo all’ingrosso, tasse/rete escl."
   }
 }

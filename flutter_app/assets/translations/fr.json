@@ -108,7 +108,8 @@
     "mentalSupport": "Soutien mental",
     "posts": "Publications",
     "admin": "Tableau de bord admin",
-    "safety": "Sécurité"
+    "safety": "Sécurité",
+    "electricityPrices": "Prix de l'électricité"
   },
   "navGroups": {
     "communication": "Communication",
@@ -4839,5 +4840,12 @@
     "level2": "Modéré",
     "level3": "Élevé",
     "level4": "Très élevé"
+  },
+  "strompreise": {
+    "title": "Prix de l'électricité",
+    "now": "Maintenant : {ct} ct/kWh",
+    "cheapest": "Heure la moins chère : {time} ({ct} ct/kWh)",
+    "noData": "Aucune donnée de prix",
+    "source": "Source : Energy-Charts (Fraunhofer ISE) · prix de gros hors taxes/réseau"
   }
 }

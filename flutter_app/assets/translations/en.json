@@ -108,7 +108,8 @@
     "mentalSupport": "Mental support",
     "posts": "Posts",
     "admin": "Admin dashboard",
-    "safety": "Safety"
+    "safety": "Safety",
+    "electricityPrices": "Electricity prices"
   },
   "navGroups": {
     "communication": "Communication",
@@ -4836,5 +4837,12 @@
     "level2": "Moderate",
     "level3": "High",
     "level4": "Very high"
+  },
+  "strompreise": {
+    "title": "Electricity prices",
+    "now": "Now: {ct} ct/kWh",
+    "cheapest": "Cheapest hour: {time} ({ct} ct/kWh)",
+    "noData": "No price data available",
+    "source": "Source: Energy-Charts (Fraunhofer ISE) · wholesale price excl. taxes/grid fees"
   }
 }

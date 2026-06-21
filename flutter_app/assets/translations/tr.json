@@ -108,7 +108,8 @@
     "mentalSupport": "Ruhsal destek",
     "posts": "Gönderiler",
     "admin": "Yönetim paneli",
-    "safety": "Güvenlik"
+    "safety": "Güvenlik",
+    "electricityPrices": "Elektrik fiyatları"
   },
   "navGroups": {
     "communication": "İletişim",
@@ -4838,5 +4839,12 @@
     "level2": "Orta",
     "level3": "Yüksek",
     "level4": "Çok yüksek"
+  },
+  "strompreise": {
+    "title": "Elektrik fiyatları",
+    "now": "Şimdi: {ct} ct/kWh",
+    "cheapest": "En ucuz saat: {time} ({ct} ct/kWh)",
+    "noData": "Fiyat verisi yok",
+    "source": "Kaynak: Energy-Charts (Fraunhofer ISE) · vergi/şebeke hariç toptan fiyat"
   }
 }

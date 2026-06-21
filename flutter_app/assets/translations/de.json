@@ -108,7 +108,8 @@
     "mentalSupport": "Mentale Unterstützung",
     "posts": "Beiträge",
     "admin": "Admin-Dashboard",
-    "safety": "Sicherheit"
+    "safety": "Sicherheit",
+    "electricityPrices": "Strompreise"
   },
   "navGroups": {
     "communication": "Kommunikation",
@@ -4835,5 +4836,12 @@
     "level2": "Mäßig",
     "level3": "Hoch",
     "level4": "Sehr hoch"
+  },
+  "strompreise": {
+    "title": "Strompreise",
+    "now": "Jetzt: {ct} ct/kWh",
+    "cheapest": "Günstigste Stunde: {time} ({ct} ct/kWh)",
+    "noData": "Keine Preisdaten verfügbar",
+    "source": "Quelle: Energy-Charts (Fraunhofer ISE) · Börsenpreis ohne Steuern/Netzentgelte"
   }
 }

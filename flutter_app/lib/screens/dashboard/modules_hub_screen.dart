@@ -151,6 +151,12 @@ const kModulesCatalog = <ModuleTile>[
       tint: Color(0xFF66C7C8),
       section: 'navGroups.shareAndResources'),
   ModuleTile(
+      label: 'nav.electricityPrices',
+      route: '/dashboard/strompreise',
+      icon: LucideIcons.zap,
+      tint: Color(0xFFE8C84A),
+      section: 'navGroups.shareAndResources'),
+  ModuleTile(
       label: 'nav.jobs',
       route: '/dashboard/jobs',
       icon: LucideIcons.briefcase,

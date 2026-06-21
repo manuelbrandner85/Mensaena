@@ -123,6 +123,7 @@ import '../../screens/dashboard/warnungen/civil_protection_screen.dart';
 import '../../screens/dashboard/warnungen/food_warnings_screen.dart';
 import '../../screens/dashboard/warnungen/meteoalarm_screen.dart';
 import '../../screens/dashboard/warnungen/warnungen_screen.dart';
+import '../../screens/dashboard/strompreise/electricity_prices_screen.dart';
 import '../../screens/misc/placeholder_screen.dart';
 import '../../screens/public/auth_screen.dart';
 import '../../screens/public/landing_screen.dart';
@@ -1045,6 +1046,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/dashboard/strompreise',
+        pageBuilder: (_, state) => mensaenaTransition<void>(
+          key: state.pageKey,
+          child: const ElectricityPricesScreen(),
+        ),
       ),
       GoRoute(
         path: '/dashboard/board',

@@ -108,7 +108,8 @@
     "mentalSupport": "Психологическая поддержка",
     "posts": "Публикации",
     "admin": "Админ-панель",
-    "safety": "Безопасность"
+    "safety": "Безопасность",
+    "electricityPrices": "Цены на электричество"
   },
   "navGroups": {
     "communication": "Общение",
@@ -4838,5 +4839,12 @@
     "level2": "Умеренная",
     "level3": "Высокая",
     "level4": "Очень высокая"
+  },
+  "strompreise": {
+    "title": "Цены на электричество",
+    "now": "Сейчас: {ct} ct/kWh",
+    "cheapest": "Самый дешёвый час: {time} ({ct} ct/kWh)",
+    "noData": "Нет данных о ценах",
+    "source": "Источник: Energy-Charts (Fraunhofer ISE) · оптовая цена без налогов/сетей"
   }
 }

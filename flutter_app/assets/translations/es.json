@@ -108,7 +108,8 @@
     "mentalSupport": "Apoyo mental",
     "posts": "Publicaciones",
     "admin": "Panel admin",
-    "safety": "Seguridad"
+    "safety": "Seguridad",
+    "electricityPrices": "Precios de luz"
   },
   "navGroups": {
     "communication": "Comunicación",
@@ -4839,5 +4840,12 @@
     "level2": "Moderado",
     "level3": "Alto",
     "level4": "Muy alto"
+  },
+  "strompreise": {
+    "title": "Precios de la luz",
+    "now": "Ahora: {ct} ct/kWh",
+    "cheapest": "Hora más barata: {time} ({ct} ct/kWh)",
+    "noData": "Sin datos de precios",
+    "source": "Fuente: Energy-Charts (Fraunhofer ISE) · precio mayorista sin impuestos/red"
   }
 }
