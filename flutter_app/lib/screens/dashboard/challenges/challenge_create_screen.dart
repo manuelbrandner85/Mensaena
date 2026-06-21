@@ -17,6 +17,7 @@ import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/readable_width.dart';
+import '../../../widgets/effects/animated_entrance.dart';
 
 class ChallengeCreateScreen extends ConsumerStatefulWidget {
   const ChallengeCreateScreen({super.key});
@@ -63,7 +64,10 @@ class _ChallengeCreateScreenState
   }
 
   Future<void> _submit() async {
-    if (!_form.currentState!.validate()) return;
+    if (!_form.currentState!.validate()) {
+      Haptics.error();
+      return;
+    }
     setState(() => _busy = true);
     final id = await ChallengesRepository.create(
       title: _title.text,
@@ -109,27 +113,33 @@ class _ChallengeCreateScreenState
                   style: AppTypography.body(
                       size: 13, color: AppColors.mute)),
               const SizedBox(height: 20),
-              TextFormField(
-                controller: _title,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                maxLength: 80,
-                decoration: _input(
-                    'challenges.fieldTitle'.tr(), 'challenges.titleHint'.tr()),
-                validator: (v) {
-                  final t = v?.trim() ?? '';
-                  if (t.length < 5) return 'challenges.minChars'.tr();
-                  if (t.length > 80) return 'challenges.maxChars'.tr();
-                  return null;
-                },
+              AnimatedEntrance(
+                index: 0,
+                child: TextFormField(
+                  controller: _title,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  maxLength: 80,
+                  decoration: _input(
+                      'challenges.fieldTitle'.tr(), 'challenges.titleHint'.tr()),
+                  validator: (v) {
+                    final t = v?.trim() ?? '';
+                    if (t.length < 5) return 'challenges.minChars'.tr();
+                    if (t.length > 80) return 'challenges.maxChars'.tr();
+                    return null;
+                  },
+                ),
               ),
               const SizedBox(height: 12),
-              TextFormField(
-                controller: _desc,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                maxLength: 500,
-                maxLines: 4,
-                decoration: _input('challenges.fieldDescOpt'.tr(),
-                    'challenges.descHint'.tr()),
+              AnimatedEntrance(
+                index: 1,
+                child: TextFormField(
+                  controller: _desc,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  maxLength: 500,
+                  maxLines: 4,
+                  decoration: _input('challenges.fieldDescOpt'.tr(),
+                      'challenges.descHint'.tr()),
+                ),
               ),
               const SizedBox(height: 18),
               Text('challenges.fieldCategory'.tr(),
@@ -229,21 +239,24 @@ class _ChallengeCreateScreenState
                     style: AppTypography.caption()),
               ),
               const SizedBox(height: 28),
-              FilledButton.icon(
-                onPressed: _busy ? null : _submit,
-                icon: _busy
-                    ? const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: AppColors.voidColor),
-                      )
-                    : const Icon(LucideIcons.trophy, size: 16),
-                label: Text('challenges.start'.tr()),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.amber,
-                  foregroundColor: AppColors.voidColor,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+              AnimatedEntrance(
+                index: 2,
+                child: FilledButton.icon(
+                  onPressed: _busy ? null : _submit,
+                  icon: _busy
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.voidColor),
+                        )
+                      : const Icon(LucideIcons.trophy, size: 16),
+                  label: Text('challenges.start'.tr()),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.amber,
+                    foregroundColor: AppColors.voidColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                 ),
               ),
             ],

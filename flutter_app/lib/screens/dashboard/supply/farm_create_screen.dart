@@ -26,6 +26,8 @@ import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 class FarmCreateScreen extends ConsumerStatefulWidget {
   const FarmCreateScreen({super.key});
@@ -182,7 +184,10 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
       .toList();
 
   Future<void> _submit() async {
-    if (!_form.currentState!.validate()) return;
+    if (!_form.currentState!.validate()) {
+      Haptics.error();
+      return;
+    }
     setState(() => _busy = true);
     final slug = await FarmsRepository.create(
       name: _name.text,
@@ -247,13 +252,16 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               ),
               const SizedBox(height: 20),
               _section('supply.farmCreate.secBasics'.tr()),
-              _field(
-                _name,
-                'supply.farmCreate.fName'.tr(),
-                'supply.farmCreate.fNameHint'.tr(),
-                validator: (v) => (v == null || v.trim().isEmpty)
-                    ? 'supply.farmCreate.required'.tr()
-                    : null,
+              AnimatedEntrance(
+                index: 0,
+                child: _field(
+                  _name,
+                  'supply.farmCreate.fName'.tr(),
+                  'supply.farmCreate.fNameHint'.tr(),
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'supply.farmCreate.required'.tr()
+                      : null,
+                ),
               ),
               const SizedBox(height: 10),
               _dropdown(
@@ -345,11 +353,14 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               ),
               const SizedBox(height: 18),
               _section('supply.farmCreate.secContact'.tr()),
-              _field(_phone, 'supply.farmCreate.fPhone'.tr(), '+43 …'),
+              _field(_phone, 'supply.farmCreate.fPhone'.tr(), '+43 …',
+                  validator: FormValidators.phoneOptional),
               const SizedBox(height: 10),
-              _field(_email, 'supply.farmCreate.fEmail'.tr(), 'hof@…'),
+              _field(_email, 'supply.farmCreate.fEmail'.tr(), 'hof@…',
+                  validator: FormValidators.emailOptional),
               const SizedBox(height: 10),
-              _field(_website, 'supply.farmCreate.fWebsite'.tr(), 'https://…'),
+              _field(_website, 'supply.farmCreate.fWebsite'.tr(), 'https://…',
+                  validator: FormValidators.urlOptional),
               const SizedBox(height: 18),
               _section('supply.farmCreate.secOffer'.tr()),
               _field(_productsRaw, 'supply.farmCreate.fProducts'.tr(),
@@ -383,21 +394,24 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               _section('supply.farmCreate.secPhotos'.tr()),
               _photoGrid(),
               const SizedBox(height: 28),
-              FilledButton.icon(
-                onPressed: _busy ? null : _submit,
-                icon: _busy
-                    ? const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: AppColors.voidColor),
-                      )
-                    : const Icon(LucideIcons.send, size: 16),
-                label: Text('supply.farmSubmit'.tr()),
-                style: FilledButton.styleFrom(
-                  backgroundColor: AppColors.bronze,
-                  foregroundColor: AppColors.voidColor,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
+              AnimatedEntrance(
+                index: 1,
+                child: FilledButton.icon(
+                  onPressed: _busy ? null : _submit,
+                  icon: _busy
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.voidColor),
+                        )
+                      : const Icon(LucideIcons.send, size: 16),
+                  label: Text('supply.farmSubmit'.tr()),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.bronze,
+                    foregroundColor: AppColors.voidColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
