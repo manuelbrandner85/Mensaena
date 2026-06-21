@@ -135,10 +135,15 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
       // BetterFeedback umrahmt zusätzlich für Shake-to-Report (Sprint 5).
       builder: (context, navChild) {
         // F20 a11y: globale TextScale-Override aus User-Pref.
+        // effectiveTextScale berücksichtigt Senior-Mode (+1.3) — vorher wurde
+        // nur textScale gelesen, der Senior-Bump griff global nicht.
+        // Defensiv auf 0.85–1.35 geklemmt: schützt Layouts auf kleinen Geräten
+        // vor Overflow (Responsive-Garantie unabhängig vom Gerät).
         final a11y = ref.watch(a11yProvider);
         final media = MediaQuery.of(context);
+        final scale = a11y.effectiveTextScale.clamp(0.85, 1.35);
         final scaled = media.copyWith(
-          textScaler: TextScaler.linear(a11y.textScale),
+          textScaler: TextScaler.linear(scale),
         );
         return MediaQuery(
           data: scaled,

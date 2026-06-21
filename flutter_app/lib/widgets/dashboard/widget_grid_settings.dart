@@ -370,12 +370,19 @@ class DashboardWidgetConfig {
     'bot_tip',
   };
 
+  // Schema-Version des schlanken Standard-Dashboards. Wird bei jeder neuen
+  // Declutter-Welle erhöht → einmalige Migration in [load] setzt Bestands-
+  // Configs auf das ruhige Set zurück (sonst greift Declutter nur bei
+  // Neu-Nutzern, weil load() local-first die gespeicherte Config behält).
+  static const int schemaVersion = 3;
+
   static DashboardWidgetConfig get defaultConfig => DashboardWidgetConfig(
         order: all.map((w) => w.id).toList(),
         visible: all
             .where((w) => !_defaultHidden.contains(w.id))
             .map((w) => w.id)
             .toSet(),
+        version: schemaVersion,
       );
 
   static Future<DashboardWidgetConfig> load() async {
@@ -387,6 +394,17 @@ class DashboardWidgetConfig {
         local = _fromJsonString(raw);
       }
     } catch (_) {}
+    // 1b. Einmalige Declutter-Migration: ältere Configs (auch die remote
+    // gespeicherten) aufs schlanke Standard-Set zurücksetzen. Ohne das würde
+    // die Entschlackung NUR Neu-Nutzer erreichen — Bestandsnutzer behielten ihr
+    // volles, überforderndes Dashboard (User-Feedback). schemaVersion gewinnt
+    // auch beim Remote-Sync (höhere version), also setzt sich das ruhige Set
+    // geräteübergreifend durch.
+    if (local.version < schemaVersion) {
+      final migrated = defaultConfig;
+      unawaited(migrated.save());
+      return migrated;
+    }
     // 2. Background-Sync: wenn remote.version > local.version → übernehmen
     unawaited(_syncFromRemote(local).catchError((_) => local));
     return local;

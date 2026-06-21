@@ -936,36 +936,45 @@ class _Header extends StatelessWidget {
                 ],
               ),
             ),
-            // F81: Share-Profil-Button rechts oben in der Header-Row
-            IconButton(
-              tooltip: 'profile.share'.tr(),
-              onPressed: () {
-                final name =
-                    profile.displayName ?? profile.name ?? 'Mensaena';
-                final url =
-                    'https://www.mensaena.de/dashboard/profile/${profile.id}';
-                Share.share(
-                  'profile.shareMessage'
-                      .tr(namedArgs: {'name': name, 'url': url}),
-                  subject: name,
-                );
-              },
-              icon: const Icon(LucideIcons.share2,
-                  size: 18, color: AppColors.mute),
-            ),
-            // F34: QR-Code-Profil-Teilen
-            IconButton(
-              tooltip: 'profile.qr_code'.tr(),
-              onPressed: () => QrShareSheet.show(
-                context,
-                userId: profile.id,
-                displayName:
-                    profile.displayName ?? profile.name ?? 'Mensaena',
-              ),
-              icon: const Icon(LucideIcons.qrCode,
-                  size: 18, color: AppColors.mute),
-            ),
+            // Teilen + QR aus der Kopf-Row ausgelagert (siehe Aktionszeile
+            // unten) → Namensspalte bekommt volle Breite, ruhigerer Header.
           ],
+        ),
+        // Rechtsbündige, dezente Aktionszeile statt gequetschter Icons oben.
+        Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                tooltip: 'profile.share'.tr(),
+                onPressed: () {
+                  final name =
+                      profile.displayName ?? profile.name ?? 'Mensaena';
+                  final url =
+                      'https://www.mensaena.de/dashboard/profile/${profile.id}';
+                  Share.share(
+                    'profile.shareMessage'
+                        .tr(namedArgs: {'name': name, 'url': url}),
+                    subject: name,
+                  );
+                },
+                icon: const Icon(LucideIcons.share2,
+                    size: 18, color: AppColors.mute),
+              ),
+              IconButton(
+                tooltip: 'profile.qr_code'.tr(),
+                onPressed: () => QrShareSheet.show(
+                  context,
+                  userId: profile.id,
+                  displayName:
+                      profile.displayName ?? profile.name ?? 'Mensaena',
+                ),
+                icon: const Icon(LucideIcons.qrCode,
+                    size: 18, color: AppColors.mute),
+              ),
+            ],
+          ),
         ),
         if (isMe) ...[
           const SizedBox(height: 12),
