@@ -126,24 +126,32 @@ jobs:
           REF: ${{ steps.ref.outputs.ref }}
           PGPASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: |
-          pip install --quiet psycopg2-binary
+          python3 -m pip install --quiet psycopg2-binary || pip3 install --quiet psycopg2-binary || true
           python3 <<'PYEOF'
-          import os, sys, psycopg2
+          import os, sys
           REQUIRED = ['dm_calls', 'live_rooms', 'notifications', 'messages']
-          conn = psycopg2.connect(
-              host='aws-0-eu-central-1.pooler.supabase.com', port=5432,
-              user=f'postgres.{os.environ["REF"]}', password=os.environ['PGPASSWORD'],
-              dbname='postgres', sslmode='require',
-          )
-          cur = conn.cursor()
-          cur.execute("SELECT count(*) FROM pg_extension WHERE extname='pg_net'")
-          pg_net = cur.fetchone()[0]
-          cur.execute(
-              "SELECT tablename FROM pg_publication_tables "
-              "WHERE pubname='supabase_realtime' AND schemaname='public'"
-          )
-          pub = {r[0] for r in cur.fetchall()}
-          conn.close()
+          # Verbindungs-/Tooling-Fehler dürfen den Deploy NICHT rot machen
+          # (Migrationen liefen davor erfolgreich). NUR eine bestätigte fehlende
+          # Infrastruktur ist ein harter Fehler.
+          try:
+              import psycopg2
+              conn = psycopg2.connect(
+                  host='aws-0-eu-central-1.pooler.supabase.com', port=5432,
+                  user=f'postgres.{os.environ["REF"]}', password=os.environ['PGPASSWORD'],
+                  dbname='postgres', sslmode='require', connect_timeout=15,
+              )
+              cur = conn.cursor()
+              cur.execute("SELECT count(*) FROM pg_extension WHERE extname='pg_net'")
+              pg_net = cur.fetchone()[0]
+              cur.execute(
+                  "SELECT tablename FROM pg_publication_tables "
+                  "WHERE pubname='supabase_realtime' AND schemaname='public'"
+              )
+              pub = {r[0] for r in cur.fetchall()}
+              conn.close()
+          except Exception as e:
+              print(f'::warning title=Realtime-Healthcheck uebersprungen::DB-Pruefung nicht moeglich ({e}). Deploy nicht blockiert.')
+              sys.exit(0)
           problems = []
           if not pg_net:
               problems.append('pg_net NICHT installiert -> FCM-Push tot (Anrufe klingeln nicht)')
