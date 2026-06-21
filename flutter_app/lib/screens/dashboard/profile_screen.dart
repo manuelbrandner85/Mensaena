@@ -173,25 +173,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen>
                 // Cinema-Cover: dezenter Bronze-Spotlight hinter dem Header
                 // (der Header scrollt nicht → kein Parallax, dafür ein
                 // filmisches Cover-Backdrop).
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        AppColors.bronze.withValues(alpha: 0.14),
-                        AppColors.surface.withValues(alpha: 0.0),
-                      ],
-                    ),
-                    border: Border(
-                      bottom: BorderSide(
-                          color: AppColors.bronze.withValues(alpha: 0.16)),
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 16),
-                    child: _Header(profile: p, isMe: effectiveIsMe),
-                  ),
+                // Cover-Banner (echtes Cover-Bild oder Bronze-Verlauf) — der
+                // Avatar im _Header überlappt es nach oben (moderner Hero).
+                _ProfileBanner(profile: p),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+                  child: _Header(profile: p, isMe: effectiveIsMe),
                 ),
                 TabBar(
                   controller: _tab,
@@ -698,6 +685,65 @@ class _BadgesTab extends ConsumerWidget {
   }
 }
 
+/// Cover-Banner über dem Profil-Header: zeigt das echte Cover-Bild (falls
+/// gesetzt) mit dezentem Scrim für Lesbarkeit, sonst einen Bronze-Verlauf.
+/// Voll-bündig (kein Seitenrand) — der Avatar im _Header überlappt es.
+class _ProfileBanner extends StatelessWidget {
+  const _ProfileBanner({required this.profile});
+  final Profile profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final cover = profile.coverUrl;
+    return Container(
+      height: 120,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: cover == null
+            ? LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.bronze.withValues(alpha: 0.22),
+                  AppColors.surface.withValues(alpha: 0.0),
+                ],
+              )
+            : null,
+        border: Border(
+          bottom:
+              BorderSide(color: AppColors.bronze.withValues(alpha: 0.16)),
+        ),
+      ),
+      child: cover == null
+          ? null
+          : Stack(
+              fit: StackFit.expand,
+              children: [
+                CachedNetworkImage(
+                  imageUrl: cover,
+                  fit: BoxFit.cover,
+                  fadeInDuration: const Duration(milliseconds: 240),
+                  errorWidget: (_, __, ___) => const SizedBox.shrink(),
+                ),
+                // Scrim unten → der überlappende Avatar bleibt klar abgesetzt.
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.0),
+                        Colors.black.withValues(alpha: 0.28),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+    );
+  }
+}
+
 class _Header extends StatelessWidget {
   const _Header({required this.profile, required this.isMe});
   final Profile profile;
@@ -714,84 +760,103 @@ class _Header extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            GestureDetector(
-              onTap: isMe
-                  ? () => context.push('/dashboard/profile/edit')
-                  : null,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Hero(
-                    tag: 'profile-avatar-${profile.id}',
-                    child: Bloom(
-                    color: AppColors.bronze,
-                    intensity: 0.5,
-                    radius: 22,
-                    child: TiltCard(
-                    intensity: 1.2,
-                    borderRadius: 999,
-                    child: profile.avatarUrl != null
-                        ? CachedNetworkImage(
-                            imageUrl: profile.avatarUrl!,
-                            fadeInDuration: const Duration(milliseconds: 200),
-                            imageBuilder: (_, img) => CircleAvatar(
-                              radius: 36,
-                              backgroundColor: AppColors.surface,
-                              backgroundImage: img,
-                            ),
-                            placeholder: (_, __) => const CircleAvatar(
-                              radius: 36,
-                              backgroundColor: AppColors.surface,
-                            ),
-                            errorWidget: (_, __, ___) => CircleAvatar(
-                              radius: 36,
-                              backgroundColor: AppColors.surface,
-                              child: Text(
-                                (profile.name ?? '?').substring(0, 1).toUpperCase(),
-                                style: AppTypography.display(
-                                  size: 28,
-                                  color: AppColors.amber,
-                                ),
-                              ),
-                            ),
-                          )
-                        : CircleAvatar(
-                            radius: 36,
-                            backgroundColor: AppColors.surface,
-                            child: Text(
-                              (profile.name ?? '?').substring(0, 1).toUpperCase(),
-                              style: AppTypography.display(
-                                size: 28,
-                                color: AppColors.amber,
-                              ),
-                            ),
-                          ),
-                  ),
-                  ),
-                  ),
-                  if (isMe)
-                    Positioned(
-                      bottom: 0,
-                      right: 0,
-                      child: Container(
-                        width: 22,
-                        height: 22,
-                        decoration: BoxDecoration(
-                          color: AppColors.amber,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: AppColors.lightVoid,
-                            width: 1.5,
-                          ),
+            // Avatar überlappt das Cover-Banner (modern, Apple-/LinkedIn-Stil)
+            // mit hellem Ring zur sauberen Trennung vom Banner. Tippen führt
+            // zum Edit-Screen (dort funktioniert der verifizierte Foto-Upload).
+            Transform.translate(
+              offset: const Offset(0, -34),
+              child: GestureDetector(
+                onTap: isMe
+                    ? () => context.push('/dashboard/profile/edit')
+                    : null,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Container(
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.fromBorderSide(
+                          BorderSide(color: AppColors.lightVoid, width: 3),
                         ),
-                        child: const Icon(
-                          LucideIcons.camera,
-                          size: 11,
-                          color: Colors.black,
+                      ),
+                      child: Hero(
+                        tag: 'profile-avatar-${profile.id}',
+                        child: Bloom(
+                          color: AppColors.bronze,
+                          intensity: 0.5,
+                          radius: 24,
+                          child: TiltCard(
+                            intensity: 1.2,
+                            borderRadius: 999,
+                            child: profile.avatarUrl != null
+                                ? CachedNetworkImage(
+                                    imageUrl: profile.avatarUrl!,
+                                    fadeInDuration:
+                                        const Duration(milliseconds: 200),
+                                    imageBuilder: (_, img) => CircleAvatar(
+                                      radius: 40,
+                                      backgroundColor: AppColors.surface,
+                                      backgroundImage: img,
+                                    ),
+                                    placeholder: (_, __) => const CircleAvatar(
+                                      radius: 40,
+                                      backgroundColor: AppColors.surface,
+                                    ),
+                                    errorWidget: (_, __, ___) => CircleAvatar(
+                                      radius: 40,
+                                      backgroundColor: AppColors.surface,
+                                      child: Text(
+                                        (profile.name ?? '?')
+                                            .substring(0, 1)
+                                            .toUpperCase(),
+                                        style: AppTypography.display(
+                                          size: 30,
+                                          color: AppColors.amber,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : CircleAvatar(
+                                    radius: 40,
+                                    backgroundColor: AppColors.surface,
+                                    child: Text(
+                                      (profile.name ?? '?')
+                                          .substring(0, 1)
+                                          .toUpperCase(),
+                                      style: AppTypography.display(
+                                        size: 30,
+                                        color: AppColors.amber,
+                                      ),
+                                    ),
+                                  ),
+                          ),
                         ),
                       ),
                     ),
-                ],
+                    if (isMe)
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: AppColors.amber,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: AppColors.lightVoid,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: const Icon(
+                            LucideIcons.camera,
+                            size: 12,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 16),
