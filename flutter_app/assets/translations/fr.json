@@ -2649,6 +2649,7 @@
     "notFound": "Ferme introuvable.",
     "searchPlaceholder": "Rechercher des fermes…",
     "screenTitle": "Approvisionnement",
+    "addFarm": "Ajouter une ferme",
     "farmCreate": {
       "intro": "Ajoutez une ferme, un magasin de ferme ou un producteur direct de votre région.",
       "secBasics": "Données de base",

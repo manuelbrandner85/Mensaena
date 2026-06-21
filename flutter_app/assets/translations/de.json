@@ -2648,6 +2648,7 @@
     "notFound": "Hof nicht gefunden.",
     "searchPlaceholder": "Höfe suchen…",
     "screenTitle": "Versorgung",
+    "addFarm": "Hof hinzufügen",
     "farmCreate": {
       "intro": "Trage einen Bauernhof, Hofladen oder Direktvermarkter aus deiner Region ein.",
       "secBasics": "Grunddaten",

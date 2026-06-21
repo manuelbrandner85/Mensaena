@@ -2649,6 +2649,7 @@
     "notFound": "Farm not found.",
     "searchPlaceholder": "Search farms…",
     "screenTitle": "Supply",
+    "addFarm": "Add farm",
     "farmCreate": {
       "intro": "Add a farm, farm shop or direct marketer from your region.",
       "secBasics": "Basics",

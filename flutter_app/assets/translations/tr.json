@@ -2648,6 +2648,7 @@
     "notFound": "Çiftlik bulunamadı.",
     "searchPlaceholder": "Çiftlik ara…",
     "screenTitle": "Tedarik",
+    "addFarm": "Çiftlik ekle",
     "farmCreate": {
       "intro": "Bölgenden bir çiftlik, çiftlik dükkanı veya doğrudan üretici ekle.",
       "secBasics": "Temel bilgiler",

@@ -98,16 +98,9 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 07',
-                metaCategory: 'events.screenTitle'.tr(),
-                title: 'modules.eventsHero.title'.tr(),
-                subtitle: 'modules.eventsHero.subtitle'.tr(),
-              ),
-            ),
-            // ── Header: View-Toggle + Refresh ──────────────
+            // Editorial-Header + Wetter/Feiertage in die Listen-Ansicht
+            // verschoben (scrollt mit) → mehr Platz für die Event-Liste.
+            // ── Suche + View-Toggle ──────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
               child: Row(
@@ -231,10 +224,6 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   }),
                 ),
               ),
-            // ── Wetter-Strip (Pendant zu Web WeatherForecastStrip) ──
-            if (_view == _EventView.list) const WeatherForecastStrip(),
-            // ── Feiertags-Vorschläge ──────────────────────────────
-            if (_view == _EventView.list) const _HolidaySuggestionsSection(),
             Expanded(
               child: RefreshIndicator(
                 color: AppColors.amber,
@@ -282,7 +271,13 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                             const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
                         children: [
-                          const SizedBox(height: 60),
+                          EditorialModuleHeader(
+                            metaIndex: '§ 07',
+                            metaCategory: 'events.screenTitle'.tr(),
+                            title: 'modules.eventsHero.title'.tr(),
+                            subtitle: 'modules.eventsHero.subtitle'.tr(),
+                          ),
+                          const SizedBox(height: 40),
                           EmptyStateWidget(
                             icon: LucideIcons.calendar,
                             title: _hasFilters
@@ -304,13 +299,31 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                         ],
                       );
                     }
+                    // i0 = Editorial-Header, i1 = Wetter-Strip, i2 = Feiertags-
+                    // Vorschläge (aus dem fixen Kopf verschoben → mehr Platz),
+                    // danach die Events.
                     return ListView.builder(
                       padding: const EdgeInsets.all(12),
-                      itemCount: list.length,
-                      itemBuilder: (context, i) => AnimatedEntrance(
-                        index: i,
-                        child: _EventTile(event: list[i]),
-                      ),
+                      itemCount: list.length + 3,
+                      itemBuilder: (context, i) {
+                        if (i == 0) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
+                            child: EditorialModuleHeader(
+                              metaIndex: '§ 07',
+                              metaCategory: 'events.screenTitle'.tr(),
+                              title: 'modules.eventsHero.title'.tr(),
+                              subtitle: 'modules.eventsHero.subtitle'.tr(),
+                            ),
+                          );
+                        }
+                        if (i == 1) return const WeatherForecastStrip();
+                        if (i == 2) return const _HolidaySuggestionsSection();
+                        return AnimatedEntrance(
+                          index: i,
+                          child: _EventTile(event: list[i - 3]),
+                        );
+                      },
                     );
                   },
                 ),

@@ -35,6 +35,15 @@ class ChallengesScreen extends ConsumerWidget {
     return DashboardScaffold(
       title: 'challenges.screenTitle'.tr(),
       currentRoute: '/dashboard/challenges',
+      // Erreichbarer Einstieg zum Erstellen einer Challenge — Route existierte,
+      // hatte aber keinen UI-Einstieg (jeder auth. Nutzer darf erstellen).
+      fab: FloatingActionButton.extended(
+        backgroundColor: AppColors.amber,
+        foregroundColor: AppColors.voidColor,
+        onPressed: () => context.push('/dashboard/challenges/create'),
+        icon: const Icon(LucideIcons.plus),
+        label: Text('challenges.create'.tr()),
+      ),
       body: SafeArea(
         child: RefreshIndicator(
           color: AppColors.amber,

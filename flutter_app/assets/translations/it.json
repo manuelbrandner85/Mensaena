@@ -2649,6 +2649,7 @@
     "notFound": "Fattoria non trovata.",
     "searchPlaceholder": "Cerca fattorie…",
     "screenTitle": "Approvvigionamento",
+    "addFarm": "Aggiungi fattoria",
     "farmCreate": {
       "intro": "Aggiungi una fattoria, uno spaccio agricolo o un produttore diretto della tua zona.",
       "secBasics": "Dati principali",

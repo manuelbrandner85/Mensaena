@@ -2649,6 +2649,7 @@
     "notFound": "Granja no encontrada.",
     "searchPlaceholder": "Buscar granjas…",
     "screenTitle": "Suministro",
+    "addFarm": "Añadir granja",
     "farmCreate": {
       "intro": "Añade una granja, tienda agrícola o productor directo de tu región.",
       "secBasics": "Datos básicos",

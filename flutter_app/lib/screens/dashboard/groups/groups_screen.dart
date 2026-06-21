@@ -71,17 +71,10 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Editorial-Header in die scrollbare Liste verschoben → mehr Platz
+            // für die Gruppenliste (weniger fixe Kopfzeile).
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 08',
-                metaCategory: 'groups.screenTitle'.tr(),
-                title: 'modules.groupsHero.title'.tr(),
-                subtitle: 'modules.groupsHero.subtitle'.tr(),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
               child: ModuleSearchBar(
                 hintText: 'groups.searchPlaceholder'.tr(),
                 onChanged: (v) => setState(() => _search = v),
@@ -138,7 +131,13 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
                         children: [
-                          const SizedBox(height: 60),
+                          EditorialModuleHeader(
+                            metaIndex: '§ 08',
+                            metaCategory: 'groups.screenTitle'.tr(),
+                            title: 'modules.groupsHero.title'.tr(),
+                            subtitle: 'modules.groupsHero.subtitle'.tr(),
+                          ),
+                          const SizedBox(height: 40),
                           EmptyStateWidget(
                             icon: LucideIcons.users2,
                             title: _hasFilters
@@ -163,15 +162,26 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
                     }
                     return ListView.builder(
                       padding: const EdgeInsets.all(12),
-                      // F74: itemCount +1 für Nachbarschafts-Carousel an
-                      // Position 0 (nur sichtbar wenn GPS-Standort
-                      // verfügbar UND mind. 1 Group mit lat/lng in Radius).
-                      itemCount: list.length + 1,
+                      // i0 = Editorial-Header (aus dem fixen Kopf verschoben →
+                      // mehr Platz), i1 = Nachbarschafts-Carousel (nur sichtbar
+                      // bei GPS + Group im Radius), danach die Gruppen.
+                      itemCount: list.length + 2,
                       itemBuilder: (context, i) {
-                        if (i == 0) return const NearbyGroupsCarousel();
+                        if (i == 0) {
+                          return Padding(
+                            padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
+                            child: EditorialModuleHeader(
+                              metaIndex: '§ 08',
+                              metaCategory: 'groups.screenTitle'.tr(),
+                              title: 'modules.groupsHero.title'.tr(),
+                              subtitle: 'modules.groupsHero.subtitle'.tr(),
+                            ),
+                          );
+                        }
+                        if (i == 1) return const NearbyGroupsCarousel();
                         return AnimatedEntrance(
                           index: i,
-                          child: _Tile(group: list[i - 1]),
+                          child: _Tile(group: list[i - 2]),
                         );
                       },
                     );

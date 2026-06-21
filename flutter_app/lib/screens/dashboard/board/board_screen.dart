@@ -86,17 +86,10 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Editorial-Header in den Scroll verschoben (SliverToBoxAdapter
+            // unten) → mehr Platz fürs Pinnwand-Raster.
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 06',
-                metaCategory: 'board.screenTitle'.tr(),
-                title: 'modules.board.titleAlt'.tr(),
-                subtitle: 'modules.board.subtitle'.tr(),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
               child: ModuleSearchBar(
                 hintText: 'board.searchPlaceholder'.tr(),
                 onChanged: _onSearch,
@@ -155,7 +148,13 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
                         children: [
-                          const SizedBox(height: 60),
+                          EditorialModuleHeader(
+                            metaIndex: '§ 06',
+                            metaCategory: 'board.screenTitle'.tr(),
+                            title: 'modules.board.titleAlt'.tr(),
+                            subtitle: 'modules.board.subtitle'.tr(),
+                          ),
+                          const SizedBox(height: 40),
                           EmptyStateCard(
                             icon: LucideIcons.stickyNote,
                             title: hasFilters
@@ -176,21 +175,42 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                         ],
                       );
                     }
-                    return GridView.builder(
-                      padding: const EdgeInsets.all(12),
+                    // Header scrollt mit (SliverToBoxAdapter) → das Raster
+                    // bekommt mehr Höhe als bei fixem Kopf.
+                    return CustomScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 220,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 0.95,
-                      ),
-                      itemCount: list.length,
-                      itemBuilder: (context, i) => AnimatedEntrance(
-                        index: i,
-                        child: _Note(post: list[i]),
-                      ),
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                            child: EditorialModuleHeader(
+                              metaIndex: '§ 06',
+                              metaCategory: 'board.screenTitle'.tr(),
+                              title: 'modules.board.titleAlt'.tr(),
+                              subtitle: 'modules.board.subtitle'.tr(),
+                            ),
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: const EdgeInsets.all(12),
+                          sliver: SliverGrid(
+                            gridDelegate:
+                                const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 220,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 0.95,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, i) => AnimatedEntrance(
+                                index: i,
+                                child: _Note(post: list[i]),
+                              ),
+                              childCount: list.length,
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),

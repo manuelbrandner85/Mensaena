@@ -147,15 +147,8 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 11',
-                metaCategory: 'marketplace.screenTitle'.tr(),
-                title: 'modules.marketplaceHero.title'.tr(),
-                subtitle: 'modules.marketplaceHero.subtitle'.tr(),
-              ),
-            ),
+            // Editorial-Header + Hinweis in den Scroll verschoben (unten) →
+            // deutlich mehr Platz fürs Marktplatz-Raster.
             // Stats-Pill-Row
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 8, 12, 6),
@@ -164,35 +157,6 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                 showClaimed: _showClaimed,
                 onToggleClaimed: () =>
                     setState(() => _showClaimed = !_showClaimed),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.amber.withValues(alpha: 0.08),
-                  border: Border.all(
-                      color: AppColors.amber.withValues(alpha: 0.3)),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(LucideIcons.info,
-                        size: 14, color: AppColors.amber),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'marketplace.nonCommercialHint'.tr(),
-                        style: AppTypography.body(
-                          size: 11,
-                          color: AppColors.inkSoft,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
               ),
             ),
             Padding(
@@ -343,7 +307,13 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                             const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
                         children: [
-                          const SizedBox(height: 40),
+                          EditorialModuleHeader(
+                            metaIndex: '§ 11',
+                            metaCategory: 'marketplace.screenTitle'.tr(),
+                            title: 'modules.marketplaceHero.title'.tr(),
+                            subtitle: 'modules.marketplaceHero.subtitle'.tr(),
+                          ),
+                          const SizedBox(height: 32),
                           EmptyStateWidget(
                             icon: LucideIcons.store,
                             title: _hasFilters
@@ -369,21 +339,75 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                         ],
                       );
                     }
-                    return GridView.builder(
-                      padding: const EdgeInsets.all(12),
+                    // Header + Hinweis scrollen mit (SliverToBoxAdapter) → das
+                    // Raster bekommt deutlich mehr Höhe als bei fixem Kopf.
+                    return CustomScrollView(
                       physics: const AlwaysScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 240,
-                        mainAxisSpacing: 10,
-                        crossAxisSpacing: 10,
-                        childAspectRatio: 0.72,
-                      ),
-                      itemCount: list.length,
-                      itemBuilder: (context, i) => AnimatedEntrance(
-                        index: i,
-                        child: _Tile(item: list[i]),
-                      ),
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                            child: EditorialModuleHeader(
+                              metaIndex: '§ 11',
+                              metaCategory: 'marketplace.screenTitle'.tr(),
+                              title: 'modules.marketplaceHero.title'.tr(),
+                              subtitle:
+                                  'modules.marketplaceHero.subtitle'.tr(),
+                            ),
+                          ),
+                        ),
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: AppColors.amber.withValues(alpha: 0.08),
+                                border: Border.all(
+                                    color:
+                                        AppColors.amber.withValues(alpha: 0.3)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(LucideIcons.info,
+                                      size: 14, color: AppColors.amber),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'marketplace.nonCommercialHint'.tr(),
+                                      style: AppTypography.body(
+                                        size: 11,
+                                        color: AppColors.inkSoft,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        SliverPadding(
+                          padding: const EdgeInsets.all(12),
+                          sliver: SliverGrid(
+                            gridDelegate:
+                                const SliverGridDelegateWithMaxCrossAxisExtent(
+                              maxCrossAxisExtent: 240,
+                              mainAxisSpacing: 10,
+                              crossAxisSpacing: 10,
+                              childAspectRatio: 0.72,
+                            ),
+                            delegate: SliverChildBuilderDelegate(
+                              (context, i) => AnimatedEntrance(
+                                index: i,
+                                child: _Tile(item: list[i]),
+                              ),
+                              childCount: list.length,
+                            ),
+                          ),
+                        ),
+                      ],
                     );
                   },
                 ),

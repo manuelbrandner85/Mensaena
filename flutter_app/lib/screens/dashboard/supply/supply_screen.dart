@@ -83,6 +83,15 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
     return DashboardScaffold(
       title: 'supply.screenTitle'.tr(),
       currentRoute: '/dashboard/supply',
+      // Erreichbarer Einstieg zum Eintragen eines Hofs/Hofladens — vorher
+      // existierte nur die Route /dashboard/supply/farm/add ohne UI-Einstieg.
+      fab: FloatingActionButton.extended(
+        backgroundColor: AppColors.amber,
+        foregroundColor: AppColors.voidColor,
+        onPressed: () => context.push('/dashboard/supply/farm/add'),
+        icon: const Icon(LucideIcons.plus),
+        label: Text('supply.addFarm'.tr()),
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -294,15 +303,20 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                             description: _hasFilters
                                 ? 'Andere Filter probieren.'
                                 : null,
-                            actionLabel:
-                                _hasFilters ? 'Filter zurücksetzen' : null,
+                            // Smarter Leerzustand: ohne Filter die nächste
+                            // sinnvolle Aktion anbieten (Hof eintragen) statt
+                            // einer Sackgasse.
+                            actionLabel: _hasFilters
+                                ? 'Filter zurücksetzen'
+                                : 'supply.addFarm'.tr(),
                             onAction: _hasFilters
                                 ? () => setState(() {
                                       _search = '';
                                       _category = null;
                                       _bioOnly = false;
                                     })
-                                : null,
+                                : () => context
+                                    .push('/dashboard/supply/farm/add'),
                           ),
                         ],
                       );
