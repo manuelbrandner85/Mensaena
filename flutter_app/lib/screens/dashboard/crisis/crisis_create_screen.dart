@@ -18,6 +18,8 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/voice_dictation_button.dart';
 import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/effects/animated_entrance.dart';
+import '../../../utils/form_validators.dart';
 
 /// SKILL: mensaena-features
 /// Crisis-Create — Schnellformular fuer Notfallmeldung.
@@ -33,6 +35,7 @@ class CrisisCreateScreen extends ConsumerStatefulWidget {
 
 class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
     with SingleTickerProviderStateMixin {
+  final _formKey = GlobalKey<FormState>();
   final _title = TextEditingController();
   final _desc = TextEditingController();
   final _location = TextEditingController();
@@ -49,8 +52,6 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
   final List<File> _images = <File>[];
   bool _anonymous = false;
   bool _submitting = false;
-  bool _titleError = false;
-  bool _descError = false;
   String? _error;
   late final AnimationController _pulse;
 
@@ -192,14 +193,9 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
   }
 
   Future<void> _submit() async {
-    final titleEmpty = _title.text.trim().isEmpty;
-    final descEmpty = _desc.text.trim().isEmpty;
-    if (titleEmpty || descEmpty) {
-      setState(() {
-        _titleError = titleEmpty;
-        _descError = descEmpty;
-        _error = 'crisis.fieldTitleRequired'.tr();
-      });
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      HapticFeedback.mediumImpact();
+      setState(() => _error = null);
       return;
     }
     if (_anonymous && _contactPhone.text.trim().isEmpty) {
@@ -266,7 +262,10 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
       currentRoute: '/dashboard/crisis',
       body: SafeArea(
         child: ReadableWidth(
-            child: ListView(
+            child: Form(
+          key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
             // Pulsierender Lebensgefahr-Banner (auf dieser Seite sehr prominent)
@@ -388,45 +387,46 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
             ),
             const SizedBox(height: 20),
             // Titel
-            TextField(
-              controller: _title,
-              maxLength: 120,
-              style: AppTypography.body(size: 15, color: AppColors.ink),
-              onChanged: _titleError
-                  ? (_) => setState(() => _titleError = false)
-                  : null,
-              decoration: InputDecoration(
-                labelText: 'crisis.fieldTitle'.tr(),
-                errorText: _titleError ? 'create.titleRequired'.tr() : null,
+            AnimatedEntrance(
+              index: 0,
+              child: TextFormField(
+                controller: _title,
+                maxLength: 120,
+                textInputAction: TextInputAction.next,
+                validator: FormValidators.lengthBetween(3, 120),
+                style: AppTypography.body(size: 15, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'crisis.fieldTitle'.tr(),
+                  counterText: '',
+                ),
               ),
             ),
             const SizedBox(height: 14),
             // Beschreibung mit Voice-Diktat-Button rechts oben
-            Stack(
-              children: [
-                TextField(
-                  controller: _desc,
-                  maxLines: 5,
-                  maxLength: 1500,
-                  style: AppTypography.body(size: 14, color: AppColors.ink),
-                  onChanged: _descError
-                      ? (_) => setState(() => _descError = false)
-                      : null,
-                  decoration: InputDecoration(
-                    labelText: 'crisis.fieldDescription'.tr(),
-                    alignLabelWithHint: true,
-                    helperText: 'crisis.voiceHint'.tr(),
-                    helperStyle: AppTypography.caption(),
-                    errorText:
-                        _descError ? 'create.descRequired'.tr() : null,
+            AnimatedEntrance(
+              index: 1,
+              child: Stack(
+                children: [
+                  TextFormField(
+                    controller: _desc,
+                    maxLines: 5,
+                    maxLength: 1500,
+                    validator: FormValidators.lengthBetween(10, 1500),
+                    style: AppTypography.body(size: 14, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      labelText: 'crisis.fieldDescription'.tr(),
+                      alignLabelWithHint: true,
+                      helperText: 'crisis.voiceHint'.tr(),
+                      helperStyle: AppTypography.caption(),
+                    ),
                   ),
-                ),
-                Positioned(
-                  right: 4,
-                  top: 4,
-                  child: VoiceDictationButton(controller: _desc),
-                ),
-              ],
+                  Positioned(
+                    right: 4,
+                    top: 4,
+                    child: VoiceDictationButton(controller: _desc),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 14),
             // Ort + GPS — größere GPS-Taste
@@ -583,9 +583,10 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
               ),
               const SizedBox(height: 14),
             ],
-            TextField(
+            TextFormField(
               controller: _contactPhone,
               keyboardType: TextInputType.phone,
+              validator: FormValidators.phoneOptional,
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'[0-9+\s/()-]')),
               ],
@@ -641,7 +642,9 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
             ],
             const SizedBox(height: 24),
             // Großer Senden-Button — mind. 60dp hoch
-            SizedBox(
+            AnimatedEntrance(
+              index: 2,
+              child: SizedBox(
               width: double.infinity,
               height: 60,
               child: ElevatedButton.icon(
@@ -672,8 +675,9 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
                     : 'crisis.reportButton'.tr()),
               ),
             ),
+            ),
           ],
-        )),
+        ))),
       ),
     );
   }
