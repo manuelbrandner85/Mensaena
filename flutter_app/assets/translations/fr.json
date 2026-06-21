@@ -109,7 +109,8 @@
     "posts": "Publications",
     "admin": "Tableau de bord admin",
     "safety": "Sécurité",
-    "electricityPrices": "Prix de l'électricité"
+    "electricityPrices": "Prix de l'électricité",
+    "transit": "Transports"
   },
   "navGroups": {
     "communication": "Communication",
@@ -4847,5 +4848,20 @@
     "cheapest": "Heure la moins chère : {time} ({ct} ct/kWh)",
     "noData": "Aucune donnée de prix",
     "source": "Source : Energy-Charts (Fraunhofer ISE) · prix de gros hors taxes/réseau"
+  },
+  "oepnv": {
+    "title": "Transports en commun",
+    "from": "De",
+    "to": "À",
+    "search": "Chercher des trajets",
+    "searching": "Recherche…",
+    "noResults": "Aucun trajet trouvé",
+    "transfers": "{n} correspondances",
+    "minutes": "{n} min",
+    "useGps": "Position actuelle",
+    "gpsFailed": "Position indisponible",
+    "fillBoth": "Indiquez départ et arrivée",
+    "myLocation": "Ma position",
+    "source": "Source : Transitous / MOTIS (données OpenStreetMap)"
   }
 }

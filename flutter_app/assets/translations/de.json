@@ -109,7 +109,8 @@
     "posts": "Beiträge",
     "admin": "Admin-Dashboard",
     "safety": "Sicherheit",
-    "electricityPrices": "Strompreise"
+    "electricityPrices": "Strompreise",
+    "transit": "ÖPNV"
   },
   "navGroups": {
     "communication": "Kommunikation",
@@ -4843,5 +4844,20 @@
     "cheapest": "Günstigste Stunde: {time} ({ct} ct/kWh)",
     "noData": "Keine Preisdaten verfügbar",
     "source": "Quelle: Energy-Charts (Fraunhofer ISE) · Börsenpreis ohne Steuern/Netzentgelte"
+  },
+  "oepnv": {
+    "title": "ÖPNV-Verbindungen",
+    "from": "Von",
+    "to": "Nach",
+    "search": "Verbindungen suchen",
+    "searching": "Suche…",
+    "noResults": "Keine Verbindungen gefunden",
+    "transfers": "{n} Umstiege",
+    "minutes": "{n} Min",
+    "useGps": "Aktueller Standort",
+    "gpsFailed": "Standort nicht verfügbar",
+    "fillBoth": "Bitte Start und Ziel angeben",
+    "myLocation": "Mein Standort",
+    "source": "Quelle: Transitous / MOTIS (OpenStreetMap-Daten)"
   }
 }

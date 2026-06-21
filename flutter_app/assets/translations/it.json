@@ -109,7 +109,8 @@
     "posts": "Post",
     "admin": "Dashboard admin",
     "safety": "Sicurezza",
-    "electricityPrices": "Prezzi luce"
+    "electricityPrices": "Prezzi luce",
+    "transit": "Trasporti"
   },
   "navGroups": {
     "communication": "Comunicazione",
@@ -4847,5 +4848,20 @@
     "cheapest": "Ora più conveniente: {time} ({ct} ct/kWh)",
     "noData": "Nessun dato di prezzo",
     "source": "Fonte: Energy-Charts (Fraunhofer ISE) · prezzo all’ingrosso, tasse/rete escl."
+  },
+  "oepnv": {
+    "title": "Trasporti pubblici",
+    "from": "Da",
+    "to": "A",
+    "search": "Cerca collegamenti",
+    "searching": "Ricerca…",
+    "noResults": "Nessun collegamento trovato",
+    "transfers": "{n} cambi",
+    "minutes": "{n} min",
+    "useGps": "Posizione attuale",
+    "gpsFailed": "Posizione non disponibile",
+    "fillBoth": "Inserisci partenza e arrivo",
+    "myLocation": "La mia posizione",
+    "source": "Fonte: Transitous / MOTIS (dati OpenStreetMap)"
   }
 }

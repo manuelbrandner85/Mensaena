@@ -109,7 +109,8 @@
     "posts": "Gönderiler",
     "admin": "Yönetim paneli",
     "safety": "Güvenlik",
-    "electricityPrices": "Elektrik fiyatları"
+    "electricityPrices": "Elektrik fiyatları",
+    "transit": "Toplu taşıma"
   },
   "navGroups": {
     "communication": "İletişim",
@@ -4846,5 +4847,20 @@
     "cheapest": "En ucuz saat: {time} ({ct} ct/kWh)",
     "noData": "Fiyat verisi yok",
     "source": "Kaynak: Energy-Charts (Fraunhofer ISE) · vergi/şebeke hariç toptan fiyat"
+  },
+  "oepnv": {
+    "title": "Toplu taşıma",
+    "from": "Nereden",
+    "to": "Nereye",
+    "search": "Bağlantı ara",
+    "searching": "Aranıyor…",
+    "noResults": "Bağlantı bulunamadı",
+    "transfers": "{n} aktarma",
+    "minutes": "{n} dk",
+    "useGps": "Mevcut konum",
+    "gpsFailed": "Konum kullanılamıyor",
+    "fillBoth": "Başlangıç ve hedef girin",
+    "myLocation": "Konumum",
+    "source": "Kaynak: Transitous / MOTIS (OpenStreetMap verileri)"
   }
 }

@@ -46,9 +46,9 @@ class _ElectricityPricesScreenState
   Color _color(double ct, double min, double max) {
     if (max <= min) return AppColors.teal;
     final t = ((ct - min) / (max - min)).clamp(0.0, 1.0);
-    if (t < 0.33) return const Color(0xFF22C55E);
+    if (t < 0.33) return AppColors.teal;
     if (t < 0.66) return AppColors.amber;
-    return const Color(0xFFEA580C);
+    return AppColors.herzrotWarm;
   }
 
   @override

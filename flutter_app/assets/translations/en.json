@@ -109,7 +109,8 @@
     "posts": "Posts",
     "admin": "Admin dashboard",
     "safety": "Safety",
-    "electricityPrices": "Electricity prices"
+    "electricityPrices": "Electricity prices",
+    "transit": "Public transit"
   },
   "navGroups": {
     "communication": "Communication",
@@ -4844,5 +4845,20 @@
     "cheapest": "Cheapest hour: {time} ({ct} ct/kWh)",
     "noData": "No price data available",
     "source": "Source: Energy-Charts (Fraunhofer ISE) · wholesale price excl. taxes/grid fees"
+  },
+  "oepnv": {
+    "title": "Public transit",
+    "from": "From",
+    "to": "To",
+    "search": "Find connections",
+    "searching": "Searching…",
+    "noResults": "No connections found",
+    "transfers": "{n} transfers",
+    "minutes": "{n} min",
+    "useGps": "Current location",
+    "gpsFailed": "Location unavailable",
+    "fillBoth": "Please enter origin and destination",
+    "myLocation": "My location",
+    "source": "Source: Transitous / MOTIS (OpenStreetMap data)"
   }
 }

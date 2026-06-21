@@ -109,7 +109,8 @@
     "posts": "Публикации",
     "admin": "Админ-панель",
     "safety": "Безопасность",
-    "electricityPrices": "Цены на электричество"
+    "electricityPrices": "Цены на электричество",
+    "transit": "Транспорт"
   },
   "navGroups": {
     "communication": "Общение",
@@ -4846,5 +4847,20 @@
     "cheapest": "Самый дешёвый час: {time} ({ct} ct/kWh)",
     "noData": "Нет данных о ценах",
     "source": "Источник: Energy-Charts (Fraunhofer ISE) · оптовая цена без налогов/сетей"
+  },
+  "oepnv": {
+    "title": "Общественный транспорт",
+    "from": "Откуда",
+    "to": "Куда",
+    "search": "Найти маршруты",
+    "searching": "Поиск…",
+    "noResults": "Маршруты не найдены",
+    "transfers": "{n} пересадок",
+    "minutes": "{n} мин",
+    "useGps": "Текущее местоположение",
+    "gpsFailed": "Местоположение недоступно",
+    "fillBoth": "Укажите откуда и куда",
+    "myLocation": "Моё местоположение",
+    "source": "Источник: Transitous / MOTIS (данные OpenStreetMap)"
   }
 }
