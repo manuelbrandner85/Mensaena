@@ -1138,7 +1138,13 @@
     "broadcastScheduleLater": "Planifier plus tard",
     "broadcastChangeTime": "Changer l’heure",
     "broadcastScheduledTitle": "Diffusions planifiées",
-    "broadcastSentInfo": "Envoyé à {count}"
+    "broadcastSentInfo": "Envoyé à {count}",
+    "regSourceTitle": "Source d'inscription",
+    "regSourceHint": "Inscriptions web vs. app — et qui utilise ensuite aussi l'app.",
+    "regWeb": "Via web",
+    "regApp": "Via app",
+    "regWebAlsoInApp": "Web → aussi app",
+    "regAppTotal": "Total dans l'app"
   },
   "adminAi": {
     "title": "Contrôle IA",

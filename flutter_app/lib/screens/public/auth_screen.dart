@@ -243,7 +243,11 @@ class _AuthScreenState extends State<AuthScreen>
           final res = await sb.auth.signUp(
             email: _emailCtrl.text.trim().toLowerCase(),
             password: _passwordCtrl.text,
-            data: {'full_name': _nameCtrl.text.trim()},
+            // signup_platform='app' → Admin-Dashboard zeigt App-Registrierung.
+            data: {
+              'full_name': _nameCtrl.text.trim(),
+              'signup_platform': 'app',
+            },
             emailRedirectTo: 'https://www.mensaena.de/auth?mode=login',
           );
           if (refCode != null && res.user?.id != null) {

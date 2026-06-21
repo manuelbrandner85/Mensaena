@@ -233,12 +233,22 @@ Future<void> _initBackgroundServices() async {
     unawaited(ChallengesRepository.checkAndAwardBadges());
   }
 
+  // Markiert das Profil als "in der App gewesen" (Admin-Dashboard:
+  // wer sich über Web registriert hat, ist nachträglich auch in der App).
+  // Idempotent serverseitig (setzt app_first_seen_at nur beim ersten Mal).
+  Future<void> markAppSeen() async {
+    try {
+      await sb.rpc('mark_app_seen');
+    } catch (_) {/* offline / noch nicht migriert → still ignorieren */}
+  }
+
   // Auth-State-Listener: bei Login/Logout Token + Rolle lifecycle managen
   sb.auth.onAuthStateChange.listen((event) {
     switch (event.event) {
       case AuthChangeEvent.signedIn:
         unawaited(PushNotificationService.registerToken());
         unawaited(UserRoleCache.reload());
+        unawaited(markAppSeen());
         break;
       case AuthChangeEvent.signedOut:
         unawaited(PushNotificationService.unregisterToken());
@@ -248,6 +258,11 @@ Future<void> _initBackgroundServices() async {
         break;
     }
   });
+
+  // Kaltstart mit bestehender Session (kein signedIn-Event) → ebenfalls markieren.
+  if (sb.auth.currentSession != null) {
+    unawaited(markAppSeen());
+  }
 
   // Token-Refresh-Stream: bei neuer Token-ID neu registrieren
   PushNotificationService.onTokenRefresh.listen((_) {

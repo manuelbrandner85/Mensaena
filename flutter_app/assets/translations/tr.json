@@ -1137,7 +1137,13 @@
     "broadcastScheduleLater": "Sonraya planla",
     "broadcastChangeTime": "Saati değiştir",
     "broadcastScheduledTitle": "Planlanmış yayınlar",
-    "broadcastSentInfo": "{count} kişiye gönderildi"
+    "broadcastSentInfo": "{count} kişiye gönderildi",
+    "regSourceTitle": "Kayıt kaynağı",
+    "regSourceHint": "Web ve uygulama kayıtları — ve sonradan uygulamayı da kullananlar.",
+    "regWeb": "Web üzerinden",
+    "regApp": "Uygulamadan",
+    "regWebAlsoInApp": "Web → ayrıca uygulama",
+    "regAppTotal": "Uygulamada toplam"
   },
   "adminAi": {
     "title": "Yapay Zekâ Kontrolü",

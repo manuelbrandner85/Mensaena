@@ -1138,7 +1138,13 @@
     "broadcastScheduleLater": "Schedule later",
     "broadcastChangeTime": "Change time",
     "broadcastScheduledTitle": "Scheduled broadcasts",
-    "broadcastSentInfo": "Sent to {count}"
+    "broadcastSentInfo": "Sent to {count}",
+    "regSourceTitle": "Registration source",
+    "regSourceHint": "Web vs. app sign-ups — and who later also uses the app.",
+    "regWeb": "Via web",
+    "regApp": "Via app",
+    "regWebAlsoInApp": "Web → also app",
+    "regAppTotal": "Total in app"
   },
   "adminAi": {
     "title": "AI Control",

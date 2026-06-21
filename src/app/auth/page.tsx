@@ -185,11 +185,19 @@ function AuthPage() {
     // email is registered (account-enumeration). Supabase's signUp() returns a
     // generic "User already registered" error for duplicates, which we map to
     // the same UX message below.
+    // Registrierungsquelle für das Admin-Dashboard: 'app' wenn in der
+    // Capacitor-Native-Hülle, sonst 'web' (Browser).
+    const signupPlatform =
+      typeof window !== 'undefined' &&
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).Capacitor?.isNativePlatform?.()
+        ? 'app'
+        : 'web'
     const { data, error: signUpError } = await supabase.auth.signUp({
       email: email.toLowerCase().trim(),
       password,
       options: {
-        data: { full_name: name },
+        data: { full_name: name, signup_platform: signupPlatform },
         emailRedirectTo: `${window.location.origin}/auth?mode=login`,
       },
     })

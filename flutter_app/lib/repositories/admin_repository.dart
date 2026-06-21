@@ -1114,6 +1114,45 @@ final adminStatsProvider = FutureProvider<AdminStats>((ref) async {
   return AdminRepository.stats();
 });
 
+/// Registrierungsquelle: wer kam über Web bzw. App — und wer (Web-Anmeldung)
+/// ist nachträglich auch in der App. Speist die Admin-Übersicht.
+class RegistrationSourceStats {
+  const RegistrationSourceStats({
+    this.webSignups = 0,
+    this.appSignups = 0,
+    this.webAlsoInApp = 0,
+    this.appTotal = 0,
+    this.total = 0,
+  });
+
+  final int webSignups;
+  final int appSignups;
+  final int webAlsoInApp;
+  final int appTotal;
+  final int total;
+}
+
+final adminRegistrationSourceProvider =
+    FutureProvider<RegistrationSourceStats>((ref) async {
+  try {
+    final res = await sb.rpc<dynamic>('admin_registration_source_stats');
+    final row = (res is List && res.isNotEmpty) ? res.first : res;
+    if (row is! Map) return const RegistrationSourceStats();
+    final m = row.cast<String, dynamic>();
+    int g(String k) => (m[k] as num?)?.toInt() ?? 0;
+    return RegistrationSourceStats(
+      webSignups: g('web_signups'),
+      appSignups: g('app_signups'),
+      webAlsoInApp: g('web_also_in_app'),
+      appTotal: g('app_total'),
+      total: g('total'),
+    );
+  } catch (_) {
+    // RPC noch nicht migriert / offline → leere Werte, kein Crash.
+    return const RegistrationSourceStats();
+  }
+});
+
 final adminAuditLogsProvider = FutureProvider<List<Map<String, dynamic>>>(
   (ref) => AdminRepository.loadAuditLogs(),
 );

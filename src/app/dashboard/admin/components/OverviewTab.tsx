@@ -1,13 +1,64 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import {
   Users, FileText, MessageCircle, Calendar, LayoutGrid,
   Building2, AlertTriangle, Wheat, Star, Bell,
-  TrendingUp, Activity, Shield, MapPin, Target, Clock, UsersRound
+  TrendingUp, Activity, Shield, MapPin, Target, Clock, UsersRound,
+  Globe, Smartphone, ArrowRight
 } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
 import type { AdminStats } from './AdminTypes'
 
 interface Props { stats: AdminStats | null }
+
+// Registrierungsquelle: Web vs. App + wer (Web-Anmeldung) nachträglich auch
+// in der App ist. Lädt admin_registration_source_stats() selbst.
+interface RegSource {
+  web_signups: number
+  app_signups: number
+  web_also_in_app: number
+  app_total: number
+  total: number
+}
+
+function RegistrationSourceCards() {
+  const [reg, setReg] = useState<RegSource | null>(null)
+  useEffect(() => {
+    const supabase = createClient()
+    supabase
+      .rpc('admin_registration_source_stats')
+      .then(({ data }) => {
+        const row = Array.isArray(data) ? data[0] : data
+        if (row) setReg(row as RegSource)
+      })
+  }, [])
+  if (!reg) return null
+  const cards = [
+    { icon: <Globe className="w-5 h-5 text-mn-teal" />, label: 'Über Web', value: reg.web_signups, bg: 'bg-mn-surface' },
+    { icon: <Smartphone className="w-5 h-5 text-mn-leben" />, label: 'Über App', value: reg.app_signups, bg: 'bg-mn-surface' },
+    { icon: <ArrowRight className="w-5 h-5 text-amber-600" />, label: 'Web → auch App', value: reg.web_also_in_app, bg: 'bg-amber-50' },
+    { icon: <Smartphone className="w-5 h-5 text-mn-bronze" />, label: 'Gesamt in App', value: reg.app_total, bg: 'bg-mn-bronze/5' },
+  ]
+  return (
+    <div>
+      <h3 className="text-sm font-semibold text-mn-ink mb-3 flex items-center gap-2">
+        <Smartphone className="w-4 h-4 text-mn-teal" /> Registrierungsquelle
+      </h3>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {cards.map(({ icon, label, value, bg }) => (
+          <div key={label} className={`${bg} rounded-2xl p-4 border border-white/50`}>
+            <div className="flex items-center gap-2 mb-2">
+              {icon}
+              <span className="text-xs text-mn-mute font-medium truncate">{label}</span>
+            </div>
+            <p className="text-2xl font-bold text-mn-ink">{value}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function OverviewTab({ stats }: Props) {
   if (!stats) return null
@@ -34,6 +85,7 @@ export default function OverviewTab({ stats }: Props) {
 
   return (
     <div className="space-y-6">
+      <RegistrationSourceCards />
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
         {cards.map(({ icon, label, value, bg, sub }) => (
           <div key={label} className={`${bg} rounded-2xl p-4 border border-white/50`}>

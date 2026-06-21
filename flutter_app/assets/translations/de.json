@@ -1137,7 +1137,13 @@
     "broadcastScheduleLater": "Später planen",
     "broadcastChangeTime": "Zeit ändern",
     "broadcastScheduledTitle": "Geplante Broadcasts",
-    "broadcastSentInfo": "Gesendet an {count}"
+    "broadcastSentInfo": "Gesendet an {count}",
+    "regSourceTitle": "Registrierungsquelle",
+    "regSourceHint": "Web- vs. App-Anmeldungen — und wer nachträglich auch in der App ist.",
+    "regWeb": "Über Web",
+    "regApp": "Über App",
+    "regWebAlsoInApp": "Web → auch App",
+    "regAppTotal": "Gesamt in App"
   },
   "adminAi": {
     "title": "KI-Steuerung",

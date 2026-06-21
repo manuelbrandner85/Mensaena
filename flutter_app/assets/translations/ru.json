@@ -1137,7 +1137,13 @@
     "broadcastScheduleLater": "Запланировать позже",
     "broadcastChangeTime": "Изменить время",
     "broadcastScheduledTitle": "Запланированные рассылки",
-    "broadcastSentInfo": "Отправлено {count}"
+    "broadcastSentInfo": "Отправлено {count}",
+    "regSourceTitle": "Источник регистрации",
+    "regSourceHint": "Регистрации через веб и приложение — и кто позже также в приложении.",
+    "regWeb": "Через веб",
+    "regApp": "Через приложение",
+    "regWebAlsoInApp": "Веб → также приложение",
+    "regAppTotal": "Всего в приложении"
   },
   "adminAi": {
     "title": "Управление ИИ",

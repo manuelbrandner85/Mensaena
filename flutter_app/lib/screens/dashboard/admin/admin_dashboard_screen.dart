@@ -43,6 +43,8 @@ class AdminDashboardScreen extends ConsumerWidget {
               _OpenReportsAlert(),
               _UsersOverviewCard(),
               SizedBox(height: 16),
+              _RegistrationSourceCard(),
+              SizedBox(height: 16),
               _UserGrowthCard(),
               SizedBox(height: 16),
               _StatsStrip(),
@@ -188,6 +190,96 @@ class _UsersOverviewCard extends ConsumerWidget {
                   style: AppTypography.caption()),
             ),
             data: (s) => _UsersOverviewContent(stats: s),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Registrierungsquelle: Web vs. App + wer (Web-Anmeldung) nachträglich auch
+// in der App ist. Speist sich aus admin_registration_source_stats().
+class _RegistrationSourceCard extends ConsumerWidget {
+  const _RegistrationSourceCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final async = ref.watch(adminRegistrationSourceProvider);
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppColors.teal.withValues(alpha: 0.16),
+            AppColors.bronze.withValues(alpha: 0.06),
+          ],
+        ),
+        border: Border.all(color: AppColors.teal.withValues(alpha: 0.30)),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.smartphone,
+                  color: AppColors.teal, size: 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text('admin.regSourceTitle'.tr(),
+                    style:
+                        AppTypography.display(size: 18, color: AppColors.ink)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text('admin.regSourceHint'.tr(), style: AppTypography.caption()),
+          const SizedBox(height: 14),
+          async.when(
+            loading: () => const ShimmerBox(height: 90, borderRadius: 12),
+            error: (_, __) => Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Text('admin.statsLoadShort'.tr(),
+                  style: AppTypography.caption()),
+            ),
+            data: (s) => LayoutBuilder(
+              builder: (ctx, c) {
+                final cols = c.maxWidth >= 520 ? 4 : 2;
+                final tiles = <_MiniTile>[
+                  _MiniTile(
+                      icon: Icons.public,
+                      label: 'admin.regWeb'.tr(),
+                      value: s.webSignups,
+                      color: AppColors.teal),
+                  _MiniTile(
+                      icon: LucideIcons.smartphone,
+                      label: 'admin.regApp'.tr(),
+                      value: s.appSignups,
+                      color: AppColors.leben),
+                  _MiniTile(
+                      icon: Icons.arrow_forward,
+                      label: 'admin.regWebAlsoInApp'.tr(),
+                      value: s.webAlsoInApp,
+                      color: AppColors.amber),
+                  _MiniTile(
+                      icon: LucideIcons.users,
+                      label: 'admin.regAppTotal'.tr(),
+                      value: s.appTotal,
+                      color: AppColors.bronze),
+                ];
+                return GridView.count(
+                  crossAxisCount: cols,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  childAspectRatio: 2.2,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [for (final t in tiles) _MiniTileView(data: t)],
+                );
+              },
+            ),
           ),
         ],
       ),
