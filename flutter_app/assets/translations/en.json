@@ -681,7 +681,17 @@
     "blockedWord": "This message contains inappropriate language and was not sent.",
     "pinnedBanner": "📌 Pinned",
     "jumpToMessage": "Jump to message",
-    "unpin": "Unpin"
+    "unpin": "Unpin",
+    "createChannel": "Create room",
+    "createChannelTitle": "Create community room",
+    "createChannelSubtitle": "Supporter feature – visible to everyone",
+    "channelNameLabel": "Channel name",
+    "channelNameHint": "my-channel",
+    "channelDescLabel": "Description (optional)",
+    "channelDescHint": "What is this room about?",
+    "createChannelCta": "Create channel",
+    "channelCreated": "Room created!",
+    "createChannelFailed": "Could not create room."
   },
   "languages": {
     "de": "German",

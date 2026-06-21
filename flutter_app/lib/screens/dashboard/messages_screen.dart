@@ -91,23 +91,177 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
     );
   }
 
+  /// „Raum erstellen" — Förderer:innen (donor_tier>=2) legen einen Community-
+  /// Kanal an (Name + Emoji + optionale Beschreibung).
+  Future<void> _openCreateChannel(BuildContext context) async {
+    Haptics.tap();
+    final nameCtrl = TextEditingController();
+    final descCtrl = TextEditingController();
+    const emojis = [
+      '💬', '🏘️', '🌿', '🤝', '🎉', '📢', '🛒', '📚', '🌍', '🍽️', '🐾', '💡'
+    ];
+    var emoji = '💬';
+    var busy = false;
+    final created = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.sheetBackground,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheet) => Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 18,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('chat.createChannelTitle'.tr(),
+                  style: AppTypography.display(size: 18, color: AppColors.ink)),
+              const SizedBox(height: 2),
+              Text('chat.createChannelSubtitle'.tr(),
+                  style: AppTypography.caption()),
+              const SizedBox(height: 14),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final e in emojis)
+                    GestureDetector(
+                      onTap: () => setSheet(() => emoji = e),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: emoji == e
+                              ? AppColors.amber.withValues(alpha: 0.2)
+                              : AppColors.elevated,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                              color:
+                                  emoji == e ? AppColors.amber : AppColors.line),
+                        ),
+                        child: Text(e, style: const TextStyle(fontSize: 18)),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: nameCtrl,
+                maxLength: 40,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'chat.channelNameLabel'.tr(),
+                  hintText: 'chat.channelNameHint'.tr(),
+                  prefixIcon: const Icon(LucideIcons.hash, size: 16),
+                ),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: descCtrl,
+                maxLength: 120,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'chat.channelDescLabel'.tr(),
+                  hintText: 'chat.channelDescHint'.tr(),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.amber,
+                    foregroundColor: AppColors.voidColor,
+                    minimumSize: const Size.fromHeight(48),
+                  ),
+                  onPressed: busy
+                      ? null
+                      : () async {
+                          if (nameCtrl.text.trim().isEmpty) return;
+                          setSheet(() => busy = true);
+                          final ch =
+                              await ConversationsRepository.createChannel(
+                            name: nameCtrl.text,
+                            emoji: emoji,
+                            description: descCtrl.text,
+                          );
+                          if (ctx.mounted) Navigator.pop(ctx, ch != null);
+                        },
+                  icon: busy
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.voidColor),
+                        )
+                      : const Icon(LucideIcons.plus, size: 16),
+                  label: Text('chat.createChannelCta'.tr()),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+    nameCtrl.dispose();
+    descCtrl.dispose();
+    if (!mounted) return;
+    if (created == true) {
+      setState(_load);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('chat.channelCreated'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+      ));
+    } else if (created == false) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('chat.createChannelFailed'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final myTier = ref.watch(myProfileProvider).value?.donorTier ?? 0;
     return DashboardScaffold(
       title: 'messages.title'.tr(),
       currentRoute: '/dashboard/messages',
-      // F2c: FAB "Neue DM" oeffnet User-Picker. Nur im DM-Tab sichtbar.
+      // FAB: DM-Tab → "Neue DM"; Community-Tab → "Raum erstellen"
+      // (nur Förderer:innen, donor_tier>=2; serverseitig per RLS erzwungen).
       fab: AnimatedBuilder(
         animation: _tab,
-        builder: (_, __) => _tab.index == 1
-            ? FloatingActionButton(
-                backgroundColor: AppColors.bronze,
-                foregroundColor: AppColors.voidColor,
-                tooltip: 'messages.newDm'.tr(),
-                onPressed: () => _openNewDmPicker(context),
-                child: const Icon(LucideIcons.messageSquarePlus, size: 24),
-              )
-            : const SizedBox.shrink(),
+        builder: (_, __) {
+          if (_tab.index == 1) {
+            return FloatingActionButton(
+              backgroundColor: AppColors.bronze,
+              foregroundColor: AppColors.voidColor,
+              tooltip: 'messages.newDm'.tr(),
+              onPressed: () => _openNewDmPicker(context),
+              child: const Icon(LucideIcons.messageSquarePlus, size: 24),
+            );
+          }
+          if (_tab.index == 0 && myTier >= 2) {
+            return FloatingActionButton.extended(
+              backgroundColor: AppColors.amber,
+              foregroundColor: AppColors.voidColor,
+              tooltip: 'chat.createChannel'.tr(),
+              onPressed: () => _openCreateChannel(context),
+              icon: const Icon(LucideIcons.plus, size: 20),
+              label: Text('chat.createChannel'.tr()),
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
       body: SafeArea(
         child: Column(

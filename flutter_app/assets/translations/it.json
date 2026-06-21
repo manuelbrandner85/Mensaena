@@ -681,7 +681,17 @@
     "blockedWord": "Questo messaggio contiene linguaggio inappropriato e non è stato inviato.",
     "pinnedBanner": "📌 Fissato",
     "jumpToMessage": "Vai al messaggio",
-    "unpin": "Rimuovi pin"
+    "unpin": "Rimuovi pin",
+    "createChannel": "Crea stanza",
+    "createChannelTitle": "Crea stanza community",
+    "createChannelSubtitle": "Funzione sostenitori – visibile a tutti",
+    "channelNameLabel": "Nome canale",
+    "channelNameHint": "mio-canale",
+    "channelDescLabel": "Descrizione (facoltativa)",
+    "channelDescHint": "Di cosa tratta questa stanza?",
+    "createChannelCta": "Crea canale",
+    "channelCreated": "Stanza creata!",
+    "createChannelFailed": "Impossibile creare la stanza."
   },
   "languages": {
     "de": "Tedesco",

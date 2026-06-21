@@ -24,6 +24,53 @@ class ConversationsRepository {
     }
   }
 
+  /// Erstellt einen Community-Kanal. NUR donor_tier>=2 ("Förderer") — wird
+  /// serverseitig per RLS (channels_donor_insert) erzwungen; die UI zeigt den
+  /// Button ohnehin nur berechtigten Nutzer:innen. Legt eine conversation
+  /// (type 'group') + die chat_channels-Row an (1:1 zur Web-CreateChannelModal).
+  /// Gibt die neue Channel-Row zurück oder null bei Fehler.
+  static Future<Map<String, dynamic>?> createChannel({
+    required String name,
+    String emoji = '💬',
+    String? description,
+  }) async {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return null;
+    try {
+      final conv = await sb
+          .from('conversations')
+          .insert({'type': 'group', 'title': trimmed})
+          .select('id')
+          .single();
+      final convId = conv['id'] as String;
+      var base = trimmed
+          .toLowerCase()
+          .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+          .replaceAll(RegExp(r'^-+|-+$'), '');
+      if (base.isEmpty) base = 'kanal';
+      if (base.length > 36) base = base.substring(0, 36);
+      final slug =
+          '$base-${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}';
+      final desc = description?.trim();
+      final ch = await sb
+          .from('chat_channels')
+          .insert({
+            'name': trimmed,
+            'slug': slug,
+            'emoji': emoji,
+            'description': (desc == null || desc.isEmpty) ? null : desc,
+            'category': 'Community',
+            'conversation_id': convId,
+          })
+          .select(
+              'id, conversation_id, name, emoji, slug, description, category')
+          .single();
+      return ch;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Eigene Konversationen sortiert nach last_message_at (neueste oben).
   static Future<List<Map<String, dynamic>>> listMine() async {
     final uid = SupabaseService.currentUser?.id;

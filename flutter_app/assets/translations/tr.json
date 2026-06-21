@@ -680,7 +680,17 @@
     "blockedWord": "Bu mesaj uygunsuz ifade içeriyor ve gönderilmedi.",
     "pinnedBanner": "📌 Sabitlendi",
     "jumpToMessage": "Mesaja git",
-    "unpin": "Sabitlemeyi kaldır"
+    "unpin": "Sabitlemeyi kaldır",
+    "createChannel": "Oda oluştur",
+    "createChannelTitle": "Topluluk odası oluştur",
+    "createChannelSubtitle": "Destekçi özelliği – herkese görünür",
+    "channelNameLabel": "Kanal adı",
+    "channelNameHint": "kanalım",
+    "channelDescLabel": "Açıklama (isteğe bağlı)",
+    "channelDescHint": "Bu oda ne hakkında?",
+    "createChannelCta": "Kanal oluştur",
+    "channelCreated": "Oda oluşturuldu!",
+    "createChannelFailed": "Oda oluşturulamadı."
   },
   "languages": {
     "de": "Almanca",

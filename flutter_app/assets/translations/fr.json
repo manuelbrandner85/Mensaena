@@ -681,7 +681,17 @@
     "blockedWord": "Ce message contient un langage inapproprié et n'a pas été envoyé.",
     "pinnedBanner": "📌 Épinglé",
     "jumpToMessage": "Aller au message",
-    "unpin": "Désépingler"
+    "unpin": "Désépingler",
+    "createChannel": "Créer un salon",
+    "createChannelTitle": "Créer un salon communautaire",
+    "createChannelSubtitle": "Fonction soutien – visible par tous",
+    "channelNameLabel": "Nom du salon",
+    "channelNameHint": "mon-salon",
+    "channelDescLabel": "Description (facultatif)",
+    "channelDescHint": "De quoi parle ce salon ?",
+    "createChannelCta": "Créer le salon",
+    "channelCreated": "Salon créé !",
+    "createChannelFailed": "Impossible de créer le salon."
   },
   "languages": {
     "de": "Allemand",

@@ -680,7 +680,17 @@
     "blockedWord": "Это сообщение содержит недопустимые выражения и не было отправлено.",
     "pinnedBanner": "📌 Закреплено",
     "jumpToMessage": "Перейти к сообщению",
-    "unpin": "Открепить"
+    "unpin": "Открепить",
+    "createChannel": "Создать комнату",
+    "createChannelTitle": "Создать комнату сообщества",
+    "createChannelSubtitle": "Функция меценатов – видна всем",
+    "channelNameLabel": "Название канала",
+    "channelNameHint": "мой-канал",
+    "channelDescLabel": "Описание (необязательно)",
+    "channelDescHint": "О чём эта комната?",
+    "createChannelCta": "Создать канал",
+    "channelCreated": "Комната создана!",
+    "createChannelFailed": "Не удалось создать комнату."
   },
   "languages": {
     "de": "Немецкий",

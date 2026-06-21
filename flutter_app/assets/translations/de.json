@@ -680,7 +680,17 @@
     "blockedWord": "Diese Nachricht enthält unangemessene Sprache und wurde nicht gesendet.",
     "pinnedBanner": "📌 Angepinnt",
     "jumpToMessage": "Zur Nachricht springen",
-    "unpin": "Lösen"
+    "unpin": "Lösen",
+    "createChannel": "Raum erstellen",
+    "createChannelTitle": "Community-Raum erstellen",
+    "createChannelSubtitle": "Förderer-Feature – für alle sichtbar",
+    "channelNameLabel": "Kanalname",
+    "channelNameHint": "mein-kanal",
+    "channelDescLabel": "Beschreibung (optional)",
+    "channelDescHint": "Worum geht es in diesem Raum?",
+    "createChannelCta": "Kanal erstellen",
+    "channelCreated": "Raum erstellt!",
+    "createChannelFailed": "Konnte Raum nicht erstellen."
   },
   "languages": {
     "de": "Deutsch",

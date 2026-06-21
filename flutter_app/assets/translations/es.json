@@ -681,7 +681,17 @@
     "blockedWord": "Este mensaje contiene lenguaje inapropiado y no se envió.",
     "pinnedBanner": "📌 Anclado",
     "jumpToMessage": "Ir al mensaje",
-    "unpin": "Desanclar"
+    "unpin": "Desanclar",
+    "createChannel": "Crear sala",
+    "createChannelTitle": "Crear sala comunitaria",
+    "createChannelSubtitle": "Función para donantes – visible para todos",
+    "channelNameLabel": "Nombre del canal",
+    "channelNameHint": "mi-canal",
+    "channelDescLabel": "Descripción (opcional)",
+    "channelDescHint": "¿De qué trata esta sala?",
+    "createChannelCta": "Crear canal",
+    "channelCreated": "¡Sala creada!",
+    "createChannelFailed": "No se pudo crear la sala."
   },
   "languages": {
     "de": "Alemán",
