@@ -4158,7 +4158,16 @@
     "alerts": {
       "allClear": "Всё спокойно"
     },
-    "tileLoadError": "Не удалось загрузить · Нажмите, чтобы повторить"
+    "tileLoadError": "Не удалось загрузить · Нажмите, чтобы повторить",
+    "profileCompletionTitle": "Заполните профиль",
+    "profileCompletionHint": "Заполните профиль для доверия.",
+    "profileItem": {
+      "avatar": "Фото профиля",
+      "name": "Отображаемое имя",
+      "bio": "Обо мне",
+      "location": "Местоположение",
+      "phone": "Телефон"
+    }
   },
   "interactions": {
     "noneTitle": "Пока нет действий помощи",

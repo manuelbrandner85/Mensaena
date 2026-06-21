@@ -4159,7 +4159,16 @@
     "alerts": {
       "allClear": "Tout va bien"
     },
-    "tileLoadError": "Échec du chargement · Appuyez pour réessayer"
+    "tileLoadError": "Échec du chargement · Appuyez pour réessayer",
+    "profileCompletionTitle": "Complète ton profil",
+    "profileCompletionHint": "Complète ton profil pour plus de confiance.",
+    "profileItem": {
+      "avatar": "Photo de profil",
+      "name": "Nom affiché",
+      "bio": "À propos",
+      "location": "Lieu",
+      "phone": "Téléphone"
+    }
   },
   "interactions": {
     "noneTitle": "Aucune activité d'aide pour l'instant",

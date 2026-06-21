@@ -58,6 +58,7 @@ import '../../../widgets/dashboard/sun_widget.dart';
 import '../../../widgets/dashboard/become_mentor_cta.dart';
 import '../../../widgets/dashboard/daily_challenges_widget.dart';
 import '../../../widgets/dashboard/nearby_neighbors_widget.dart';
+import '../../../widgets/dashboard/profile_completion_card.dart';
 import '../../../widgets/dashboard/recent_routes_widget.dart';
 import '../../../widgets/dashboard/today_events_widget.dart';
 import '../../../widgets/dashboard/traffic_info_widget.dart';
@@ -1104,6 +1105,7 @@ class _DashboardScrollBody extends ConsumerWidget {
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
           const DashboardDorfHeader(),
+          const ProfileCompletionCard(),
           const DashboardOnboardingTooltip(),
           ...buildChildren(cfg, data, loading),
         ],

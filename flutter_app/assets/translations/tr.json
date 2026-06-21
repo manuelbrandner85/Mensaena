@@ -4158,7 +4158,16 @@
     "alerts": {
       "allClear": "Her şey yolunda"
     },
-    "tileLoadError": "Yüklenemedi · Yeniden denemek için dokun"
+    "tileLoadError": "Yüklenemedi · Yeniden denemek için dokun",
+    "profileCompletionTitle": "Profilini tamamla",
+    "profileCompletionHint": "Güven için profilini tamamla.",
+    "profileItem": {
+      "avatar": "Profil fotoğrafı",
+      "name": "Görünen ad",
+      "bio": "Hakkımda",
+      "location": "Konum",
+      "phone": "Telefon"
+    }
   },
   "interactions": {
     "noneTitle": "Henüz yardım etkinliği yok",

@@ -4159,7 +4159,16 @@
     "alerts": {
       "allClear": "Todo despejado"
     },
-    "tileLoadError": "No se pudo cargar · Toca para reintentar"
+    "tileLoadError": "No se pudo cargar · Toca para reintentar",
+    "profileCompletionTitle": "Completa tu perfil",
+    "profileCompletionHint": "Completa tu perfil para generar confianza.",
+    "profileItem": {
+      "avatar": "Foto de perfil",
+      "name": "Nombre visible",
+      "bio": "Sobre mí",
+      "location": "Ubicación",
+      "phone": "Teléfono"
+    }
   },
   "interactions": {
     "noneTitle": "Aún no hay actividades de ayuda",

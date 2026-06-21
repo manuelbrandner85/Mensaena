@@ -4155,7 +4155,16 @@
     "alerts": {
       "allClear": "Alles sicher"
     },
-    "tileLoadError": "Konnte nicht laden · Tippen zum Wiederholen"
+    "tileLoadError": "Konnte nicht laden · Tippen zum Wiederholen",
+    "profileCompletionTitle": "Profil vervollständigen",
+    "profileCompletionHint": "Vervollständige dein Profil für mehr Vertrauen.",
+    "profileItem": {
+      "avatar": "Profilbild",
+      "name": "Anzeigename",
+      "bio": "Über mich",
+      "location": "Standort",
+      "phone": "Telefon"
+    }
   },
   "interactions": {
     "noneTitle": "Noch keine Hilfe-Vorgänge",

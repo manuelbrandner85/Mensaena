@@ -4156,7 +4156,16 @@
     "alerts": {
       "allClear": "All clear"
     },
-    "tileLoadError": "Couldn’t load · Tap to retry"
+    "tileLoadError": "Couldn’t load · Tap to retry",
+    "profileCompletionTitle": "Complete your profile",
+    "profileCompletionHint": "Complete your profile to build trust.",
+    "profileItem": {
+      "avatar": "Profile photo",
+      "name": "Display name",
+      "bio": "About me",
+      "location": "Location",
+      "phone": "Phone"
+    }
   },
   "interactions": {
     "noneTitle": "No help activities yet",

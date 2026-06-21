@@ -4159,7 +4159,16 @@
     "alerts": {
       "allClear": "Tutto tranquillo"
     },
-    "tileLoadError": "Caricamento non riuscito · Tocca per riprovare"
+    "tileLoadError": "Caricamento non riuscito · Tocca per riprovare",
+    "profileCompletionTitle": "Completa il profilo",
+    "profileCompletionHint": "Completa il profilo per più fiducia.",
+    "profileItem": {
+      "avatar": "Foto profilo",
+      "name": "Nome visualizzato",
+      "bio": "Su di me",
+      "location": "Posizione",
+      "phone": "Telefono"
+    }
   },
   "interactions": {
     "noneTitle": "Ancora nessuna attività di aiuto",
