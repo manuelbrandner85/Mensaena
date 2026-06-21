@@ -14,10 +14,8 @@ import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
-import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
-import '../../../widgets/shared/readable_width.dart';
-import '../../../widgets/effects/animated_entrance.dart';
 import '../../../utils/form_validators.dart';
 
 /// Vereinfachter Create-Flow für 'giveaway' und 'swap' — kein Preis-Feld.
@@ -45,6 +43,7 @@ class _SharingCreateScreenState
   bool _locating = false;
   bool _submitting = false;
   bool _uploading = false;
+  bool _noTradeConfirmed = false;
   String? _error;
   final List<File> _images = [];
   static const int _maxImages = 5;
@@ -168,6 +167,12 @@ class _SharingCreateScreenState
       setState(() => _error = null);
       return;
     }
+    // Pflicht-Bestätigung „Kein Handel/Geldgeschäft" (Verschenken/Tauschen).
+    if (!_noTradeConfirmed) {
+      Haptics.error();
+      setState(() => _error = 'create.noTradeRequired'.tr());
+      return;
+    }
     setState(() {
       _submitting = true;
       _error = null;
@@ -231,56 +236,64 @@ class _SharingCreateScreenState
 
   @override
   Widget build(BuildContext context) {
-    return DashboardScaffold(
-      title: 'sharing.createTitle'.tr(),
-      currentRoute: '/dashboard/sharing',
-      body: SafeArea(
-        child: ReadableWidth(
-          child: Form(
-            key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: ListView(
-            padding: const EdgeInsets.all(20),
-            children: [
-              // ── Typ-Toggle: Giveaway / Swap ──────────────────────────
-              Text('sharing.typeLabel'.tr(),
-                  style: AppTypography.label(size: 10)),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  _TypeButton(
-                    emoji: '🎁',
-                    label: 'sharing.typeGiveaway'.tr(),
-                    active: _listingType == 'giveaway',
-                    color: AppColors.leben,
-                    onTap: () => setState(() => _listingType = 'giveaway'),
-                  ),
-                  const SizedBox(width: 8),
-                  _TypeButton(
-                    emoji: '🔄',
-                    label: 'sharing.typeSwap'.tr(),
-                    active: _listingType == 'swap',
-                    color: AppColors.teal,
-                    onTap: () => setState(() => _listingType = 'swap'),
-                  ),
-                ],
-              ),
-              // Info-Hint je Typ
-              Padding(
-                padding: const EdgeInsets.only(top: 8, bottom: 4),
-                child: Text(
-                  _listingType == 'giveaway'
-                      ? 'sharing.hintGiveaway'.tr()
-                      : 'sharing.hintSwap'.tr(),
-                  style: AppTypography.body(
-                      size: 12, color: AppColors.inkSoft),
+    return Form(
+      key: _formKey,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      child: CreatePostScaffold(
+        title: 'sharing.createTitle'.tr(),
+        subtitle: 'create.descriptions.sharing'.tr(),
+        accent: AppColors.teal,
+        icon: LucideIcons.repeat,
+        returnRoute: '/dashboard/sharing',
+        sections: [
+          // ── Art (Verschenken / Tauschen) ────────────────────────────
+          CreateCard(
+            title: 'sharing.typeLabel'.tr(),
+            icon: LucideIcons.repeat,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    _TypeButton(
+                      emoji: '🎁',
+                      label: 'sharing.typeGiveaway'.tr(),
+                      active: _listingType == 'giveaway',
+                      color: AppColors.leben,
+                      onTap: () => setState(() => _listingType = 'giveaway'),
+                    ),
+                    const SizedBox(width: 8),
+                    _TypeButton(
+                      emoji: '🔄',
+                      label: 'sharing.typeSwap'.tr(),
+                      active: _listingType == 'swap',
+                      color: AppColors.teal,
+                      onTap: () => setState(() => _listingType = 'swap'),
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(height: 10),
-              // ── Titel ────────────────────────────────────────────────
-              AnimatedEntrance(
-                index: 0,
-                child: TextFormField(
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(
+                    _listingType == 'giveaway'
+                        ? 'sharing.hintGiveaway'.tr()
+                        : 'sharing.hintSwap'.tr(),
+                    style:
+                        AppTypography.body(size: 12, color: AppColors.inkSoft),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ── Titel & Beschreibung ────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionDetails'.tr(),
+            icon: LucideIcons.fileText,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
                   controller: _title,
                   maxLength: 120,
                   textInputAction: TextInputAction.next,
@@ -288,15 +301,10 @@ class _SharingCreateScreenState
                   style: AppTypography.body(size: 15, color: AppColors.ink),
                   decoration: InputDecoration(
                     labelText: 'create.title'.tr(),
-                    counterText: '',
                   ),
                 ),
-              ),
-              const SizedBox(height: 10),
-              // ── Beschreibung ─────────────────────────────────────────
-              AnimatedEntrance(
-                index: 1,
-                child: TextFormField(
+                const SizedBox(height: 8),
+                TextFormField(
                   controller: _desc,
                   maxLines: 4,
                   validator: FormValidators.lengthBetween(10, 2000),
@@ -306,195 +314,219 @@ class _SharingCreateScreenState
                     alignLabelWithHint: true,
                   ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              // ── Bilder ───────────────────────────────────────────────
-              Text('marketplace.create.images'.tr(),
-                  style: AppTypography.label(size: 10)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  ..._images.asMap().entries.map((e) {
-                    final i = e.key;
-                    final f = e.value;
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(f,
-                              width: 80,
-                              height: 80,
-                              fit: BoxFit.cover,
-                              cacheWidth: 160,
-                              cacheHeight: 160),
-                        ),
-                        Positioned(
-                          top: -4,
-                          right: -4,
-                          child: GestureDetector(
-                            onTap: () =>
-                                setState(() => _images.removeAt(i)),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: AppColors.herzrot,
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                    color: AppColors.surface, width: 2),
-                              ),
-                              padding: const EdgeInsets.all(2),
-                              child: const Icon(LucideIcons.x,
-                                  size: 12, color: Colors.white),
+              ],
+            ),
+          ),
+
+          // ── Bilder ──────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionImages'.tr(),
+            icon: LucideIcons.image,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                ..._images.asMap().entries.map((e) {
+                  final i = e.key;
+                  final f = e.value;
+                  return Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(f,
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                            cacheWidth: 160,
+                            cacheHeight: 160),
+                      ),
+                      Positioned(
+                        top: -4,
+                        right: -4,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _images.removeAt(i)),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppColors.herzrot,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: AppColors.surface, width: 2),
                             ),
+                            padding: const EdgeInsets.all(2),
+                            child: const Icon(LucideIcons.x,
+                                size: 12, color: Colors.white),
                           ),
-                        ),
-                      ],
-                    );
-                  }),
-                  if (_images.length < _maxImages)
-                    GestureDetector(
-                      onTap: _pickImage,
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.elevated,
-                          border: Border.all(color: AppColors.line),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(LucideIcons.plus,
-                                size: 20, color: AppColors.primary500),
-                            const SizedBox(height: 2),
-                            Text(
-                              'marketplace.create.addImage'.tr(),
-                              style: AppTypography.label(
-                                  size: 8, color: AppColors.inkSoft),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
                         ),
                       ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              // ── Kategorie ────────────────────────────────────────────
-              DropdownButtonFormField<String>(
-                value: _category,
-                decoration:
-                    InputDecoration(labelText: 'create.categoryLabel'.tr()),
-                dropdownColor: AppColors.surface,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                items: _categories.entries
-                    .map((e) => DropdownMenuItem(
-                        value: e.key, child: Text(e.value.tr())))
-                    .toList(),
-                onChanged: (v) =>
-                    setState(() => _category = v ?? _category),
-              ),
-              const SizedBox(height: 10),
-              // ── Zustand ──────────────────────────────────────────────
-              DropdownButtonFormField<String>(
-                value: _condition,
-                decoration:
-                    InputDecoration(labelText: 'create.condition'.tr()),
-                dropdownColor: AppColors.surface,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                items: _conditions.entries
-                    .map((e) => DropdownMenuItem(
-                        value: e.key, child: Text(e.value.tr())))
-                    .toList(),
-                onChanged: (v) =>
-                    setState(() => _condition = v ?? _condition),
-              ),
-              const SizedBox(height: 10),
-              // ── Schlagwörter ─────────────────────────────────────────
-              TextField(
-                controller: _tags,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'marketplace.tags'.tr(),
-                  hintText: 'marketplace.tagsHint'.tr(),
-                  prefixIcon: const Icon(LucideIcons.tag, size: 18),
-                ),
-              ),
-              const SizedBox(height: 10),
-              // ── Standort ─────────────────────────────────────────────
-              TextField(
-                controller: _location,
-                style: AppTypography.body(size: 14, color: AppColors.ink),
-                decoration: InputDecoration(
-                  labelText: 'create.location'.tr(),
-                  suffixIcon: IconButton(
-                    onPressed: _locating ? null : _useGps,
-                    tooltip: 'marketplace.useGps'.tr(),
-                    icon: _locating
-                        ? const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: AppColors.primary500),
-                          )
-                        : Icon(
-                            _lat != null
-                                ? LucideIcons.mapPin
-                                : LucideIcons.locate,
-                            size: 18,
-                            color: _lat != null
-                                ? AppColors.primary500
-                                : AppColors.inkSoft,
+                    ],
+                  );
+                }),
+                if (_images.length < _maxImages)
+                  GestureDetector(
+                    onTap: _pickImage,
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        color: AppColors.elevated,
+                        border: Border.all(color: AppColors.line),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(LucideIcons.plus,
+                              size: 20, color: AppColors.primary500),
+                          const SizedBox(height: 2),
+                          Text(
+                            'marketplace.create.addImage'.tr(),
+                            style: AppTypography.label(
+                                size: 8, color: AppColors.inkSoft),
+                            textAlign: TextAlign.center,
                           ),
-                  ),
-                ),
-              ),
-              if (_error != null) ...[
-                const SizedBox(height: 10),
-                Text(_error!,
-                    style: AppTypography.body(
-                        size: 13, color: AppColors.herzrotWarm)),
-              ],
-              if (_uploading) ...[
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    const SizedBox(
-                      width: 14,
-                      height: 14,
-                      child: CircularProgressIndicator(
-                          strokeWidth: 2, color: AppColors.primary500),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 10),
-                    Text('marketplace.create.uploading'.tr(),
-                        style: AppTypography.body(
-                            size: 13, color: AppColors.inkSoft)),
-                  ],
+                  ),
+              ],
+            ),
+          ),
+
+          // ── Kategorie & Zustand ─────────────────────────────────────
+          CreateCard(
+            title: 'create.categoryLabel'.tr(),
+            icon: LucideIcons.layoutGrid,
+            child: Column(
+              children: [
+                DropdownButtonFormField<String>(
+                  value: _category,
+                  decoration: InputDecoration(
+                      labelText: 'create.categoryLabel'.tr()),
+                  dropdownColor: AppColors.surface,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  items: _categories.entries
+                      .map((e) => DropdownMenuItem(
+                          value: e.key, child: Text(e.value.tr())))
+                      .toList(),
+                  onChanged: (v) => setState(() => _category = v ?? _category),
+                ),
+                const SizedBox(height: 10),
+                DropdownButtonFormField<String>(
+                  value: _condition,
+                  decoration:
+                      InputDecoration(labelText: 'create.condition'.tr()),
+                  dropdownColor: AppColors.surface,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  items: _conditions.entries
+                      .map((e) => DropdownMenuItem(
+                          value: e.key, child: Text(e.value.tr())))
+                      .toList(),
+                  onChanged: (v) =>
+                      setState(() => _condition = v ?? _condition),
                 ),
               ],
-              const SizedBox(height: 20),
-              AnimatedEntrance(
-                index: 2,
-                child: FilledButton.icon(
-                  onPressed: _submitting ? null : _submit,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary500,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size.fromHeight(48),
-                  ),
-                  icon: const Icon(Icons.volunteer_activism_rounded, size: 18),
-                  label: Text(_submitting
-                      ? 'marketplace.saving'.tr()
-                      : 'sharing.submitButton'.tr()),
+            ),
+          ),
+
+          // ── Tags ────────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionTags'.tr(),
+            icon: LucideIcons.tag,
+            child: TextField(
+              controller: _tags,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: InputDecoration(
+                labelText: 'marketplace.tags'.tr(),
+                hintText: 'marketplace.tagsHint'.tr(),
+                prefixIcon: const Icon(LucideIcons.tag, size: 18),
+              ),
+            ),
+          ),
+
+          // ── Standort ────────────────────────────────────────────────
+          CreateCard(
+            title: 'create.sectionLocation'.tr(),
+            icon: LucideIcons.mapPin,
+            child: TextField(
+              controller: _location,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: InputDecoration(
+                labelText: 'create.location'.tr(),
+                suffixIcon: IconButton(
+                  onPressed: _locating ? null : _useGps,
+                  tooltip: 'marketplace.useGps'.tr(),
+                  icon: _locating
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: AppColors.primary500),
+                        )
+                      : Icon(
+                          _lat != null
+                              ? LucideIcons.mapPin
+                              : LucideIcons.locate,
+                          size: 18,
+                          color: _lat != null
+                              ? AppColors.primary500
+                              : AppColors.inkSoft,
+                        ),
                 ),
               ),
-            ],
+            ),
           ),
+
+          // Pflicht-Bestätigung „Kein Handel/Geldgeschäft"
+          NoTradeConfirmCard(
+            value: _noTradeConfirmed,
+            onChanged: (v) => setState(() => _noTradeConfirmed = v),
           ),
+
+          if (_error != null)
+            Text(_error!,
+                style: AppTypography.body(
+                    size: 13, color: AppColors.herzrotWarm)),
+          if (_uploading)
+            Row(
+              children: [
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.primary500),
+                ),
+                const SizedBox(width: 10),
+                Text('marketplace.create.uploading'.tr(),
+                    style:
+                        AppTypography.body(size: 13, color: AppColors.inkSoft)),
+              ],
+            ),
+        ],
+        footer: Column(
+          children: [
+            FilledButton.icon(
+              onPressed: _submitting ? null : _submit,
+              style: FilledButton.styleFrom(
+                backgroundColor: AppColors.teal,
+                foregroundColor: AppColors.voidColor,
+                minimumSize: const Size.fromHeight(50),
+              ),
+              icon: const Icon(Icons.volunteer_activism_rounded, size: 18),
+              label: Text(_submitting
+                  ? 'marketplace.saving'.tr()
+                  : 'sharing.submitButton'.tr()),
+            ),
+            const SizedBox(height: 10),
+            OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.inkSoft,
+                side: const BorderSide(color: AppColors.line),
+              ),
+              onPressed: () => context.go('/dashboard/sharing'),
+              child: Text('common.cancel'.tr()),
+            ),
+          ],
         ),
       ),
     );
