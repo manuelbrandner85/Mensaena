@@ -15,6 +15,7 @@ import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/forms/create_post_scaffold.dart';
+import '../../../widgets/forms/location_picker_field.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/form_error_box.dart';
 import '../../../utils/form_validators.dart';
@@ -390,6 +391,15 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
                         tooltip: 'board.noExpiry'.tr(),
                       ),
                   ],
+                ),
+                const SizedBox(height: 10),
+                LocationPickerField(
+                  initialLat: _lat,
+                  initialLng: _lng,
+                  onChanged: (la, lo) => setState(() {
+                    _lat = la;
+                    _lng = lo;
+                  }),
                 ),
                 const SizedBox(height: 10),
                 OutlinedButton.icon(

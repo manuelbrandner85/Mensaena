@@ -24,6 +24,7 @@ import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/location_picker_field.dart';
 import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/effects/animated_entrance.dart';
@@ -324,6 +325,15 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 10),
+              LocationPickerField(
+                initialLat: _lat,
+                initialLng: _lng,
+                onChanged: (la, lo) => setState(() {
+                  _lat = la;
+                  _lng = lo;
+                }),
               ),
               const SizedBox(height: 10),
               // Standort per GPS (optional) — für korrekte Karten-Platzierung.

@@ -26,6 +26,7 @@ import '../../../widgets/effects/celebrate_burst.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
 import '../../../widgets/shared/tag_suggestion_field.dart';
 import '../../../widgets/forms/create_post_scaffold.dart';
+import '../../../widgets/forms/location_picker_field.dart';
 import 'module_create_config.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../widgets/shared/form_error_box.dart';
@@ -732,6 +733,17 @@ class _ModuleCreatePostScreenState
                     ),
                   ],
                 ),
+                const SizedBox(height: 10),
+                LocationPickerField(
+                  initialLat: _lat,
+                  initialLng: _lng,
+                  onChanged: (la, lo) => setState(() {
+                    _lat = la;
+                    _lng = lo;
+                    _shareExactLocation = true;
+                  }),
+                ),
+                const SizedBox(height: 6),
                 InkWell(
                   onTap: () => setState(
                       () => _shareExactLocation = !_shareExactLocation),

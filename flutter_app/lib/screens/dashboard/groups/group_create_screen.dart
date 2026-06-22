@@ -14,6 +14,7 @@ import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/forms/create_post_scaffold.dart';
+import '../../../widgets/forms/location_picker_field.dart';
 import '../../../widgets/shared/address_autocomplete_field.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../utils/form_validators.dart';
@@ -313,6 +314,15 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
                   onSelected: (s) => setState(() {
                     _lat = s.lat;
                     _lng = s.lng;
+                  }),
+                ),
+                const SizedBox(height: 10),
+                LocationPickerField(
+                  initialLat: _lat,
+                  initialLng: _lng,
+                  onChanged: (la, lo) => setState(() {
+                    _lat = la;
+                    _lng = lo;
                   }),
                 ),
                 if (_lat != null) ...[

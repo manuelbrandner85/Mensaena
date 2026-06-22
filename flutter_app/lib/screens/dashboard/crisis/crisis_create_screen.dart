@@ -15,6 +15,7 @@ import '../../../repositories/crisis_repository.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/forms/location_picker_field.dart';
 import '../../../widgets/shared/voice_dictation_button.dart';
 import '../../../widgets/shared/readable_width.dart';
 import '../../../widgets/shared/app_snackbar.dart';
@@ -462,6 +463,16 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 10),
+            LocationPickerField(
+              initialLat: _lat,
+              initialLng: _lng,
+              accent: AppColors.herzrot,
+              onChanged: (la, lo) => setState(() {
+                _lat = la;
+                _lng = lo;
+              }),
             ),
             const SizedBox(height: 24),
             // ─── Weitere, krisen-spezifische Details (alle optional) ─────

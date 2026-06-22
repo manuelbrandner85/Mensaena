@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../widgets/forms/location_picker_field.dart';
 import '../../../repositories/events_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../widgets/effects/mini_confetti.dart';
@@ -768,6 +769,15 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
             decoration: InputDecoration(
               labelText: 'events.locationAddress'.tr(),
             ),
+          ),
+          const SizedBox(height: 10),
+          LocationPickerField(
+            initialLat: _lat,
+            initialLng: _lng,
+            onChanged: (la, lo) => setState(() {
+              _lat = la;
+              _lng = lo;
+            }),
           ),
           const SizedBox(height: 10),
           OutlinedButton.icon(
