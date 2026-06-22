@@ -877,7 +877,11 @@
     "autoSearchHint": "Buscamos automáticamente publicaciones compatibles.",
     "pushOnNewMatchHint": "Push cuando se encuentra una nueva coincidencia.",
     "countOpen": "Abiertos",
-    "countActive": "Activos"
+    "countActive": "Activos",
+    "filterAll": "Todos",
+    "filterPending": "Abiertos",
+    "filterAccepted": "Aceptados",
+    "filterCompleted": "Completados"
   },
   "admin": {
     "screens": {
@@ -3035,7 +3039,19 @@
     "errDescTooShort": "Al menos 3 caracteres.",
     "receiverChosen": "Destinatario elegido: {name}",
     "emptyHint": "Aún no hay registros. En cuanto ayudes a tus vecinos, podrás anotar aquí las horas.",
-    "empty": "Aún no hay entradas."
+    "empty": "Aún no hay entradas.",
+    "accountTitle": "Cuenta de horas",
+    "balanceMoreReceived": "Has recibido más ayuda de la que has dado.",
+    "balanceMoreGiven": "Has dado más ayuda de la que has recibido.",
+    "statGiven": "Dado",
+    "statReceived": "Recibido",
+    "statOpen": "Abierto",
+    "statusPending": "Pendiente",
+    "statusConfirmed": "Confirmado",
+    "statusRejected": "Rechazado",
+    "statusCancelled": "Cancelado",
+    "youReceived": "Recibiste",
+    "youGave": "Diste"
   },
   "search": {
     "minChars": "Escribe al menos 2 caracteres",
@@ -4237,7 +4253,22 @@
   "interactions": {
     "noneTitle": "Aún no hay actividades de ayuda",
     "noneBody": "Aquí verás todas las publicaciones en las que has ofrecido o recibido ayuda — desde la solicitud hasta la finalización.",
-    "discover": "Descubrir solicitudes de ayuda"
+    "discover": "Descubrir solicitudes de ayuda",
+    "statusPending": "Pendiente",
+    "statusAccepted": "Aceptado",
+    "statusOnWay": "En camino",
+    "statusArrived": "Ha llegado",
+    "statusCompleted": "Completado",
+    "statusCancelled": "Cancelado",
+    "actAccept": "Aceptar",
+    "actReject": "Rechazar",
+    "actWithdraw": "Retirar solicitud",
+    "actOnWay": "En camino",
+    "actCancel": "Cancelar",
+    "actArrived": "He llegado",
+    "actCompleted": "Completar",
+    "statusSet": "Estado: {label}",
+    "neighbor": "Vecino/a"
   },
   "uploads": {
     "imageFailed": "Error al subir la imagen {n}: {e}",

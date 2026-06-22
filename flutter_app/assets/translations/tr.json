@@ -876,7 +876,11 @@
     "autoSearchHint": "Uygun gönderileri otomatik olarak arıyoruz.",
     "pushOnNewMatchHint": "Yeni eşleşme bulununca bildirim.",
     "countOpen": "Açık",
-    "countActive": "Aktif"
+    "countActive": "Aktif",
+    "filterAll": "Tümü",
+    "filterPending": "Açık",
+    "filterAccepted": "Kabul edilen",
+    "filterCompleted": "Tamamlanan"
   },
   "admin": {
     "screens": {
@@ -3034,7 +3038,19 @@
     "errDescTooShort": "En az 3 karakter.",
     "receiverChosen": "Alıcı seçildi: {name}",
     "emptyHint": "Henüz kayıt yok. Komşularına yardım ettiğinde saatlerini buraya girebilirsin.",
-    "empty": "Henüz kayıt yok."
+    "empty": "Henüz kayıt yok.",
+    "accountTitle": "Saat hesabı",
+    "balanceMoreReceived": "Verdiğinden daha fazla yardım aldın.",
+    "balanceMoreGiven": "Aldığından daha fazla yardım verdin.",
+    "statGiven": "Verilen",
+    "statReceived": "Alınan",
+    "statOpen": "Açık",
+    "statusPending": "Bekliyor",
+    "statusConfirmed": "Onaylandı",
+    "statusRejected": "Reddedildi",
+    "statusCancelled": "İptal edildi",
+    "youReceived": "Aldın",
+    "youGave": "Verdin"
   },
   "search": {
     "minChars": "En az 2 karakter girin",
@@ -4236,7 +4252,22 @@
   "interactions": {
     "noneTitle": "Henüz yardım etkinliği yok",
     "noneBody": "Burada yardım önerdiğin veya aldığın tüm gönderileri göreceksin — talepten tamamlanmaya kadar.",
-    "discover": "Yardım taleplerini keşfet"
+    "discover": "Yardım taleplerini keşfet",
+    "statusPending": "Bekliyor",
+    "statusAccepted": "Kabul edildi",
+    "statusOnWay": "Yolda",
+    "statusArrived": "Geldi",
+    "statusCompleted": "Tamamlandı",
+    "statusCancelled": "İptal edildi",
+    "actAccept": "Kabul et",
+    "actReject": "Reddet",
+    "actWithdraw": "İsteği geri çek",
+    "actOnWay": "Yolda",
+    "actCancel": "İptal et",
+    "actArrived": "Geldim",
+    "actCompleted": "Tamamla",
+    "statusSet": "Durum: {label}",
+    "neighbor": "Komşu"
   },
   "uploads": {
     "imageFailed": "{n}. resim yüklenemedi: {e}",

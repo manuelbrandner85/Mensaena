@@ -370,7 +370,7 @@ class _BalanceCard extends StatelessWidget {
                 const Icon(LucideIcons.clock, color: AppColors.amber),
                 const SizedBox(width: 8),
                 Text(
-                  'Stundenkonto',
+                  'timebank.accountTitle'.tr(),
                   style: AppTypography.label(size: 10),
                 ),
               ],
@@ -401,8 +401,8 @@ class _BalanceCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               b.balance >= 0
-                  ? 'Du hast mehr Hilfe bekommen als gegeben.'
-                  : 'Du hast mehr Hilfe gegeben als bekommen.',
+                  ? 'timebank.balanceMoreReceived'.tr()
+                  : 'timebank.balanceMoreGiven'.tr(),
               style: AppTypography.caption(),
             ),
             const SizedBox(height: 14),
@@ -410,21 +410,21 @@ class _BalanceCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _MiniStat(
-                    label: 'Gegeben',
+                    label: 'timebank.statGiven'.tr(),
                     value: b.given,
                     color: AppColors.teal,
                   ),
                 ),
                 Expanded(
                   child: _MiniStat(
-                    label: 'Empfangen',
+                    label: 'timebank.statReceived'.tr(),
                     value: b.received,
                     color: AppColors.leben,
                   ),
                 ),
                 Expanded(
                   child: _MiniStat(
-                    label: 'Offen',
+                    label: 'timebank.statOpen'.tr(),
                     value: b.pendingAsReceiver + b.pendingAsGiver,
                     color: AppColors.amber,
                   ),
@@ -468,20 +468,32 @@ class _EntryTile extends ConsumerWidget {
   const _EntryTile({required this.entry});
   final TimebankEntry entry;
 
-  static const Map<String, ({String label, Color color})> _status = {
-    'pending': (label: 'Wartet', color: AppColors.amber),
-    'confirmed': (label: 'Bestätigt', color: AppColors.leben),
-    'rejected': (label: 'Abgelehnt', color: AppColors.herzrot),
-    'cancelled': (label: 'Abgebrochen', color: AppColors.mute),
-  };
+  static ({String label, Color color}) _statusFor(String s) {
+    switch (s) {
+      case 'confirmed':
+        return (label: 'timebank.statusConfirmed'.tr(), color: AppColors.leben);
+      case 'rejected':
+        return (
+          label: 'timebank.statusRejected'.tr(),
+          color: AppColors.herzrot
+        );
+      case 'cancelled':
+        return (
+          label: 'timebank.statusCancelled'.tr(),
+          color: AppColors.mute
+        );
+      case 'pending':
+      default:
+        return (label: 'timebank.statusPending'.tr(), color: AppColors.amber);
+    }
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final me = SupabaseService.currentUser?.id;
     final isReceiver = entry.receiverId == me;
     final canConfirm = isReceiver && entry.status == 'pending';
-    final s = _status[entry.status ?? 'pending'] ??
-        (label: entry.status ?? 'pending', color: AppColors.mute);
+    final s = _statusFor(entry.status ?? 'pending');
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(14),
@@ -508,7 +520,9 @@ class _EntryTile extends ConsumerWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                isReceiver ? 'Du empfangen' : 'Du gegeben',
+                isReceiver
+                    ? 'timebank.youReceived'.tr()
+                    : 'timebank.youGave'.tr(),
                 style: AppTypography.label(size: 9),
               ),
               const Spacer(),

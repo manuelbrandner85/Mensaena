@@ -877,7 +877,11 @@
     "autoSearchHint": "Nous cherchons automatiquement des publications correspondantes.",
     "pushOnNewMatchHint": "Notification quand une nouvelle correspondance est trouvée.",
     "countOpen": "Ouverts",
-    "countActive": "Actifs"
+    "countActive": "Actifs",
+    "filterAll": "Tous",
+    "filterPending": "Ouverts",
+    "filterAccepted": "Acceptés",
+    "filterCompleted": "Terminés"
   },
   "admin": {
     "screens": {
@@ -3035,7 +3039,19 @@
     "errDescTooShort": "3 caractères minimum.",
     "receiverChosen": "Destinataire choisi : {name}",
     "emptyHint": "Pas encore d’entrées. Dès que tu aides tes voisins, tu peux enregistrer tes heures ici.",
-    "empty": "Pas encore d'entrées."
+    "empty": "Pas encore d'entrées.",
+    "accountTitle": "Compte d'heures",
+    "balanceMoreReceived": "Tu as reçu plus d'aide que tu n'en as donné.",
+    "balanceMoreGiven": "Tu as donné plus d'aide que tu n'en as reçu.",
+    "statGiven": "Donné",
+    "statReceived": "Reçu",
+    "statOpen": "Ouvert",
+    "statusPending": "En attente",
+    "statusConfirmed": "Confirmé",
+    "statusRejected": "Refusé",
+    "statusCancelled": "Annulé",
+    "youReceived": "Tu as reçu",
+    "youGave": "Tu as donné"
   },
   "search": {
     "minChars": "Saisissez au moins 2 caractères",
@@ -4237,7 +4253,22 @@
   "interactions": {
     "noneTitle": "Aucune activité d'aide pour l'instant",
     "noneBody": "Ici, tu verras toutes les publications où tu as offert ou reçu de l'aide — de la demande à la finalisation.",
-    "discover": "Découvrir les demandes d'aide"
+    "discover": "Découvrir les demandes d'aide",
+    "statusPending": "En attente",
+    "statusAccepted": "Accepté",
+    "statusOnWay": "En route",
+    "statusArrived": "Arrivé",
+    "statusCompleted": "Terminé",
+    "statusCancelled": "Annulé",
+    "actAccept": "Accepter",
+    "actReject": "Refuser",
+    "actWithdraw": "Retirer la demande",
+    "actOnWay": "En route",
+    "actCancel": "Annuler",
+    "actArrived": "Arrivé",
+    "actCompleted": "Terminer",
+    "statusSet": "Statut : {label}",
+    "neighbor": "Voisin·e"
   },
   "uploads": {
     "imageFailed": "Échec du téléchargement de l'image {n} : {e}",

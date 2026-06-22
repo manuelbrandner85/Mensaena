@@ -876,7 +876,11 @@
     "autoSearchHint": "Мы автоматически ищем подходящие публикации.",
     "pushOnNewMatchHint": "Push при появлении нового совпадения.",
     "countOpen": "Открытые",
-    "countActive": "Активные"
+    "countActive": "Активные",
+    "filterAll": "Все",
+    "filterPending": "Открытые",
+    "filterAccepted": "Принятые",
+    "filterCompleted": "Завершённые"
   },
   "admin": {
     "screens": {
@@ -3034,7 +3038,19 @@
     "errDescTooShort": "Минимум 3 символа.",
     "receiverChosen": "Получатель выбран: {name}",
     "emptyHint": "Записей пока нет. Как только поможешь соседям, сможешь внести часы здесь.",
-    "empty": "Записей пока нет."
+    "empty": "Записей пока нет.",
+    "accountTitle": "Счёт часов",
+    "balanceMoreReceived": "Вы получили больше помощи, чем оказали.",
+    "balanceMoreGiven": "Вы оказали больше помощи, чем получили.",
+    "statGiven": "Отдано",
+    "statReceived": "Получено",
+    "statOpen": "Открыто",
+    "statusPending": "Ожидание",
+    "statusConfirmed": "Подтверждено",
+    "statusRejected": "Отклонено",
+    "statusCancelled": "Отменено",
+    "youReceived": "Вы получили",
+    "youGave": "Вы отдали"
   },
   "search": {
     "minChars": "Введите минимум 2 символа",
@@ -4236,7 +4252,22 @@
   "interactions": {
     "noneTitle": "Пока нет действий помощи",
     "noneBody": "Здесь ты увидишь все публикации, в которых ты предложил или получил помощь — от заявки до завершения.",
-    "discover": "Найти запросы о помощи"
+    "discover": "Найти запросы о помощи",
+    "statusPending": "Ожидание",
+    "statusAccepted": "Принято",
+    "statusOnWay": "В пути",
+    "statusArrived": "На месте",
+    "statusCompleted": "Завершено",
+    "statusCancelled": "Отменено",
+    "actAccept": "Принять",
+    "actReject": "Отклонить",
+    "actWithdraw": "Отозвать запрос",
+    "actOnWay": "В пути",
+    "actCancel": "Отменить",
+    "actArrived": "Прибыл",
+    "actCompleted": "Завершить",
+    "statusSet": "Статус: {label}",
+    "neighbor": "Сосед(ка)"
   },
   "uploads": {
     "imageFailed": "Ошибка загрузки изображения {n}: {e}",

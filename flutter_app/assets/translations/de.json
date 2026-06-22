@@ -876,7 +876,11 @@
     "autoSearchHint": "Wir suchen automatisch nach passenden Beiträgen.",
     "pushOnNewMatchHint": "Push wenn ein neuer Match gefunden wird.",
     "countOpen": "Offen",
-    "countActive": "Aktiv"
+    "countActive": "Aktiv",
+    "filterAll": "Alle",
+    "filterPending": "Offen",
+    "filterAccepted": "Akzeptiert",
+    "filterCompleted": "Abgeschlossen"
   },
   "admin": {
     "screens": {
@@ -3034,7 +3038,19 @@
     "errDescTooShort": "Bitte mindestens 3 Zeichen Beschreibung.",
     "receiverChosen": "Empfänger:in gewählt: {name}",
     "emptyHint": "Noch keine Einträge. Sobald du Nachbar:innen hilfst, kannst du die Stunden hier eintragen.",
-    "empty": "Noch keine Einträge."
+    "empty": "Noch keine Einträge.",
+    "accountTitle": "Stundenkonto",
+    "balanceMoreReceived": "Du hast mehr Hilfe bekommen als gegeben.",
+    "balanceMoreGiven": "Du hast mehr Hilfe gegeben als bekommen.",
+    "statGiven": "Gegeben",
+    "statReceived": "Empfangen",
+    "statOpen": "Offen",
+    "statusPending": "Wartet",
+    "statusConfirmed": "Bestätigt",
+    "statusRejected": "Abgelehnt",
+    "statusCancelled": "Abgebrochen",
+    "youReceived": "Du empfangen",
+    "youGave": "Du gegeben"
   },
   "search": {
     "minChars": "Mindestens 2 Zeichen eingeben",
@@ -4233,7 +4249,22 @@
   "interactions": {
     "noneTitle": "Noch keine Hilfe-Vorgänge",
     "noneBody": "Hier siehst du alle Posts, bei denen du Hilfe angeboten oder erhalten hast — von der Anfrage bis zum Abschluss.",
-    "discover": "Hilfe-Anfragen entdecken"
+    "discover": "Hilfe-Anfragen entdecken",
+    "statusPending": "Wartet",
+    "statusAccepted": "Angenommen",
+    "statusOnWay": "Unterwegs",
+    "statusArrived": "Vor Ort",
+    "statusCompleted": "Abgeschlossen",
+    "statusCancelled": "Abgebrochen",
+    "actAccept": "Annehmen",
+    "actReject": "Ablehnen",
+    "actWithdraw": "Anfrage zurückziehen",
+    "actOnWay": "Unterwegs",
+    "actCancel": "Absagen",
+    "actArrived": "Angekommen",
+    "actCompleted": "Abgeschlossen",
+    "statusSet": "Status: {label}",
+    "neighbor": "Nachbar:in"
   },
   "uploads": {
     "imageFailed": "Upload-Fehler Bild {n}: {e}",

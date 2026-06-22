@@ -877,7 +877,11 @@
     "autoSearchHint": "We automatically look for matching posts.",
     "pushOnNewMatchHint": "Push when a new match is found.",
     "countOpen": "Open",
-    "countActive": "Active"
+    "countActive": "Active",
+    "filterAll": "All",
+    "filterPending": "Open",
+    "filterAccepted": "Accepted",
+    "filterCompleted": "Completed"
   },
   "admin": {
     "screens": {
@@ -3035,7 +3039,19 @@
     "errDescTooShort": "Please enter at least 3 characters.",
     "receiverChosen": "Recipient chosen: {name}",
     "emptyHint": "No entries yet. As soon as you help neighbours, you can log your hours here.",
-    "empty": "No entries yet."
+    "empty": "No entries yet.",
+    "accountTitle": "Hours account",
+    "balanceMoreReceived": "You've received more help than you've given.",
+    "balanceMoreGiven": "You've given more help than you've received.",
+    "statGiven": "Given",
+    "statReceived": "Received",
+    "statOpen": "Open",
+    "statusPending": "Pending",
+    "statusConfirmed": "Confirmed",
+    "statusRejected": "Rejected",
+    "statusCancelled": "Cancelled",
+    "youReceived": "You received",
+    "youGave": "You gave"
   },
   "search": {
     "minChars": "Type at least 2 characters",
@@ -4234,7 +4250,22 @@
   "interactions": {
     "noneTitle": "No help activities yet",
     "noneBody": "Here you'll see all posts where you've offered or received help — from request to completion.",
-    "discover": "Discover help requests"
+    "discover": "Discover help requests",
+    "statusPending": "Pending",
+    "statusAccepted": "Accepted",
+    "statusOnWay": "On the way",
+    "statusArrived": "Arrived",
+    "statusCompleted": "Completed",
+    "statusCancelled": "Cancelled",
+    "actAccept": "Accept",
+    "actReject": "Decline",
+    "actWithdraw": "Withdraw request",
+    "actOnWay": "On the way",
+    "actCancel": "Cancel",
+    "actArrived": "Arrived",
+    "actCompleted": "Complete",
+    "statusSet": "Status: {label}",
+    "neighbor": "Neighbour"
   },
   "uploads": {
     "imageFailed": "Image {n} upload failed: {e}",

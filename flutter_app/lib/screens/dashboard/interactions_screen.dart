@@ -205,17 +205,17 @@ class _StatusBadge extends StatelessWidget {
   static ({String label, Color color}) _config(String s) {
     switch (s) {
       case 'pending':
-        return (label: 'Wartet', color: AppColors.amber);
+        return (label: 'interactions.statusPending'.tr(), color: AppColors.amber);
       case 'accepted':
-        return (label: 'Angenommen', color: AppColors.leben);
+        return (label: 'interactions.statusAccepted'.tr(), color: AppColors.leben);
       case 'on_way':
-        return (label: 'Unterwegs', color: AppColors.teal);
+        return (label: 'interactions.statusOnWay'.tr(), color: AppColors.teal);
       case 'arrived':
-        return (label: 'Vor Ort', color: AppColors.tealSoft);
+        return (label: 'interactions.statusArrived'.tr(), color: AppColors.tealSoft);
       case 'completed':
-        return (label: 'Abgeschlossen', color: AppColors.leben);
+        return (label: 'interactions.statusCompleted'.tr(), color: AppColors.leben);
       case 'cancelled':
-        return (label: 'Abgebrochen', color: AppColors.mute);
+        return (label: 'interactions.statusCancelled'.tr(), color: AppColors.mute);
       default:
         return (label: s, color: AppColors.mute);
     }
@@ -264,7 +264,12 @@ class _StatusActions extends ConsumerWidget {
               final ok = await InteractionsRepository.setStatus(
                   interactionId, step.value);
               if (!context.mounted) return;
-              AppSnackBar.info(context, ok ? 'Status: ${step.label}' : 'Fehler.');
+              AppSnackBar.info(
+                  context,
+                  ok
+                      ? 'interactions.statusSet'
+                          .tr(namedArgs: {'label': step.label})
+                      : 'common.error'.tr());
               if (ok) onChanged();
               // D2 Stolz-Momente: erste abgeschlossene Hilfe als
               // Helfer:in → einmalige Dankes-Sequenz (Guard im Widget).
@@ -283,36 +288,39 @@ class _StatusActions extends ConsumerWidget {
     switch (s) {
       case 'pending':
         if (isHelper) {
-          return const [
-            _Step('accepted', 'Annehmen', LucideIcons.check, AppColors.leben),
-            _Step('cancelled', 'Ablehnen', LucideIcons.x, AppColors.herzrot),
+          return [
+            _Step('accepted', 'interactions.actAccept'.tr(), LucideIcons.check,
+                AppColors.leben),
+            _Step('cancelled', 'interactions.actReject'.tr(), LucideIcons.x,
+                AppColors.herzrot),
           ];
         }
-        return const [
-          _Step('cancelled', 'Anfrage zurueckziehen', LucideIcons.x,
+        return [
+          _Step('cancelled', 'interactions.actWithdraw'.tr(), LucideIcons.x,
               AppColors.mute),
         ];
       case 'accepted':
         if (isHelper) {
-          return const [
-            _Step('on_way', 'Unterwegs', LucideIcons.navigation,
-                AppColors.tealSoft),
-            _Step('cancelled', 'Absagen', LucideIcons.x, AppColors.herzrot),
+          return [
+            _Step('on_way', 'interactions.actOnWay'.tr(),
+                LucideIcons.navigation, AppColors.tealSoft),
+            _Step('cancelled', 'interactions.actCancel'.tr(), LucideIcons.x,
+                AppColors.herzrot),
           ];
         }
         return const [];
       case 'on_way':
         if (isHelper) {
-          return const [
-            _Step('arrived', 'Angekommen', LucideIcons.mapPin,
+          return [
+            _Step('arrived', 'interactions.actArrived'.tr(), LucideIcons.mapPin,
                 AppColors.tealSoft),
           ];
         }
         return const [];
       case 'arrived':
-        return const [
-          _Step('completed', 'Abgeschlossen', LucideIcons.checkCircle,
-              AppColors.leben),
+        return [
+          _Step('completed', 'interactions.actCompleted'.tr(),
+              LucideIcons.checkCircle, AppColors.leben),
         ];
       case 'completed':
       case 'cancelled':
@@ -422,14 +430,14 @@ class _RateButtonState extends State<_RateButton> {
     final p = await ProfilesRepository.getById(widget.partnerId);
     if (!mounted) return;
     setState(() =>
-        _partnerName = p?.displayName ?? p?.name ?? 'Nachbar:in');
+        _partnerName = p?.displayName ?? p?.name ?? 'interactions.neighbor'.tr());
   }
 
   Future<void> _openRatingModal() async {
     final result = await TrustRatingModal.show(
       context,
       ratedUserId: widget.partnerId,
-      ratedUserName: _partnerName ?? 'Nachbar:in',
+      ratedUserName: _partnerName ?? 'interactions.neighbor'.tr(),
       interactionId: widget.interactionId,
     );
     if (result == true) widget.onRated();

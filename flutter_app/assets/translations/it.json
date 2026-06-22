@@ -877,7 +877,11 @@
     "autoSearchHint": "Cerchiamo automaticamente post in linea.",
     "pushOnNewMatchHint": "Push quando viene trovato un nuovo match.",
     "countOpen": "Aperti",
-    "countActive": "Attivi"
+    "countActive": "Attivi",
+    "filterAll": "Tutti",
+    "filterPending": "Aperti",
+    "filterAccepted": "Accettati",
+    "filterCompleted": "Completati"
   },
   "admin": {
     "screens": {
@@ -3035,7 +3039,19 @@
     "errDescTooShort": "Almeno 3 caratteri.",
     "receiverChosen": "Destinatario scelto: {name}",
     "emptyHint": "Ancora nessuna voce. Appena aiuti i tuoi vicini, puoi registrare qui le ore.",
-    "empty": "Ancora nessuna voce."
+    "empty": "Ancora nessuna voce.",
+    "accountTitle": "Conto ore",
+    "balanceMoreReceived": "Hai ricevuto più aiuto di quanto ne hai dato.",
+    "balanceMoreGiven": "Hai dato più aiuto di quanto ne hai ricevuto.",
+    "statGiven": "Dato",
+    "statReceived": "Ricevuto",
+    "statOpen": "Aperto",
+    "statusPending": "In attesa",
+    "statusConfirmed": "Confermato",
+    "statusRejected": "Rifiutato",
+    "statusCancelled": "Annullato",
+    "youReceived": "Hai ricevuto",
+    "youGave": "Hai dato"
   },
   "search": {
     "minChars": "Inserisci almeno 2 caratteri",
@@ -4237,7 +4253,22 @@
   "interactions": {
     "noneTitle": "Ancora nessuna attività di aiuto",
     "noneBody": "Qui vedrai tutti i post in cui hai offerto o ricevuto aiuto — dalla richiesta al completamento.",
-    "discover": "Scopri richieste di aiuto"
+    "discover": "Scopri richieste di aiuto",
+    "statusPending": "In attesa",
+    "statusAccepted": "Accettato",
+    "statusOnWay": "In arrivo",
+    "statusArrived": "Arrivato",
+    "statusCompleted": "Completato",
+    "statusCancelled": "Annullato",
+    "actAccept": "Accetta",
+    "actReject": "Rifiuta",
+    "actWithdraw": "Ritira richiesta",
+    "actOnWay": "In arrivo",
+    "actCancel": "Annulla",
+    "actArrived": "Arrivato",
+    "actCompleted": "Completa",
+    "statusSet": "Stato: {label}",
+    "neighbor": "Vicino/a"
   },
   "uploads": {
     "imageFailed": "Caricamento immagine {n} fallito: {e}",

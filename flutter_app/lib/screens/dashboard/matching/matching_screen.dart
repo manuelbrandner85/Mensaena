@@ -17,11 +17,12 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 
+// (Filter-Wert, i18n-Key) — Label wird zur Laufzeit via .tr() aufgelöst.
 const _filters = <(String, String)>[
-  ('all', 'Alle'),
-  ('pending', 'Offen'),
-  ('accepted', 'Akzeptiert'),
-  ('completed', 'Abgeschlossen'),
+  ('all', 'matching.filterAll'),
+  ('pending', 'matching.filterPending'),
+  ('accepted', 'matching.filterAccepted'),
+  ('completed', 'matching.filterCompleted'),
 ];
 
 /// SKILL: mensaena-features
@@ -384,7 +385,7 @@ class _FilterBar extends ConsumerWidget {
       scrollDirection: Axis.horizontal,
       child: Row(
         children: [
-          for (final (val, label) in _filters) ...[
+          for (final (val, labelKey) in _filters) ...[
             GestureDetector(
               onTap: () =>
                   ref.read(matchingFilterProvider.notifier).state = val,
@@ -403,7 +404,7 @@ class _FilterBar extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  label,
+                  labelKey.tr(),
                   style: AppTypography.label(
                     size: 10,
                     color: active == val
