@@ -95,81 +95,10 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
       body: SafeArea(
         child: Column(
           children: [
+            // Editorial-Header + Info + Foodbanks-Verweis in die scrollbare
+            // Liste verschoben (_SupplyIntro) → mehr Platz für die Hof-Liste.
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 13',
-                metaCategory: 'supply.screenTitle'.tr(),
-                title: 'modules.farms.title'.tr(),
-                subtitle: 'modules.farms.subtitle'.tr(),
-              ),
-            ),
-            // Info-Karte: erklärt was "Versorgung" meint.
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.amber.withValues(alpha: 0.10),
-                  border: Border.all(
-                      color: AppColors.amber.withValues(alpha: 0.35)),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(children: [
-                  const Icon(LucideIcons.info,
-                      size: 16, color: AppColors.amber),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Hier findest du Solidarische Landwirtschaft (Solawi), '
-                      'Tafeln, Hofläden und Foodsharing-Stellen in deiner '
-                      'Nähe — plus eigene Tausch- und Mitnehm-Angebote.',
-                      style: AppTypography.body(
-                          size: 12, color: AppColors.inkSoft, height: 1.4),
-                    ),
-                  ),
-                ]),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-              child: InkWell(
-                onTap: () => context.push('/dashboard/supply/foodbanks'),
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 12, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: AppColors.amber.withValues(alpha: 0.08),
-                    border: Border.all(
-                      color: AppColors.amber.withValues(alpha: 0.35),
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(LucideIcons.heartHandshake,
-                          size: 18, color: AppColors.amber),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          'foodbanks.title'.tr(),
-                          style: AppTypography.body(
-                            size: 13,
-                            color: AppColors.ink,
-                            weight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const Icon(LucideIcons.chevronRight,
-                          size: 16, color: AppColors.mute),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),
+              padding: const EdgeInsets.fromLTRB(12, 12, 12, 6),
               child: Row(
                 children: [
                   Expanded(
@@ -294,7 +223,8 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                         physics: const AlwaysScrollableScrollPhysics(),
                         padding: const EdgeInsets.all(16),
                         children: [
-                          const SizedBox(height: 60),
+                          const _SupplyIntro(),
+                          const SizedBox(height: 24),
                           EmptyStateCard(
                             icon: LucideIcons.wheat,
                             title: _hasFilters
@@ -323,11 +253,15 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                     }
                     return ListView.builder(
                       padding: const EdgeInsets.all(12),
-                      itemCount: list.length,
-                      itemBuilder: (context, i) => AnimatedEntrance(
-                        index: i,
-                        child: _FarmTile(farm: list[i]),
-                      ),
+                      // i0 = Intro (Header+Info+Foodbanks) aus dem fixen Kopf.
+                      itemCount: list.length + 1,
+                      itemBuilder: (context, i) {
+                        if (i == 0) return const _SupplyIntro();
+                        return AnimatedEntrance(
+                          index: i,
+                          child: _FarmTile(farm: list[i - 1]),
+                        );
+                      },
                     );
                   },
                 ),
@@ -336,6 +270,82 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Kopfbereich der Versorgungs-Liste: Editorial-Header, Info-Karte und
+/// Foodbanks-Verweis. Aus dem fixen Screen-Kopf in die scrollbare Liste
+/// verschoben → die Hof-Liste bekommt mehr Platz.
+class _SupplyIntro extends StatelessWidget {
+  const _SupplyIntro();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        EditorialModuleHeader(
+          metaIndex: '§ 13',
+          metaCategory: 'supply.screenTitle'.tr(),
+          title: 'modules.farms.title'.tr(),
+          subtitle: 'modules.farms.subtitle'.tr(),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.amber.withValues(alpha: 0.10),
+            border: Border.all(color: AppColors.amber.withValues(alpha: 0.35)),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(children: [
+            const Icon(LucideIcons.info, size: 16, color: AppColors.amber),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Hier findest du Solidarische Landwirtschaft (Solawi), '
+                'Tafeln, Hofläden und Foodsharing-Stellen in deiner '
+                'Nähe — plus eigene Tausch- und Mitnehm-Angebote.',
+                style: AppTypography.body(
+                    size: 12, color: AppColors.inkSoft, height: 1.4),
+              ),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 8),
+        InkWell(
+          onTap: () => context.push('/dashboard/supply/foodbanks'),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.amber.withValues(alpha: 0.08),
+              border: Border.all(color: AppColors.amber.withValues(alpha: 0.35)),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                const Icon(LucideIcons.heartHandshake,
+                    size: 18, color: AppColors.amber),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'foodbanks.title'.tr(),
+                    style: AppTypography.body(
+                        size: 13,
+                        color: AppColors.ink,
+                        weight: FontWeight.w600),
+                  ),
+                ),
+                const Icon(LucideIcons.chevronRight,
+                    size: 16, color: AppColors.mute),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

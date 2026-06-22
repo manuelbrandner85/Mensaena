@@ -58,15 +58,7 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 12',
-                metaCategory: 'skills.screenTitle'.tr(),
-                title: 'modules.skillsHero.title'.tr(),
-                subtitle: 'modules.skillsHero.subtitle'.tr(),
-              ),
-            ),
+            // Editorial-Header in den Scroll verschoben → mehr Platz.
             Expanded(
               child: RefreshIndicator(
           color: AppColors.amber,
@@ -92,7 +84,16 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
                 return ListView(
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    const SizedBox(height: 80),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      child: EditorialModuleHeader(
+                        metaIndex: '§ 12',
+                        metaCategory: 'skills.screenTitle'.tr(),
+                        title: 'modules.skillsHero.title'.tr(),
+                        subtitle: 'modules.skillsHero.subtitle'.tr(),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
                     EmptyStateWidget(
                       icon: LucideIcons.wrench,
                       title: 'skills.empty'.tr(),
@@ -103,11 +104,25 @@ class _SkillsScreenState extends ConsumerState<SkillsScreen> {
               }
               return ListView.builder(
                 padding: const EdgeInsets.all(12),
-                itemCount: list.length,
-                itemBuilder: (context, i) => AnimatedEntrance(
-                  index: i,
-                  child: _SkillTile(skill: list[i]),
-                ),
+                // i0 = Editorial-Header (aus dem fixen Kopf → mehr Platz).
+                itemCount: list.length + 1,
+                itemBuilder: (context, i) {
+                  if (i == 0) {
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(4, 4, 4, 8),
+                      child: EditorialModuleHeader(
+                        metaIndex: '§ 12',
+                        metaCategory: 'skills.screenTitle'.tr(),
+                        title: 'modules.skillsHero.title'.tr(),
+                        subtitle: 'modules.skillsHero.subtitle'.tr(),
+                      ),
+                    );
+                  }
+                  return AnimatedEntrance(
+                    index: i,
+                    child: _SkillTile(skill: list[i - 1]),
+                  );
+                },
               );
             },
           ),

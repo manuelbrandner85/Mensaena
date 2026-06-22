@@ -281,29 +281,8 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Editorial-Header (1:1 Web) ─────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 05',
-                metaCategory: 'posts.title'.tr(),
-                title: 'posts.allPosts'.tr(),
-                // Text spiegelt die Realität: ohne aktiven Radius-Filter
-                // werden ALLE Beiträge gezeigt ("aktiv"), nur mit gesetztem
-                // Radius "in deiner Nähe".
-                subtitle: _loading
-                    ? (_radiusKm != null
-                        ? 'posts.loadingNearby'.tr()
-                        : 'posts.loadingAll'.tr())
-                    : (_radiusKm != null
-                            ? 'posts.activeNearby'
-                            : 'posts.activeAll')
-                        .tr(namedArgs: {
-                        'count': '${_items.length}',
-                        'more': _hasMore ? '+' : '',
-                      }),
-              ),
-            ),
+            // Editorial-Header in den Scroll verschoben (_editorialHeader) →
+            // mehr Platz für die Beitragsliste.
             // ── Search + Filter-Sheet ────────────────────────────
             Padding(
               padding:
@@ -372,6 +351,26 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
     );
   }
 
+  // Editorial-Header als Listen-Item (aus dem fixen Kopf in den Scroll
+  // verschoben → mehr Platz). Dynamischer Untertitel (Anzahl/Radius).
+  Widget _editorialHeader() => Padding(
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+        child: EditorialModuleHeader(
+          metaIndex: '§ 05',
+          metaCategory: 'posts.title'.tr(),
+          title: 'posts.allPosts'.tr(),
+          subtitle: _loading
+              ? (_radiusKm != null
+                  ? 'posts.loadingNearby'.tr()
+                  : 'posts.loadingAll'.tr())
+              : (_radiusKm != null ? 'posts.activeNearby' : 'posts.activeAll')
+                  .tr(namedArgs: {
+                  'count': '${_items.length}',
+                  'more': _hasMore ? '+' : '',
+                }),
+        ),
+      );
+
   Widget _buildList() {
     if (_loading) {
       // BUG-FIX #14: Shimmer-Skeleton statt statischer Box-Pulse
@@ -382,7 +381,8 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.all(16),
         children: [
-          const SizedBox(height: 60),
+          _editorialHeader(),
+          const SizedBox(height: 24),
           EmptyStateCard(
             icon: LucideIcons.inbox,
             title: _hasActiveFilters
@@ -411,9 +411,13 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
       child: ListView.builder(
         padding: const EdgeInsets.all(12),
         physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: _items.length + (_hasMore ? 1 : 0),
+        // i0 = Editorial-Header (aus dem fixen Kopf → mehr Platz),
+        // danach Beiträge, am Ende ggf. „Mehr laden".
+        itemCount: _items.length + 1 + (_hasMore ? 1 : 0),
         itemBuilder: (context, i) {
-          if (i >= _items.length) {
+          if (i == 0) return _editorialHeader();
+          final idx = i - 1;
+          if (idx >= _items.length) {
             return Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: Center(
@@ -432,8 +436,8 @@ class _PostsListScreenState extends ConsumerState<PostsListScreen> {
             );
           }
           return AnimatedEntrance(
-            index: i,
-            child: PostCard(post: _items[i]),
+            index: idx,
+            child: PostCard(post: _items[idx]),
           );
         },
       ),

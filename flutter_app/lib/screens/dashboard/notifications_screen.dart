@@ -7,7 +7,6 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
-import '../../widgets/shared/editorial_module_header.dart';
 import '../../widgets/shared/error_state_widget.dart';
 import '../../models/notification_model.dart';
 import '../../services/notification_router.dart';
@@ -76,17 +75,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 03',
-                metaCategory: 'notifications.screenTitle'.tr(),
-                title: 'notifications.activities'.tr(),
-                subtitle: unread > 0
-                    ? '$unread ungelesen'
-                    : 'Alle gelesen',
-              ),
-            ),
+            // Editorial-Header entfernt: die Unread-Zahl steht bereits in der
+            // Action-Bar darunter (Redundanz) — spart Platz, mehr Liste sichtbar.
             // ── Action-Bar: Mark-All-Read ────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(12, 0, 12, 6),

@@ -89,15 +89,8 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: EditorialModuleHeader(
-                metaIndex: '§ 22',
-                metaCategory: 'jobs.liveSearchTitle'.tr(),
-                title: 'jobs.liveSearchTitle'.tr(),
-                subtitle: 'jobs.liveSearchSubtitle'.tr(),
-              ),
-            ),
+            // Editorial-Header in den Scroll verschoben → mehr Platz für
+            // die Ergebnisliste (Filter bleiben oben griffbereit).
             // Filter-Bar
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
@@ -202,13 +195,24 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
                         }
                         final list = snap.data ?? const <JobOffer>[];
                         if (list.isEmpty) {
-                          return Padding(
-                            padding: const EdgeInsets.all(24),
-                            child: EmptyStateCard(
-                              icon: LucideIcons.briefcase,
-                              title: 'jobs.noneFound'.tr(),
-                              description: 'jobs.noneFoundHint'.tr(),
-                            ),
+                          return ListView(
+                            physics:
+                                const AlwaysScrollableScrollPhysics(),
+                            padding: const EdgeInsets.all(16),
+                            children: [
+                              EditorialModuleHeader(
+                                metaIndex: '§ 22',
+                                metaCategory: 'jobs.liveSearchTitle'.tr(),
+                                title: 'jobs.liveSearchTitle'.tr(),
+                                subtitle: 'jobs.liveSearchSubtitle'.tr(),
+                              ),
+                              const SizedBox(height: 16),
+                              EmptyStateCard(
+                                icon: LucideIcons.briefcase,
+                                title: 'jobs.noneFound'.tr(),
+                                description: 'jobs.noneFoundHint'.tr(),
+                              ),
+                            ],
                           );
                         }
                         return RefreshIndicator(
@@ -218,13 +222,28 @@ class _LiveJobsScreenState extends ConsumerState<LiveJobsScreen> {
                           child: ListView.separated(
                             padding:
                                 const EdgeInsets.fromLTRB(12, 8, 12, 24),
-                            itemCount: list.length,
+                            // i0 = Editorial-Header (aus dem fixen Kopf).
+                            itemCount: list.length + 1,
                             separatorBuilder: (_, __) =>
                                 const SizedBox(height: 6),
-                            itemBuilder: (_, i) => AnimatedEntrance(
-                              index: i,
-                              child: _JobCard(job: list[i]),
-                            ),
+                            itemBuilder: (_, i) {
+                              if (i == 0) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.fromLTRB(4, 4, 4, 8),
+                                  child: EditorialModuleHeader(
+                                    metaIndex: '§ 22',
+                                    metaCategory: 'jobs.liveSearchTitle'.tr(),
+                                    title: 'jobs.liveSearchTitle'.tr(),
+                                    subtitle: 'jobs.liveSearchSubtitle'.tr(),
+                                  ),
+                                );
+                              }
+                              return AnimatedEntrance(
+                                index: i,
+                                child: _JobCard(job: list[i - 1]),
+                              );
+                            },
                           ),
                         );
                       },
