@@ -608,7 +608,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
 
   /// Deep-Link Share auf www.mensaena.de/dashboard/groups/{id}.
   Future<void> _shareGroup(String id, String name) async {
-    final url = 'mensaena://dashboard/groups/$id';
+    final url = 'https://www.mensaena.de/get/groups/$id';
     await Share.share(
       'groups.shareBody'.tr(namedArgs: {'title': name, 'url': url}),
       subject: 'groups.shareSubject'.tr(namedArgs: {'title': name}),

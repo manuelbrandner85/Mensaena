@@ -91,6 +91,11 @@
                 <data android:host="www.mensaena.de"/>
                 <data android:host="mensaena.de"/>
                 <data android:pathPrefix="/dashboard/"/>
+                <!-- Smart-Share-Links: geteilte Inhalte nutzen /get/<typ>/<id>
+                     (klickbarer https-Link). Mit verifizierter assetlinks.json
+                     öffnet sich die App direkt; sonst leitet die Web-Seite zum
+                     APK-Download. -->
+                <data android:pathPrefix="/get/"/>
             </intent-filter>
             <!-- Eigenständiger App-Deep-Link: mensaena://… öffnet die App
                  direkt (geteilte Inhalte verweisen nicht mehr auf die Website).

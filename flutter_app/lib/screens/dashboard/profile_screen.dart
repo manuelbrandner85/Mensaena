@@ -1017,7 +1017,7 @@ class _Header extends StatelessWidget {
                   final name =
                       profile.displayName ?? profile.name ?? 'Mensaena';
                   final url =
-                      'mensaena://dashboard/profile/${profile.id}';
+                      'https://www.mensaena.de/get/profile/${profile.id}';
                   Share.share(
                     'profile.shareMessage'
                         .tr(namedArgs: {'name': name, 'url': url}),

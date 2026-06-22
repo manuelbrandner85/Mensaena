@@ -100,7 +100,7 @@ class _PostCardState extends ConsumerState<PostCard> {
   }
 
   Future<void> _share() async {
-    final url = 'mensaena://dashboard/posts/${widget.post.id}';
+    final url = 'https://www.mensaena.de/get/posts/${widget.post.id}';
     await Share.share(
       '${widget.post.title}\n$url',
       subject: widget.post.title,

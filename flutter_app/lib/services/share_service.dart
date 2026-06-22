@@ -60,11 +60,11 @@ class ShareService {
     }
   }
 
-  /// Erzeugt den App-Deep-Link für einen Inhalt. Die Flutter-App ist
-  /// eigenständig — geteilte Links öffnen die App (Schema `mensaena://`),
-  /// NICHT mehr die Website www.mensaena.de.
+  /// Erzeugt den klickbaren Smart-Share-Link. https-Link (in Messengern
+  /// klickbar) auf /get/<typ>/<id>: Ist die App installiert, öffnet der
+  /// Android App Link sie direkt; sonst leitet die Web-Seite zum APK-Download.
   static String buildUrl({required ShareableType type, required String id}) {
-    return 'mensaena://dashboard/${type.path}/$id';
+    return 'https://www.mensaena.de/get/${type.path}/$id';
   }
 
   /// Externe Share via System-Share-Sheet (WhatsApp, Signal, Mail …).
@@ -107,12 +107,12 @@ class ShareService {
     }
   }
 
-  /// Mensaena-Einladung als pre-built Share-Text. Verweist auf die App
-  /// (Deep-Link), nicht mehr auf die Website.
+  /// Mensaena-Einladung als pre-built Share-Text. Klickbarer https-Link auf
+  /// die Download-Seite (für Empfänger ohne App genau richtig).
   static String inviteText({String? referralCode}) {
     final url = referralCode == null
-        ? 'mensaena://invite'
-        : 'mensaena://invite?ref=$referralCode';
+        ? 'https://www.mensaena.de/download'
+        : 'https://www.mensaena.de/download?ref=$referralCode';
     return 'Komm zu ${AppConfig.appName} – die Nachbarschafts-App.\n\n$url';
   }
 }

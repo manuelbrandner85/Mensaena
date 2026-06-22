@@ -54,11 +54,12 @@ class DeepLinkService {
   /// Konvertiert eine eingehende URL in eine GoRouter-Route.
   /// Returns null wenn URL nicht zu uns gehoert.
   ///
-  /// Zwei Formate:
-  ///   mensaena://dashboard/posts/<id>      (App-Deep-Link, eigenständig)
-  ///       → host='dashboard' IST das erste Routen-Segment → /dashboard/posts/<id>
-  ///   https://www.mensaena.de/dashboard/...(Alt-Link, falls noch im Umlauf)
-  ///       → host ist die Domain, nur der Pfad zählt → /dashboard/...
+  /// Formate:
+  ///   https://www.mensaena.de/get/<typ>/<id>   (Smart-Share-Link, App Link)
+  ///       → intern auf /dashboard/<typ>/<id> abgebildet
+  ///   https://www.mensaena.de/dashboard/...     (direkter App-Link-Pfad)
+  ///   mensaena://dashboard/...                  (Custom-Scheme, JS-Bridge der
+  ///       Web-Smart-Link-Seite) → host ist erstes Routen-Segment
   static String? toInternalRoute(Uri uri) {
     final query = uri.query.isEmpty ? '' : '?${uri.query}';
     if (uri.scheme == 'mensaena') {
@@ -70,7 +71,12 @@ class DeepLinkService {
     if (uri.host.isNotEmpty && !uri.host.contains('mensaena')) {
       return null;
     }
-    final path = uri.path.isEmpty ? '/' : uri.path;
+    var path = uri.path.isEmpty ? '/' : uri.path;
+    // Smart-Share-Links: /get/<typ>/<id> ist nur der klickbare Außen-Link →
+    // intern auf den echten Detail-Pfad /dashboard/<typ>/<id> abbilden.
+    if (path.startsWith('/get/')) {
+      path = '/dashboard/${path.substring('/get/'.length)}';
+    }
     return '$path$query';
   }
 

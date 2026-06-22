@@ -232,7 +232,7 @@ class CrisisDetailScreen extends ConsumerWidget {
   /// Deep-Link Share auf www.mensaena.de/dashboard/crisis/{id}.
   /// Verbreitet den Notruf an die Nachbarschaft (WhatsApp, Signal, ...).
   Future<void> _shareCrisis(Crisis c) async {
-    final url = 'mensaena://dashboard/crisis/${c.id}';
+    final url = 'https://www.mensaena.de/get/crisis/${c.id}';
     await Share.share(
       'crisis.shareBody'.tr(namedArgs: {'title': c.title, 'url': url}),
       subject:
