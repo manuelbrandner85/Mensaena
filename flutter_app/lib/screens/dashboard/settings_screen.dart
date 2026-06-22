@@ -30,7 +30,6 @@ import '../../services/biometric_service.dart';
 import '../../services/device_tier_service.dart';
 import '../../services/memory_watchdog_service.dart';
 import '../../services/screen_time_service.dart';
-import '../../services/shorebird_patch_service.dart';
 import '../../services/sleep_reminder_service.dart';
 import '../../services/sound_service.dart';
 import '../../services/supabase_service.dart';
