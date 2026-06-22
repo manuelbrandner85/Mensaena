@@ -37,6 +37,10 @@ class SkillsRepository {
     double? hourlyRate,
     bool isOnline = false,
     String? locationAddress,
+    DateTime? availableFrom,
+    DateTime? availableUntil,
+    int? radiusKm,
+    String? currency,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -51,9 +55,18 @@ class SkillsRepository {
             if (level != null) 'level': level,
             'is_free': isFree,
             if (hourlyRate != null && !isFree) 'hourly_rate': hourlyRate,
+            if (!isFree && currency != null && currency.isNotEmpty)
+              'currency': currency,
             'is_online': isOnline,
             if (locationAddress != null && locationAddress.isNotEmpty)
               'location_address': locationAddress,
+            if (!isOnline && radiusKm != null && radiusKm > 0)
+              'radius_km': radiusKm,
+            if (availableFrom != null)
+              'available_from': availableFrom.toIso8601String().substring(0, 10),
+            if (availableUntil != null)
+              'available_until':
+                  availableUntil.toIso8601String().substring(0, 10),
             'is_active': true,
           })
           .select()

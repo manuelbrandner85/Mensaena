@@ -47,6 +47,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
   double? _lng;
   int _affected = 0;
   int _neededHelpers = 0;
+  double _radiusKm = 0; // betroffener Radius, 0 = nicht angegeben
   final Set<String> _skills = <String>{};
   final Set<String> _resources = <String>{};
   final List<File> _images = <File>[];
@@ -231,6 +232,7 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
       longitude: _lng,
       affectedCount: _affected > 0 ? _affected : null,
       neededHelpers: _neededHelpers > 0 ? _neededHelpers : null,
+      radiusKm: _radiusKm <= 0 ? null : _radiusKm,
       neededSkills: _skills.toList(),
       neededResources: _resources.toList(),
       contactName:
@@ -494,6 +496,24 @@ class _CrisisCreateScreenState extends ConsumerState<CrisisCreateScreen>
                   ),
                 ),
               ],
+            ),
+            const SizedBox(height: 14),
+            // Betroffener Radius — zeichnet den Gefahren-/Hilfekreis auf der Karte.
+            Text(
+              _radiusKm <= 0
+                  ? 'crisisCreate.affectedRadiusAny'.tr()
+                  : 'crisisCreate.affectedRadiusKm'
+                      .tr(namedArgs: {'km': _radiusKm.round().toString()}),
+              style: AppTypography.label(size: 10),
+            ),
+            Slider(
+              value: _radiusKm,
+              min: 0,
+              max: 50,
+              divisions: 50,
+              activeColor: AppColors.herzrot,
+              label: _radiusKm <= 0 ? '–' : '${_radiusKm.round()} km',
+              onChanged: (v) => setState(() => _radiusKm = v),
             ),
             const SizedBox(height: 18),
             // Benötigte Fähigkeiten (Mehrfachauswahl).

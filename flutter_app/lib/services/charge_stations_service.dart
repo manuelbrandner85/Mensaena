@@ -60,17 +60,33 @@ class ChargeStationsService {
     final q = '[out:json][timeout:25];'
         'nwr["amenity"="charging_station"](around:$radiusM,$lat,$lng);'
         'out center $limit;';
+    // WICHTIG: Overpass antwortet OHNE User-Agent-Header mit HTTP 406
+    // ("Not Acceptable") → der Client bekam 0 Stationen. Header setzen behebt
+    // das. Zusätzlich ein Mirror als Fallback, weil der Hauptserver oft
+    // überlastet ist (429/504).
+    const endpoints = [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter',
+    ];
     try {
-      final r = await http
-          .post(
-            Uri.parse('https://overpass-api.de/api/interpreter'),
+      http.Response? r;
+      for (final ep in endpoints) {
+        try {
+          final resp = await http.post(
+            Uri.parse(ep),
+            headers: const {'User-Agent': 'mensaena/1.0 (de.mensaena.app)'},
             body: {'data': q},
-          )
-          .timeout(const Duration(seconds: 30));
-      if (r.statusCode != 200) {
-        debugPrint('[ChargeStations] HTTP ${r.statusCode}');
-        return const [];
+          ).timeout(const Duration(seconds: 30));
+          if (resp.statusCode == 200) {
+            r = resp;
+            break;
+          }
+          debugPrint('[ChargeStations] $ep HTTP ${resp.statusCode}');
+        } catch (e) {
+          debugPrint('[ChargeStations] $ep failed: $e');
+        }
       }
+      if (r == null) return const [];
       final j = json.decode(r.body) as Map<String, dynamic>;
       final elements = (j['elements'] as List?) ?? const [];
       final out = <ChargeStation>[];

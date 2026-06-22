@@ -46,6 +46,8 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
   final _whatToBringCtrl = TextEditingController();
   final _contactCtrl = TextEditingController();
   final _onlineUrlCtrl = TextEditingController();
+  final _cohostCtrl = TextEditingController();
+  DateTime? _registrationDeadline;
 
   String _category = 'community';
   DateTime? _startDate;
@@ -107,6 +109,7 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
     _whatToBringCtrl.dispose();
     _contactCtrl.dispose();
     _onlineUrlCtrl.dispose();
+    _cohostCtrl.dispose();
     super.dispose();
   }
 
@@ -339,6 +342,8 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       recurringPattern: _isRecurring ? _recurringPattern : null,
       isOnline: _isOnline,
       onlineUrl: _isOnline ? _onlineUrlCtrl.text.trim() : null,
+      registrationDeadline: _registrationDeadline,
+      cohostName: _cohostCtrl.text.trim(),
     );
 
     if (!mounted) return;
@@ -865,12 +870,85 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
 
   Widget _sectionContact() {
     return _sectionWrap(
-      child: TextField(
-        controller: _contactCtrl,
-        style: AppTypography.body(size: 14, color: AppColors.ink),
-        decoration: InputDecoration(
-          labelText: 'events.contactInfo'.tr(),
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            controller: _contactCtrl,
+            style: AppTypography.body(size: 14, color: AppColors.ink),
+            decoration: InputDecoration(
+              labelText: 'events.contactInfo'.tr(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          TextField(
+            controller: _cohostCtrl,
+            style: AppTypography.body(size: 14, color: AppColors.ink),
+            decoration: InputDecoration(
+              labelText: 'events.cohost'.tr(),
+              hintText: 'events.cohostHint'.tr(),
+            ),
+          ),
+          const SizedBox(height: 10),
+          InkWell(
+            onTap: () async {
+              final now = DateTime.now();
+              final last =
+                  (_startDate != null && _startDate!.isAfter(now))
+                      ? _startDate!
+                      : now.add(const Duration(days: 365));
+              final init = _registrationDeadline ?? now;
+              final initClamped = init.isBefore(now)
+                  ? now
+                  : (init.isAfter(last) ? last : init);
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: initClamped,
+                firstDate: now,
+                lastDate: last,
+              );
+              if (picked != null) {
+                setState(() => _registrationDeadline = picked);
+              }
+            },
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: AppColors.elevated,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.line),
+              ),
+              child: Row(
+                children: [
+                  const Icon(LucideIcons.calendarClock,
+                      size: 18, color: AppColors.bronze),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      _registrationDeadline == null
+                          ? 'events.registrationDeadlineNone'.tr()
+                          : 'events.registrationDeadlineOn'.tr(namedArgs: {
+                              'date':
+                                  '${_registrationDeadline!.day}.${_registrationDeadline!.month}.${_registrationDeadline!.year}'
+                            }),
+                      style:
+                          AppTypography.body(size: 13, color: AppColors.ink),
+                    ),
+                  ),
+                  if (_registrationDeadline != null)
+                    GestureDetector(
+                      onTap: () =>
+                          setState(() => _registrationDeadline = null),
+                      child: const Icon(LucideIcons.x,
+                          size: 16, color: AppColors.mute),
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

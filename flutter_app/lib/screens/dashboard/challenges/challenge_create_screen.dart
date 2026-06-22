@@ -37,6 +37,10 @@ class _ChallengeCreateScreenState
   int _maxParticipants = 0;
   bool _isWeekly = false;
   bool _busy = false;
+  String? _rewardBadge; // Belohnungs-Abzeichen (Emoji), optional
+  static const List<String> _badgeChoices = [
+    '🏆', '🌱', '💪', '🧠', '🎨', '🥗', '🤝', '⭐', '🔥', '❤️'
+  ];
 
   Map<String, String> get _categories => {
         'umwelt': 'challenges.catUmwelt'.tr(),
@@ -76,6 +80,7 @@ class _ChallengeCreateScreenState
       durationDays: _days,
       maxParticipants: _maxParticipants > 0 ? _maxParticipants : null,
       isWeekly: _isWeekly,
+      rewardBadge: _rewardBadge,
     );
     if (!mounted) return;
     setState(() => _busy = false);
@@ -171,6 +176,41 @@ class _ChallengeCreateScreenState
                         ),
                       ))
                   .toList(),
+            ),
+          ),
+
+          // ── Belohnungs-Abzeichen (optional) ─────────────────────────
+          CreateCard(
+            title: 'challenges.rewardBadge'.tr(),
+            icon: LucideIcons.award,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final emoji in _badgeChoices)
+                  GestureDetector(
+                    onTap: () => setState(() =>
+                        _rewardBadge = _rewardBadge == emoji ? null : emoji),
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: _rewardBadge == emoji
+                            ? AppColors.amber.withValues(alpha: 0.20)
+                            : AppColors.surface.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _rewardBadge == emoji
+                              ? AppColors.amber
+                              : AppColors.line,
+                          width: _rewardBadge == emoji ? 2 : 1,
+                        ),
+                      ),
+                      child: Text(emoji, style: const TextStyle(fontSize: 22)),
+                    ),
+                  ),
+              ],
             ),
           ),
 

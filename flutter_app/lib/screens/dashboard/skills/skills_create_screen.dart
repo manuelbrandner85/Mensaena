@@ -35,6 +35,12 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
   bool _submitting = false;
   bool _locating = false;
   String? _error;
+  // Mehrwert-Felder (Batch B): Verfügbarkeit, Aktionsradius, Währung.
+  double _radiusKm = 0; // 0 = egal (nur offline relevant)
+  String _currency = 'EUR';
+  DateTime? _availableFrom;
+  DateTime? _availableUntil;
+  static const List<String> _currencies = ['EUR', 'CHF', 'USD', 'GBP'];
 
   static const Map<String, String> _categories = {
     'sprachen': 'skills.create.catSprachen',
@@ -105,6 +111,10 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
       locationAddress: _locationCtrl.text.trim().isEmpty
           ? null
           : _locationCtrl.text.trim(),
+      currency: _isFree ? null : _currency,
+      radiusKm: _radiusKm <= 0 ? null : _radiusKm.round(),
+      availableFrom: _availableFrom,
+      availableUntil: _availableUntil,
     );
 
     if (!mounted) return;
@@ -121,6 +131,58 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
     MiniConfetti.show(context);
     AppSnackBar.success(context, 'common.created'.tr());
     context.go('/dashboard/skills');
+  }
+
+  Widget _availabilityTile({
+    required String label,
+    required DateTime? value,
+    required DateTime first,
+    required ValueChanged<DateTime?> onChanged,
+  }) {
+    return InkWell(
+      onTap: () async {
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+        final firstDate = first.isBefore(today) ? today : first;
+        final picked = await showDatePicker(
+          context: context,
+          initialDate: value ?? firstDate,
+          firstDate: firstDate,
+          lastDate: today.add(const Duration(days: 365)),
+        );
+        if (picked != null) onChanged(picked);
+      },
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.elevated,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.line),
+        ),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.calendar, size: 14, color: AppColors.bronze),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                value == null
+                    ? label
+                    : '${value.day}.${value.month}.${value.year}',
+                style: AppTypography.body(size: 12, color: AppColors.ink),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (value != null)
+              GestureDetector(
+                onTap: () => onChanged(null),
+                child: const Icon(LucideIcons.x,
+                    size: 14, color: AppColors.mute),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -268,6 +330,20 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
                     ),
                   ),
                   const SizedBox(height: 6),
+                  DropdownButtonFormField<String>(
+                    value: _currency,
+                    decoration: InputDecoration(
+                        labelText: 'skills.create.currency'.tr()),
+                    dropdownColor: AppColors.surface,
+                    style: AppTypography.body(size: 14, color: AppColors.ink),
+                    items: _currencies
+                        .map((c) =>
+                            DropdownMenuItem(value: c, child: Text(c)))
+                        .toList(),
+                    onChanged: (v) =>
+                        setState(() => _currency = v ?? _currency),
+                  ),
+                  const SizedBox(height: 6),
                 ],
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
@@ -280,6 +356,56 @@ class _SkillsCreateScreenState extends ConsumerState<SkillsCreateScreen> {
                   subtitle: Text('skills.create.isOnlineHint'.tr(),
                       style: AppTypography.body(
                           size: 12, color: AppColors.inkSoft)),
+                ),
+                if (!_isOnline) ...[
+                  const SizedBox(height: 4),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      _radiusKm <= 0
+                          ? 'skills.create.radiusAny'.tr()
+                          : 'skills.create.radiusKm'.tr(
+                              namedArgs: {'km': _radiusKm.round().toString()}),
+                      style: AppTypography.label(
+                          size: 11, color: AppColors.inkSoft),
+                    ),
+                  ),
+                  Slider(
+                    value: _radiusKm,
+                    min: 0,
+                    max: 100,
+                    divisions: 20,
+                    activeColor: AppColors.primary500,
+                    label: _radiusKm <= 0 ? '∞' : '${_radiusKm.round()} km',
+                    onChanged: (v) => setState(() => _radiusKm = v),
+                  ),
+                ],
+              ],
+            ),
+          ),
+
+          // ── Verfügbarkeit (optional) ────────────────────────────────
+          CreateCard(
+            title: 'skills.create.availability'.tr(),
+            icon: LucideIcons.calendarRange,
+            child: Row(
+              children: [
+                Expanded(
+                  child: _availabilityTile(
+                    label: 'skills.create.availableFrom'.tr(),
+                    value: _availableFrom,
+                    first: DateTime.now(),
+                    onChanged: (d) => setState(() => _availableFrom = d),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _availabilityTile(
+                    label: 'skills.create.availableUntil'.tr(),
+                    value: _availableUntil,
+                    first: _availableFrom ?? DateTime.now(),
+                    onChanged: (d) => setState(() => _availableUntil = d),
+                  ),
                 ),
               ],
             ),

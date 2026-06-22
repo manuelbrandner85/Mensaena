@@ -2244,6 +2244,10 @@
     "catEmpathic": "Empathic"
   },
   "events": {
+    "cohost": "Co-host (optional)",
+    "cohostHint": "Name of the co-hosting person/group",
+    "registrationDeadlineNone": "No registration deadline",
+    "registrationDeadlineOn": "Registration deadline: {date}",
     "title": "Event",
     "checkin_title": "Event check-in",
     "checkin_count": "{n} checked in",
@@ -2396,6 +2400,7 @@
     "createSubtitle": "Invite your neighbours"
   },
   "challenges": {
+    "rewardBadge": "Reward badge (optional)",
     "create": "Create challenge",
     "createFailed": "Challenge could not be created.",
     "createSuccess": "Challenge created!",
@@ -2476,6 +2481,8 @@
     "shareSubject": "Invitation to Mensaena"
   },
   "groups": {
+    "rulesLabel": "Group rules (optional)",
+    "rulesHint": "e.g. be respectful, no spam, stay on topic …",
     "title": "Group",
     "nearbyTitle": "Groups near you",
     "memberCount": "{count} members",
@@ -2658,6 +2665,8 @@
     "screenTitle": "Supply",
     "addFarm": "Add farm",
     "farmCreate": {
+      "fSubcategories": "Subcategories (comma-separated)",
+      "fSubcategoriesHint": "Vegetables, fruit, eggs, honey",
       "intro": "Add a farm, farm shop or direct marketer from your region.",
       "secBasics": "Basics",
       "secLocation": "Location",
@@ -3057,6 +3066,12 @@
       "hourlyRate": "Hourly rate (€/h)",
       "isOnline": "Available online",
       "isOnlineHint": "Also via video call or remote",
+      "currency": "Currency",
+      "radiusAny": "Service radius: any",
+      "radiusKm": "Service radius: {km} km",
+      "availability": "Availability (optional)",
+      "availableFrom": "Available from",
+      "availableUntil": "Available until",
       "submitButton": "Publish skill",
       "saving": "Saving…"
     }
@@ -4199,6 +4214,8 @@
     "privateBadge": "PRIVATE"
   },
   "crisisCreate": {
+    "affectedRadiusAny": "Affected radius: not specified",
+    "affectedRadiusKm": "Affected radius: {km} km",
     "areYouHere": "Are you HERE?",
     "yesReportHere": "Yes, report here",
     "moreDetails": "More details (optional)",

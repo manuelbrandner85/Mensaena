@@ -2244,6 +2244,10 @@
     "catEmpathic": "Empathique"
   },
   "events": {
+    "cohost": "Co-organisateur (facultatif)",
+    "cohostHint": "Nom de la personne/du groupe co-organisateur",
+    "registrationDeadlineNone": "Pas de date limite d'inscription",
+    "registrationDeadlineOn": "Clôture des inscriptions : {date}",
     "title": "Événement",
     "checkin_title": "Enregistrement à l'événement",
     "checkin_count": "{n} enregistrés",
@@ -2396,6 +2400,7 @@
     "createSubtitle": "Invite tes voisins"
   },
   "challenges": {
+    "rewardBadge": "Badge de récompense (facultatif)",
     "create": "Créer un défi",
     "createFailed": "Impossible de créer le défi.",
     "createSuccess": "Défi créé !",
@@ -2476,6 +2481,8 @@
     "shareSubject": "Invitation à Mensaena"
   },
   "groups": {
+    "rulesLabel": "Règles du groupe (facultatif)",
+    "rulesHint": "ex. respect, pas de spam, rester dans le sujet …",
     "title": "Groupe",
     "nearbyTitle": "Groupes près de chez vous",
     "memberCount": "{count} membres",
@@ -2658,6 +2665,8 @@
     "screenTitle": "Approvisionnement",
     "addFarm": "Ajouter une ferme",
     "farmCreate": {
+      "fSubcategories": "Sous-catégories (séparées par des virgules)",
+      "fSubcategoriesHint": "Légumes, fruits, œufs, miel",
       "intro": "Ajoutez une ferme, un magasin de ferme ou un producteur direct de votre région.",
       "secBasics": "Données de base",
       "secLocation": "Lieu",
@@ -3057,6 +3066,12 @@
       "hourlyRate": "Tarif horaire (€/h)",
       "isOnline": "Disponible en ligne",
       "isOnlineHint": "Aussi par appel vidéo ou à distance",
+      "currency": "Devise",
+      "radiusAny": "Rayon d'action : indifférent",
+      "radiusKm": "Rayon d'action : {km} km",
+      "availability": "Disponibilité (facultatif)",
+      "availableFrom": "Disponible à partir du",
+      "availableUntil": "Disponible jusqu'au",
       "submitButton": "Publier la compétence",
       "saving": "Enregistrement…"
     }
@@ -4202,6 +4217,8 @@
     "privateBadge": "PRIVÉ"
   },
   "crisisCreate": {
+    "affectedRadiusAny": "Rayon affecté : non précisé",
+    "affectedRadiusKm": "Rayon affecté : {km} km",
     "areYouHere": "Es-tu ICI ?",
     "yesReportHere": "Oui, signaler ici",
     "moreDetails": "Plus de détails (facultatif)",

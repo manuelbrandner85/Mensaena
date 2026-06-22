@@ -2244,6 +2244,10 @@
     "catEmpathic": "Empático"
   },
   "events": {
+    "cohost": "Coorganizador (opcional)",
+    "cohostHint": "Nombre de la persona/grupo coorganizador",
+    "registrationDeadlineNone": "Sin fecha límite de inscripción",
+    "registrationDeadlineOn": "Cierre de inscripción: {date}",
     "title": "Evento",
     "checkin_title": "Registro de evento",
     "checkin_count": "{n} registrados",
@@ -2396,6 +2400,7 @@
     "createSubtitle": "Invita a tus vecinos"
   },
   "challenges": {
+    "rewardBadge": "Insignia de recompensa (opcional)",
     "create": "Crear reto",
     "createFailed": "No se pudo crear el reto.",
     "createSuccess": "¡Reto creado!",
@@ -2476,6 +2481,8 @@
     "shareSubject": "Invitación a Mensaena"
   },
   "groups": {
+    "rulesLabel": "Reglas del grupo (opcional)",
+    "rulesHint": "p. ej. respeto, sin spam, mantener el tema …",
     "title": "Grupo",
     "nearbyTitle": "Grupos cerca de ti",
     "memberCount": "{count} miembros",
@@ -2658,6 +2665,8 @@
     "screenTitle": "Suministro",
     "addFarm": "Añadir granja",
     "farmCreate": {
+      "fSubcategories": "Subcategorías (separadas por comas)",
+      "fSubcategoriesHint": "Verduras, fruta, huevos, miel",
       "intro": "Añade una granja, tienda agrícola o productor directo de tu región.",
       "secBasics": "Datos básicos",
       "secLocation": "Ubicación",
@@ -3057,6 +3066,12 @@
       "hourlyRate": "Tarifa por hora (€/h)",
       "isOnline": "Disponible en línea",
       "isOnlineHint": "También por videollamada o de forma remota",
+      "currency": "Moneda",
+      "radiusAny": "Radio de acción: cualquiera",
+      "radiusKm": "Radio de acción: {km} km",
+      "availability": "Disponibilidad (opcional)",
+      "availableFrom": "Disponible desde",
+      "availableUntil": "Disponible hasta",
       "submitButton": "Publicar habilidad",
       "saving": "Guardando…"
     }
@@ -4202,6 +4217,8 @@
     "privateBadge": "PRIVADO"
   },
   "crisisCreate": {
+    "affectedRadiusAny": "Radio afectado: sin especificar",
+    "affectedRadiusKm": "Radio afectado: {km} km",
     "areYouHere": "¿Estás AQUÍ?",
     "yesReportHere": "Sí, reportar aquí",
     "moreDetails": "Más detalles (opcional)",

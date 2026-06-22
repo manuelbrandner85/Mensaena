@@ -389,6 +389,7 @@ class FarmsRepository {
     List<String> products = const [],
     List<String> services = const [],
     List<String> deliveryOptions = const [],
+    List<String> subcategories = const [],
     List<String> mediaUrls = const [],
     bool isBio = false,
     bool isSeasonal = false,
@@ -429,6 +430,7 @@ class FarmsRepository {
         if (services.isNotEmpty) 'services': services,
         if (deliveryOptions.isNotEmpty)
           'delivery_options': deliveryOptions,
+        if (subcategories.isNotEmpty) 'subcategories': subcategories,
         'is_bio': isBio,
         'is_seasonal': isSeasonal,
         'is_verified': false,

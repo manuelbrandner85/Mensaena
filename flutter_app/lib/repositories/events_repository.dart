@@ -271,6 +271,8 @@ class EventsRepository {
     String? recurringPattern, // 'daily' | 'weekly' | 'monthly'
     bool isOnline = false,
     String? onlineUrl,
+    DateTime? registrationDeadline,
+    String? cohostName,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -301,6 +303,11 @@ class EventsRepository {
         if (recurringPattern != null) 'recurring_pattern': recurringPattern,
         'is_online': isOnline,
         if (onlineUrl != null && onlineUrl.isNotEmpty) 'online_url': onlineUrl,
+        if (registrationDeadline != null)
+          'registration_deadline':
+              registrationDeadline.toUtc().toIso8601String(),
+        if (cohostName != null && cohostName.trim().isNotEmpty)
+          'cohost_name': cohostName.trim(),
         'status': 'active',
       }).select('id').maybeSingle();
       if (row == null) return null;

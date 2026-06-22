@@ -2243,6 +2243,10 @@
     "catEmpathic": "Эмпатичный"
   },
   "events": {
+    "cohost": "Соорганизатор (необязательно)",
+    "cohostHint": "Имя соорганизатора (человек/группа)",
+    "registrationDeadlineNone": "Без срока регистрации",
+    "registrationDeadlineOn": "Срок регистрации: {date}",
     "title": "Событие",
     "checkin_title": "Регистрация на событии",
     "checkin_count": "Зарегистрировано: {n}",
@@ -2395,6 +2399,7 @@
     "createSubtitle": "Пригласите своих соседей"
   },
   "challenges": {
+    "rewardBadge": "Награда-значок (необязательно)",
     "create": "Создать челлендж",
     "createFailed": "Не удалось создать челлендж.",
     "createSuccess": "Челлендж создан!",
@@ -2475,6 +2480,8 @@
     "shareSubject": "Приглашение в Mensaena"
   },
   "groups": {
+    "rulesLabel": "Правила группы (необязательно)",
+    "rulesHint": "напр. уважение, без спама, по теме …",
     "title": "Группа",
     "nearbyTitle": "Группы рядом",
     "memberCount": "{count} участников",
@@ -2657,6 +2664,8 @@
     "screenTitle": "Снабжение",
     "addFarm": "Добавить ферму",
     "farmCreate": {
+      "fSubcategories": "Подкатегории (через запятую)",
+      "fSubcategoriesHint": "Овощи, фрукты, яйца, мёд",
       "intro": "Добавьте ферму, фермерский магазин или прямого производителя из вашего региона.",
       "secBasics": "Основное",
       "secLocation": "Местоположение",
@@ -3056,6 +3065,12 @@
       "hourlyRate": "Почасовая ставка (€/ч)",
       "isOnline": "Доступно онлайн",
       "isOnlineHint": "Также по видеосвязи или удалённо",
+      "currency": "Валюта",
+      "radiusAny": "Радиус действия: любой",
+      "radiusKm": "Радиус действия: {km} км",
+      "availability": "Доступность (необязательно)",
+      "availableFrom": "Доступно с",
+      "availableUntil": "Доступно до",
       "submitButton": "Опубликовать навык",
       "saving": "Сохранение…"
     }
@@ -4201,6 +4216,8 @@
     "privateBadge": "ЛИЧНЫЙ"
   },
   "crisisCreate": {
+    "affectedRadiusAny": "Затронутый радиус: не указан",
+    "affectedRadiusKm": "Затронутый радиус: {km} км",
     "areYouHere": "Ты ЗДЕСЬ?",
     "yesReportHere": "Да, сообщить здесь",
     "moreDetails": "Дополнительно (необязательно)",

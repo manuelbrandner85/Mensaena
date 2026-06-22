@@ -385,6 +385,7 @@ class GroupsRepository {
     double? latitude,
     double? longitude,
     int? radiusKm,
+    String? rules,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -401,6 +402,7 @@ class GroupsRepository {
             'member_count': 1,
             'post_count': 0,
             if (coverImageUrl != null) 'cover_image_url': coverImageUrl,
+            if (rules != null && rules.trim().isNotEmpty) 'rules': rules.trim(),
             if (maxMembers != null) 'max_members': maxMembers,
             if (latitude != null) 'latitude': LocationAnonymizer.lat(latitude),
             if (longitude != null) 'longitude': LocationAnonymizer.lng(longitude),

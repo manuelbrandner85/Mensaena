@@ -2244,6 +2244,10 @@
     "catEmpathic": "Empatico"
   },
   "events": {
+    "cohost": "Co-organizzatore (facoltativo)",
+    "cohostHint": "Nome della persona/gruppo co-organizzatore",
+    "registrationDeadlineNone": "Nessuna scadenza di iscrizione",
+    "registrationDeadlineOn": "Scadenza iscrizione: {date}",
     "title": "Evento",
     "checkin_title": "Check-in evento",
     "checkin_count": "{n} registrati",
@@ -2396,6 +2400,7 @@
     "createSubtitle": "Invita i tuoi vicini"
   },
   "challenges": {
+    "rewardBadge": "Distintivo premio (facoltativo)",
     "create": "Crea sfida",
     "createFailed": "Impossibile creare la sfida.",
     "createSuccess": "Sfida creata!",
@@ -2476,6 +2481,8 @@
     "shareSubject": "Invito a Mensaena"
   },
   "groups": {
+    "rulesLabel": "Regole del gruppo (facoltativo)",
+    "rulesHint": "es. rispetto reciproco, niente spam, restare in tema …",
     "title": "Gruppo",
     "nearbyTitle": "Gruppi vicino a te",
     "memberCount": "{count} membri",
@@ -2658,6 +2665,8 @@
     "screenTitle": "Approvvigionamento",
     "addFarm": "Aggiungi fattoria",
     "farmCreate": {
+      "fSubcategories": "Sottocategorie (separate da virgola)",
+      "fSubcategoriesHint": "Verdura, frutta, uova, miele",
       "intro": "Aggiungi una fattoria, uno spaccio agricolo o un produttore diretto della tua zona.",
       "secBasics": "Dati principali",
       "secLocation": "Posizione",
@@ -3057,6 +3066,12 @@
       "hourlyRate": "Tariffa oraria (€/h)",
       "isOnline": "Disponibile online",
       "isOnlineHint": "Anche tramite videochiamata o da remoto",
+      "currency": "Valuta",
+      "radiusAny": "Raggio d'azione: qualsiasi",
+      "radiusKm": "Raggio d'azione: {km} km",
+      "availability": "Disponibilità (facoltativo)",
+      "availableFrom": "Disponibile dal",
+      "availableUntil": "Disponibile fino al",
       "submitButton": "Pubblica competenza",
       "saving": "Salvataggio…"
     }
@@ -4202,6 +4217,8 @@
     "privateBadge": "PRIVATO"
   },
   "crisisCreate": {
+    "affectedRadiusAny": "Raggio interessato: non specificato",
+    "affectedRadiusKm": "Raggio interessato: {km} km",
     "areYouHere": "Sei QUI?",
     "yesReportHere": "Sì, segnala qui",
     "moreDetails": "Altri dettagli (facoltativo)",

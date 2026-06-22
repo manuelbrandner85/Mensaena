@@ -30,6 +30,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
   final _name = TextEditingController();
   final _desc = TextEditingController();
   final _location = TextEditingController();
+  final _rules = TextEditingController();
   String _category = 'nachbarschaft';
   bool _isPrivate = false;
   File? _cover;
@@ -59,6 +60,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
     _name.dispose();
     _desc.dispose();
     _location.dispose();
+    _rules.dispose();
     super.dispose();
   }
 
@@ -125,6 +127,7 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
       latitude: _lat,
       longitude: _lng,
       radiusKm: _lat != null && _radiusKm > 0 ? _radiusKm : null,
+      rules: _rules.text.trim().isEmpty ? null : _rules.text.trim(),
     );
     if (!mounted) return;
     if (id == null) {
@@ -231,6 +234,20 @@ class _GroupCreateScreenState extends ConsumerState<GroupCreateScreen> {
                   style: AppTypography.body(size: 14, color: AppColors.ink),
                   decoration: InputDecoration(
                     labelText: 'create.description'.tr(),
+                    alignLabelWithHint: true,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _rules,
+                  maxLines: 3,
+                  maxLength: 600,
+                  validator: FormValidators.lengthBetween(0, 600,
+                      requiredField: false),
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'groups.rulesLabel'.tr(),
+                    hintText: 'groups.rulesHint'.tr(),
                     alignLabelWithHint: true,
                   ),
                 ),

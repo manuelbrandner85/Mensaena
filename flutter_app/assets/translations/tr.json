@@ -2243,6 +2243,10 @@
     "catEmpathic": "Empatik"
   },
   "events": {
+    "cohost": "Eş düzenleyici (isteğe bağlı)",
+    "cohostHint": "Eş düzenleyen kişi/grup adı",
+    "registrationDeadlineNone": "Kayıt son tarihi yok",
+    "registrationDeadlineOn": "Kayıt son tarihi: {date}",
     "title": "Etkinlik",
     "checkin_title": "Etkinlik girişi",
     "checkin_count": "{n} kişi giriş yaptı",
@@ -2395,6 +2399,7 @@
     "createSubtitle": "Komşularını davet et"
   },
   "challenges": {
+    "rewardBadge": "Ödül rozeti (isteğe bağlı)",
     "create": "Meydan okuma oluştur",
     "createFailed": "Meydan okuma oluşturulamadı.",
     "createSuccess": "Meydan okuma oluşturuldu!",
@@ -2475,6 +2480,8 @@
     "shareSubject": "Mensaena daveti"
   },
   "groups": {
+    "rulesLabel": "Grup kuralları (isteğe bağlı)",
+    "rulesHint": "ör. saygılı olun, spam yok, konuda kalın …",
     "title": "Grup",
     "nearbyTitle": "Yakındaki gruplar",
     "memberCount": "{count} üye",
@@ -2657,6 +2664,8 @@
     "screenTitle": "Tedarik",
     "addFarm": "Çiftlik ekle",
     "farmCreate": {
+      "fSubcategories": "Alt kategoriler (virgülle ayrılmış)",
+      "fSubcategoriesHint": "Sebze, meyve, yumurta, bal",
       "intro": "Bölgenden bir çiftlik, çiftlik dükkanı veya doğrudan üretici ekle.",
       "secBasics": "Temel bilgiler",
       "secLocation": "Konum",
@@ -3056,6 +3065,12 @@
       "hourlyRate": "Saatlik ücret (€/sa)",
       "isOnline": "Çevrimiçi mevcut",
       "isOnlineHint": "Görüntülü görüşme veya uzaktan da olabilir",
+      "currency": "Para birimi",
+      "radiusAny": "Hizmet yarıçapı: farketmez",
+      "radiusKm": "Hizmet yarıçapı: {km} km",
+      "availability": "Uygunluk (isteğe bağlı)",
+      "availableFrom": "Şu tarihten itibaren",
+      "availableUntil": "Şu tarihe kadar",
       "submitButton": "Beceriyi yayınla",
       "saving": "Kaydediliyor…"
     }
@@ -4201,6 +4216,8 @@
     "privateBadge": "ÖZEL"
   },
   "crisisCreate": {
+    "affectedRadiusAny": "Etkilenen yarıçap: belirtilmemiş",
+    "affectedRadiusKm": "Etkilenen yarıçap: {km} km",
     "areYouHere": "BURADA mısın?",
     "yesReportHere": "Evet, burada bildir",
     "moreDetails": "Daha fazla ayrıntı (isteğe bağlı)",

@@ -2243,6 +2243,10 @@
     "catEmpathic": "Empathisch"
   },
   "events": {
+    "cohost": "Co-Veranstalter (optional)",
+    "cohostHint": "Name der mitveranstaltenden Person/Gruppe",
+    "registrationDeadlineNone": "Kein Anmeldeschluss",
+    "registrationDeadlineOn": "Anmeldeschluss: {date}",
     "title": "Event",
     "checkin_title": "Event Check-in",
     "checkin_count": "{n} eingecheckt",
@@ -2395,6 +2399,7 @@
     "createSubtitle": "Lade deine Nachbarn ein"
   },
   "challenges": {
+    "rewardBadge": "Belohnungs-Abzeichen (optional)",
     "create": "Challenge erstellen",
     "createFailed": "Challenge konnte nicht erstellt werden.",
     "createSuccess": "Challenge erstellt!",
@@ -2475,6 +2480,8 @@
     "shareSubject": "Einladung zu Mensaena"
   },
   "groups": {
+    "rulesLabel": "Gruppenregeln (optional)",
+    "rulesHint": "z. B. respektvoller Umgang, kein Spam, Thema der Gruppe …",
     "title": "Gruppe",
     "nearbyTitle": "Gruppen in deiner Nähe",
     "memberCount": "{count} Mitglieder",
@@ -2657,6 +2664,8 @@
     "screenTitle": "Versorgung",
     "addFarm": "Hof hinzufügen",
     "farmCreate": {
+      "fSubcategories": "Unterkategorien (kommagetrennt)",
+      "fSubcategoriesHint": "Gemüse, Obst, Eier, Honig",
       "intro": "Trage einen Bauernhof, Hofladen oder Direktvermarkter aus deiner Region ein.",
       "secBasics": "Grunddaten",
       "secLocation": "Standort",
@@ -3056,6 +3065,12 @@
       "hourlyRate": "Stundensatz (€/h)",
       "isOnline": "Online verfügbar",
       "isOnlineHint": "Auch per Video-Call oder Remote",
+      "currency": "Währung",
+      "radiusAny": "Aktionsradius: egal",
+      "radiusKm": "Aktionsradius: {km} km",
+      "availability": "Verfügbarkeit (optional)",
+      "availableFrom": "Verfügbar ab",
+      "availableUntil": "Verfügbar bis",
       "submitButton": "Skill veröffentlichen",
       "saving": "Speichere…"
     }
@@ -4198,6 +4213,8 @@
     "privateBadge": "PRIVAT"
   },
   "crisisCreate": {
+    "affectedRadiusAny": "Betroffener Radius: nicht angegeben",
+    "affectedRadiusKm": "Betroffener Radius: {km} km",
     "areYouHere": "Bist du HIER?",
     "yesReportHere": "Ja, hier melden",
     "moreDetails": "Weitere Details (optional)",

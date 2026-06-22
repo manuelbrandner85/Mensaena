@@ -80,17 +80,31 @@ class MundraubService {
         'nwr["amenity"="give_box"](around:$radiusM,$lat,$lng);'
         'nwr["amenity"="public_bookcase"](around:$radiusM,$lat,$lng);'
         ');out center $limit;';
+    // WICHTIG: Overpass antwortet OHNE User-Agent-Header mit HTTP 406 → 0
+    // Spots. Header setzen + Mirror als Fallback (Hauptserver oft überlastet).
+    const endpoints = [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter',
+    ];
     try {
-      final r = await http
-          .post(
-            Uri.parse('https://overpass-api.de/api/interpreter'),
+      http.Response? r;
+      for (final ep in endpoints) {
+        try {
+          final resp = await http.post(
+            Uri.parse(ep),
+            headers: const {'User-Agent': 'mensaena/1.0 (de.mensaena.app)'},
             body: {'data': q},
-          )
-          .timeout(const Duration(seconds: 30));
-      if (r.statusCode != 200) {
-        debugPrint('[Mundraub] Overpass HTTP ${r.statusCode}');
-        return const [];
+          ).timeout(const Duration(seconds: 30));
+          if (resp.statusCode == 200) {
+            r = resp;
+            break;
+          }
+          debugPrint('[Mundraub] $ep HTTP ${resp.statusCode}');
+        } catch (e) {
+          debugPrint('[Mundraub] $ep failed: $e');
+        }
       }
+      if (r == null) return const [];
       final j = json.decode(r.body) as Map<String, dynamic>;
       final elements = (j['elements'] as List?) ?? const [];
       final out = <FreePickSpot>[];
