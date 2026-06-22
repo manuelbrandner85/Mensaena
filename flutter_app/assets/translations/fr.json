@@ -597,6 +597,10 @@
     "seasonal": {
       "label": "Accents saisonniers",
       "hint": "Ambiance subtile selon la saison : fraîcheur hivernale, vert printanier, or estival, ambre automnal."
+    },
+    "videoBackdrop": {
+      "label": "Arrière-plan vidéo",
+      "hint": "Vidéo en boucle selon l'heure au lieu du dégradé. Gourmand en GPU — sur les appareils plus faibles, une image fixe est affichée automatiquement."
     }
   },
   "chat": {

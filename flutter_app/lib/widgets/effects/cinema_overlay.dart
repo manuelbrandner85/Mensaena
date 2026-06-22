@@ -32,6 +32,7 @@ import '../../providers/theme_mode_provider.dart';
 import '../../services/device_tier_service.dart';
 import 'atmospheric_layers.dart';
 import 'chromatic_aberration.dart';
+import 'cinematic_video_backdrop.dart';
 import 'film_grain.dart';
 import 'lens_flare.dart';
 import 'light_leaks.dart';
@@ -96,6 +97,11 @@ class CinemaOverlay extends ConsumerWidget {
     final seasonalTint = seasonalBase == null
         ? null
         : Color.lerp(Colors.transparent, seasonalBase, intensity);
+    // Video-Hintergrund nur bei vollen Effekten (Crash-Schutz hat profile
+    // ggf. schon auf reduced gedrosselt → dann Mesh-Gradient).
+    final videoBackdrop =
+        ref.watch(cinemaVideoBackdropProvider) && profile.isFull;
+    final phaseVideo = videoBackdrop ? _videoAssetsForPhase(phase) : null;
 
     return KeyedSubtree(
       key: const ValueKey('cinema_overlay_on'),
@@ -105,16 +111,28 @@ class CinemaOverlay extends ConsumerWidget {
         children: [
         // ═══════════ BACKGROUND-STACK (alle hinter Content) ═══════════
 
-        // 1. Mesh-Gradient mit Drift
-        RepaintBoundary(
-          child: AnimatedSwitcher(
-            duration: const Duration(seconds: 8),
-            child: _MeshBackground(
-              key: ValueKey('mesh_${phase.name}'),
-              spec: spec,
+        // 1. Hintergrund: bewegtes Video je Tageszeit (nur full + Schalter an)
+        // ODER der animierte Mesh-Gradient (Standard / bei Crash-Schutz).
+        if (phaseVideo != null)
+          RepaintBoundary(
+            child: CinematicVideoBackdrop(
+              key: ValueKey('video_${phase.name}'),
+              videoAsset: phaseVideo.video,
+              stillAsset: phaseVideo.still,
+              topScrim: 0.25,
+              bottomScrim: 0.7,
+            ),
+          )
+        else
+          RepaintBoundary(
+            child: AnimatedSwitcher(
+              duration: const Duration(seconds: 8),
+              child: _MeshBackground(
+                key: ValueKey('mesh_${phase.name}'),
+                spec: spec,
+              ),
             ),
           ),
-        ),
 
         // 1a2. Saisonaler Tint (Winter/Frühling/Sommer/Herbst).
         if (seasonalTint != null)
@@ -229,6 +247,30 @@ class CinemaOverlay extends ConsumerWidget {
       ),
       ),
     );
+  }
+}
+
+/// Phase → (Loop-Video, Standbild-Fallback) für den Video-Hintergrund.
+({String video, String still}) _videoAssetsForPhase(CinemaPhase phase) {
+  switch (phase) {
+    case CinemaPhase.night:
+      return (
+        video: 'assets/videos/splash_cosmos.mp4',
+        still: 'assets/images/splash_cosmos.webp',
+      );
+    case CinemaPhase.dusk:
+    case CinemaPhase.evening:
+      return (
+        video: 'assets/videos/splash_dusk.mp4',
+        still: 'assets/images/splash_dusk.webp',
+      );
+    case CinemaPhase.dawn:
+    case CinemaPhase.morning:
+    case CinemaPhase.day:
+      return (
+        video: 'assets/videos/dorf_intro.mp4',
+        still: 'assets/images/dorf_morning.webp',
+      );
   }
 }
 

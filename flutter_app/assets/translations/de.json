@@ -597,6 +597,10 @@
     "seasonal": {
       "label": "Saisonale Akzente",
       "hint": "Dezente Stimmung je Jahreszeit: Winter-Kühle, Frühlingsgrün, Sommer-Gold, Herbst-Bernstein."
+    },
+    "videoBackdrop": {
+      "label": "Video-Hintergrund",
+      "hint": "Bewegtes Loop-Video je Tageszeit statt Farbverlauf. Render-intensiv — auf schwächeren Geräten zeigt die App automatisch ein Standbild."
     }
   },
   "chat": {

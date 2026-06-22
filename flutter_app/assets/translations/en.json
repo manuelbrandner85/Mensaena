@@ -597,6 +597,10 @@
     "seasonal": {
       "label": "Seasonal accents",
       "hint": "Subtle mood per season: winter cool, spring green, summer gold, autumn amber."
+    },
+    "videoBackdrop": {
+      "label": "Video background",
+      "hint": "Looping video per time of day instead of a gradient. GPU-heavy — on weaker devices the app automatically shows a still image."
     }
   },
   "chat": {

@@ -597,6 +597,10 @@
     "seasonal": {
       "label": "Mevsimsel tonlar",
       "hint": "Mevsime göre ince atmosfer: kış serinliği, bahar yeşili, yaz altını, sonbahar kehribarı."
+    },
+    "videoBackdrop": {
+      "label": "Video arka plan",
+      "hint": "Degrade yerine günün saatine göre döngülü video. GPU yoğun — zayıf cihazlarda otomatik olarak sabit görsel gösterilir."
     }
   },
   "chat": {

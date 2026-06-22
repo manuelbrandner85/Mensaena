@@ -1134,6 +1134,8 @@ class _AppearanceTab extends ConsumerWidget {
         const _WeatherAdaptiveToggle(),
         const SizedBox(height: 12),
         const _SeasonalToggle(),
+        const SizedBox(height: 12),
+        const _VideoBackdropToggle(),
         const SizedBox(height: 16),
         Text('settings.sections.sound'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
@@ -1608,6 +1610,50 @@ class _EffectStrengthSlider extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// „Video-Hintergrund" — bewegtes Loop-Video je Tageszeit (render-intensiv,
+/// nur bei vollen Effekten; sonst Standbild / Gradient).
+class _VideoBackdropToggle extends ConsumerWidget {
+  const _VideoBackdropToggle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final on = ref.watch(cinemaVideoBackdropProvider);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        border: Border.all(color: on ? AppColors.amber : AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(LucideIcons.clapperboard,
+              size: 18, color: on ? AppColors.amber : AppColors.mute),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('settings.videoBackdrop.label'.tr(),
+                    style: AppTypography.body(size: 14, color: AppColors.ink)),
+                const SizedBox(height: 2),
+                Text('settings.videoBackdrop.hint'.tr(),
+                    style: AppTypography.caption()),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: on,
+            activeColor: AppColors.amber,
+            onChanged: (v) =>
+                ref.read(cinemaVideoBackdropProvider.notifier).set(v),
+          ),
+        ],
+      ),
     );
   }
 }

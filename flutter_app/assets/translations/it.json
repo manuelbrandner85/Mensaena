@@ -597,6 +597,10 @@
     "seasonal": {
       "label": "Accenti stagionali",
       "hint": "Atmosfera discreta per stagione: freddo invernale, verde primaverile, oro estivo, ambra autunnale."
+    },
+    "videoBackdrop": {
+      "label": "Sfondo video",
+      "hint": "Video in loop per fascia oraria invece del gradiente. Pesante per la GPU — su dispositivi più deboli viene mostrata automaticamente un'immagine fissa."
     }
   },
   "chat": {

@@ -597,6 +597,10 @@
     "seasonal": {
       "label": "Acentos de temporada",
       "hint": "Ambiente sutil por estación: frío invernal, verde primaveral, oro veraniego, ámbar otoñal."
+    },
+    "videoBackdrop": {
+      "label": "Fondo de vídeo",
+      "hint": "Vídeo en bucle según la hora del día en vez del degradado. Exige GPU — en dispositivos más débiles se muestra automáticamente una imagen fija."
     }
   },
   "chat": {
