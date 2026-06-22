@@ -1648,6 +1648,9 @@
     }
   },
   "create": {
+    "stepOf": "Adım {i}/{n}",
+    "back": "Geri",
+    "next": "İleri",
     "preview": "Önizleme",
     "locationPickHint": "Noktayı ayarlamak için haritayı kaydır",
     "locationPickEmpty": "Konum seç – haritayı kaydır veya GPS",

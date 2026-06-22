@@ -1649,6 +1649,9 @@
     }
   },
   "create": {
+    "stepOf": "Step {i}/{n}",
+    "back": "Back",
+    "next": "Next",
     "preview": "Preview",
     "locationPickHint": "Move the map to set the spot",
     "locationPickEmpty": "Pick a location – move the map or use GPS",

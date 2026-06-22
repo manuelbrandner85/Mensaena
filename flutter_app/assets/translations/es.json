@@ -1649,6 +1649,9 @@
     }
   },
   "create": {
+    "stepOf": "Paso {i}/{n}",
+    "back": "Atrás",
+    "next": "Siguiente",
     "preview": "Vista previa",
     "locationPickHint": "Mueve el mapa para fijar el punto",
     "locationPickEmpty": "Elige una ubicación – mueve el mapa o usa GPS",

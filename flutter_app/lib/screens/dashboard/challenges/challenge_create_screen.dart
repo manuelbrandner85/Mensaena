@@ -19,6 +19,7 @@ import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/forms/create_post_scaffold.dart';
+import '../../../widgets/forms/stepped_create_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 
 class ChallengeCreateScreen extends ConsumerStatefulWidget {
@@ -122,13 +123,20 @@ class _ChallengeCreateScreenState
     return Form(
       key: _form,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      child: CreatePostScaffold(
+      child: SteppedCreateScaffold(
         title: 'challenges.newChallenge'.tr(),
         subtitle: 'challenges.motivate'.tr(),
         accent: AppColors.amber,
         icon: LucideIcons.trophy,
         returnRoute: '/dashboard/challenges',
-        sections: [
+        submitting: _busy,
+        submitLabel: 'challenges.start'.tr(),
+        onSubmit: _submit,
+        steps: [
+          CreateStep(
+            title: 'challenges.newChallenge'.tr(),
+            icon: LucideIcons.trophy,
+            sections: [
           // ── Titel & Beschreibung ────────────────────────────────────
           CreateCard(
             title: 'create.sectionDetails'.tr(),
@@ -201,6 +209,12 @@ class _ChallengeCreateScreenState
             ),
           ),
 
+            ],
+          ),
+          CreateStep(
+            title: 'create.sectionOptions'.tr(),
+            icon: LucideIcons.award,
+            sections: [
           // ── Cover-Bild (optional) ───────────────────────────────────
           CreateCard(
             title: 'challenges.coverImage'.tr(),
@@ -356,24 +370,9 @@ class _ChallengeCreateScreenState
               ],
             ),
           ),
-        ],
-        footer: FilledButton.icon(
-          onPressed: _busy ? null : _submit,
-          icon: _busy
-              ? const SizedBox(
-                  width: 14,
-                  height: 14,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: AppColors.voidColor),
-                )
-              : const Icon(LucideIcons.trophy, size: 16),
-          label: Text('challenges.start'.tr()),
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.amber,
-            foregroundColor: AppColors.voidColor,
-            minimumSize: const Size(double.infinity, 50),
+            ],
           ),
-        ),
+        ],
       ),
     );
   }

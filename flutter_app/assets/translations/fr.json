@@ -1649,6 +1649,9 @@
     }
   },
   "create": {
+    "stepOf": "Étape {i}/{n}",
+    "back": "Retour",
+    "next": "Suivant",
     "preview": "Aperçu",
     "locationPickHint": "Déplace la carte pour définir le point",
     "locationPickEmpty": "Choisis un lieu – déplace la carte ou GPS",
