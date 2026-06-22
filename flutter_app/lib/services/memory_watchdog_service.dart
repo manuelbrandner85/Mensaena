@@ -34,6 +34,33 @@ class MemoryWatchdogService {
   Timer? _timer;
   bool _started = false;
 
+  /// Crash-Schutz: wird gerufen wenn der Bild-Cache/RAM knapp wird (true) bzw.
+  /// sich wieder entspannt (false) → der Aufrufer (MensaenaApp) deckelt damit
+  /// die Effekte (memoryEffectsCapProvider), bevor das System die App killt.
+  void Function(bool capped)? _onCapChanged;
+  bool _capped = false;
+  DateTime? _lastCapTrigger;
+
+  /// Ab dieser Cache-Auslastung Effekte drosseln (vor dem harten Limit).
+  static const double _capThreshold = 0.85;
+  /// Erst wieder hochfahren, wenn der Cache deutlich entspannt ist (Hysterese).
+  static const double _capReleaseThreshold = 0.55;
+  /// Nach einem Trigger mind. so lange gedeckelt lassen (kein Flackern).
+  static const Duration _capHold = Duration(seconds: 45);
+
+  void _setCap(bool value) {
+    if (value) {
+      _lastCapTrigger = DateTime.now();
+    } else {
+      // Hysterese: nicht zu früh nach einem Trigger wieder freigeben.
+      final last = _lastCapTrigger;
+      if (last != null && DateTime.now().difference(last) < _capHold) return;
+    }
+    if (value == _capped) return;
+    _capped = value;
+    _onCapChanged?.call(value);
+  }
+
   /// Weiche Schwelle: ab 80 % des konfigurierten Byte-Limits räumen wir den
   /// nicht-sichtbaren Cache-Anteil auf, bevor das harte Limit greift (das
   /// greift erst beim Decode des nächsten Bildes → kurzer Ruckler).
@@ -49,9 +76,13 @@ class MemoryWatchdogService {
 
   /// Startet den periodischen Soft-Check. Idempotent — mehrfacher Aufruf
   /// (z. B. Hot-Reload) legt keinen zweiten Timer an.
-  void start({Duration interval = const Duration(seconds: 60)}) {
+  void start({
+    Duration interval = const Duration(seconds: 60),
+    void Function(bool capped)? onCapChanged,
+  }) {
     if (_started) return;
     _started = true;
+    _onCapChanged = onCapChanged;
     _timer = Timer.periodic(interval, (_) => _softCheck());
   }
 
@@ -76,6 +107,13 @@ class MemoryWatchdogService {
     final maxBytes = cache.maximumSizeBytes;
     if (maxBytes <= 0) return;
     final ratio = cache.currentSizeBytes / maxBytes;
+    // Crash-Schutz: Effekte automatisch drosseln, bevor der Cache das harte
+    // Limit reißt; mit Hysterese wieder freigeben.
+    if (ratio >= _capThreshold) {
+      _setCap(true);
+    } else if (ratio < _capReleaseThreshold) {
+      _setCap(false);
+    }
     if (ratio >= _softThreshold) {
       // clearLiveImages() gibt die ImageStreamCompleter frei, die nur noch
       // referenziert sind, weil das Bild kürzlich sichtbar war — nicht die
@@ -124,6 +162,8 @@ class MemoryWatchdogService {
   /// OS meldet akuten Speichermangel → kompletter Cache-Reset.
   /// Aufruf aus `WidgetsBindingObserver.didHaveMemoryPressure`.
   void onMemoryPressure() {
+    // Akuter RAM-Mangel = stärkstes Vor-Crash-Signal → Effekte sofort deckeln.
+    _setCap(true);
     final cache = PaintingBinding.instance.imageCache;
     final ratioBefore = cache.maximumSizeBytes > 0
         ? cache.currentSizeBytes / cache.maximumSizeBytes

@@ -51,14 +51,33 @@ extension EffectsProfileX on EffectsProfile {
 /// nimmt nur Schmuck weg, nie Funktion (deshalb kein Deckel auf none).
 final runtimeEffectsCapProvider = StateProvider<bool>((_) => false);
 
+/// Crash-Schutz-Deckel vom MemoryWatchdog: true = der Bild-Cache/RAM wird
+/// knapp (proaktiv ab ~85 % bzw. akut bei OS-Speicherdruck). Effekte werden
+/// AUTOMATISCH auf reduced gedrosselt — bevor das System die App OOM-killt.
+/// Wirkt AUCH wenn der User „Maximale Effekte" erzwungen hat.
+final memoryEffectsCapProvider = StateProvider<bool>((_) => false);
+
+/// Kombiniertes Sicherheits-Signal: Gerät kommt nicht hinterher (Jank) ODER
+/// RAM wird knapp. Beide drosseln Effekte zum Crash-Schutz.
+final effectsSafetyCapProvider = Provider<bool>((ref) =>
+    ref.watch(runtimeEffectsCapProvider) ||
+    ref.watch(memoryEffectsCapProvider));
+
 final effectsProfileProvider = Provider<EffectsProfile>((ref) {
   // effectiveReduceMotion: schließt seniorMode mit ein.
   final reduceMotion = ref.watch(a11yProvider).effectiveReduceMotion;
   if (reduceMotion) return EffectsProfile.none;
 
-  // User-Override „Maximale Kino-Effekte": volle Effekte trotz Lite-Tier
-  // und Watchdog-Deckel (A11y oben gewinnt aber weiterhin).
-  if (ref.watch(forceFullEffectsProvider)) return EffectsProfile.full;
+  // Crash-Schutz: Jank (FrameWatchdog) ODER knapper RAM (MemoryWatchdog)
+  // deckeln Effekte AUTOMATISCH auf reduced — bevor die App crasht.
+  final safetyCap = ref.watch(effectsSafetyCapProvider);
+
+  // User-Override „Maximale Kino-Effekte": volle Effekte trotz Lite-Tier —
+  // ABER der Crash-Schutz greift weiterhin (sonst killt das System die App).
+  // A11y/reduceMotion (oben) gewinnt ebenfalls.
+  if (ref.watch(forceFullEffectsProvider)) {
+    return safetyCap ? EffectsProfile.reduced : EffectsProfile.full;
+  }
 
   final lite = ref.watch(liteModeActiveProvider);
   final intensity = ref.watch(cinemaIntensityProvider);
@@ -73,9 +92,8 @@ final effectsProfileProvider = Provider<EffectsProfile>((ref) {
     CinemaIntensity.reduced => EffectsProfile.reduced,
     CinemaIntensity.minimal => EffectsProfile.none,
   };
-  // Frame-Watchdog-Deckel: full -> reduced solange das Gerät janked.
-  if (base == EffectsProfile.full &&
-      ref.watch(runtimeEffectsCapProvider)) {
+  // Frame-Watchdog/Memory-Deckel: full -> reduced solange das Gerät strugglet.
+  if (base == EffectsProfile.full && safetyCap) {
     return EffectsProfile.reduced;
   }
   return base;

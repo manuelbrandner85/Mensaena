@@ -50,7 +50,14 @@ class _MensaenaAppState extends ConsumerState<MensaenaApp>
     // Globaler Speicher-Wächter: einmalige Initialisierung. Räumt den
     // Image-Cache proaktiv, bevor er das harte Limit reißt (→ kein OOM-Crash
     // / kein Langsamer-Werden über Stunden). Siehe MemoryWatchdogService.
-    MemoryWatchdogService.instance.start();
+    MemoryWatchdogService.instance.start(
+      // Crash-Schutz: knapper RAM → Effekte automatisch drosseln (greift auch
+      // bei erzwungenen „Maximalen Effekten"), bevor das System die App killt.
+      onCapChanged: (capped) {
+        if (!mounted) return;
+        ref.read(memoryEffectsCapProvider.notifier).state = capped;
+      },
+    );
     // Frame-Watchdog (Phase 6): misst echte Frame-Zeiten und deckelt das
     // EffectsGate auf reduced, wenn >10% der Frames das Budget reissen.
     FrameWatchdogService.instance.start(onCapChanged: (capped) {
