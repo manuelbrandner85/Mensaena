@@ -593,6 +593,10 @@
     "weatherAdaptive": {
       "label": "Weather-adaptive mood",
       "hint": "The background adapts to the real weather at your location (rain, fog, snow, storm)."
+    },
+    "seasonal": {
+      "label": "Seasonal accents",
+      "hint": "Subtle mood per season: winter cool, spring green, summer gold, autumn amber."
     }
   },
   "chat": {

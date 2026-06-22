@@ -147,6 +147,52 @@ final cinemaWeatherTintProvider = StreamProvider<Color?>((ref) async* {
   }
 });
 
+const _seasonalStorageKey = 'cinema_seasonal_v1';
+
+/// Schalter: dezente saisonale Stimmung (Winter-Kühle, Frühlingsgrün,
+/// Sommer-Gold, Herbst-Bernstein) als Tint über den Hintergrund. Default an,
+/// leichtgewichtig (datumsbasiert, keine Netzwerk-/Animationslast).
+class CinemaSeasonalNotifier extends StateNotifier<bool> {
+  CinemaSeasonalNotifier() : super(true) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    try {
+      final raw = await _storage.read(key: _seasonalStorageKey);
+      final loaded = raw == null ? true : raw == '1';
+      if (!mounted) return;
+      if (loaded != state) state = loaded;
+    } catch (_) {}
+  }
+
+  Future<void> set(bool value) async {
+    if (!mounted) return;
+    state = value;
+    try {
+      await _storage.write(key: _seasonalStorageKey, value: value ? '1' : '0');
+    } catch (_) {}
+  }
+}
+
+final cinemaSeasonalProvider =
+    StateNotifierProvider<CinemaSeasonalNotifier, bool>(
+        (ref) => CinemaSeasonalNotifier());
+
+/// Monat (1–12) → saisonaler Stimmungs-Tint (Nordhalbkugel, Alpha im Hex).
+Color? seasonalTintForMonth(int month) {
+  if (month == 12 || month == 1 || month == 2) {
+    return const Color(0x16CEE0F2); // Winter — kühles Blauweiß
+  }
+  if (month >= 3 && month <= 5) {
+    return const Color(0x120FB07A); // Frühling — frisches Grün
+  }
+  if (month >= 6 && month <= 8) {
+    return const Color(0x14FFCF7A); // Sommer — warmes Gold
+  }
+  return const Color(0x18D98A3A); // Herbst — Bernstein
+}
+
 /// WMO-Wettercode → subtiler Stimmungs-Tint (Alpha im Hex enthalten).
 Color? _weatherTintForCode(int code) {
   if (code <= 1) return null; // klar / überwiegend klar

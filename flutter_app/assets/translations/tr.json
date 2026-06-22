@@ -593,6 +593,10 @@
     "weatherAdaptive": {
       "label": "Hava durumuna uyumlu atmosfer",
       "hint": "Arka plan konumundaki gerçek hava durumuna uyum sağlar (yağmur, sis, kar, fırtına)."
+    },
+    "seasonal": {
+      "label": "Mevsimsel tonlar",
+      "hint": "Mevsime göre ince atmosfer: kış serinliği, bahar yeşili, yaz altını, sonbahar kehribarı."
     }
   },
   "chat": {

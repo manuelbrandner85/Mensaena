@@ -593,6 +593,10 @@
     "weatherAdaptive": {
       "label": "Wetter-adaptive Stimmung",
       "hint": "Der Hintergrund passt sich ans echte Wetter am Standort an (Regen, Nebel, Schnee, Gewitter)."
+    },
+    "seasonal": {
+      "label": "Saisonale Akzente",
+      "hint": "Dezente Stimmung je Jahreszeit: Winter-Kühle, Frühlingsgrün, Sommer-Gold, Herbst-Bernstein."
     }
   },
   "chat": {

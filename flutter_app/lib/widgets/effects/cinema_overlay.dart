@@ -89,6 +89,13 @@ class CinemaOverlay extends ConsumerWidget {
     final weatherTint = weatherBase == null
         ? null
         : Color.lerp(Colors.transparent, weatherBase, intensity);
+    // Saisonaler Tint (datumsbasiert, keine Netzwerklast).
+    final seasonalBase = ref.watch(cinemaSeasonalProvider)
+        ? seasonalTintForMonth(DateTime.now().month)
+        : null;
+    final seasonalTint = seasonalBase == null
+        ? null
+        : Color.lerp(Colors.transparent, seasonalBase, intensity);
 
     return KeyedSubtree(
       key: const ValueKey('cinema_overlay_on'),
@@ -108,6 +115,12 @@ class CinemaOverlay extends ConsumerWidget {
             ),
           ),
         ),
+
+        // 1a2. Saisonaler Tint (Winter/Frühling/Sommer/Herbst).
+        if (seasonalTint != null)
+          Positioned.fill(
+            child: IgnorePointer(child: ColoredBox(color: seasonalTint)),
+          ),
 
         // 1b. Wetter-Tint (Regen/Nebel/Schnee/Gewitter) — eine Farb-Ebene
         // über dem Mesh, passt die Stimmung ans echte Wetter an.

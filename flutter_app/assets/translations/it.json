@@ -593,6 +593,10 @@
     "weatherAdaptive": {
       "label": "Atmosfera adattiva al meteo",
       "hint": "Lo sfondo si adatta al meteo reale della tua posizione (pioggia, nebbia, neve, temporale)."
+    },
+    "seasonal": {
+      "label": "Accenti stagionali",
+      "hint": "Atmosfera discreta per stagione: freddo invernale, verde primaverile, oro estivo, ambra autunnale."
     }
   },
   "chat": {

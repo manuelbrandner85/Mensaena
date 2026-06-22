@@ -593,6 +593,10 @@
     "weatherAdaptive": {
       "label": "Ambiente según el clima",
       "hint": "El fondo se adapta al clima real de tu ubicación (lluvia, niebla, nieve, tormenta)."
+    },
+    "seasonal": {
+      "label": "Acentos de temporada",
+      "hint": "Ambiente sutil por estación: frío invernal, verde primaveral, oro veraniego, ámbar otoñal."
     }
   },
   "chat": {
