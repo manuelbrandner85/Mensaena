@@ -98,8 +98,10 @@ class _PostReactionsButtonState extends ConsumerState<PostReactionsButton> {
   Future<void> _toggle(String emoji) async {
     Haptics.tap();
     // Aktuellen Stand (Override oder Provider) als Basis nehmen.
-    final base = _optimistic ??
-        ref.read(_reactionsStateProvider(postId)).maybeWhen(
+    // Expliziter Typ-Parameter + Annotation: im `??`-Kontext würde maybeWhen
+    // sonst als nullable inferiert (argument_type_not_assignable).
+    final _ReactionsState base = _optimistic ??
+        ref.read(_reactionsStateProvider(postId)).maybeWhen<_ReactionsState>(
               data: (s) => s,
               orElse: () =>
                   const _ReactionsState(total: 0, byType: {}, mine: null),
