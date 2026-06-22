@@ -181,6 +181,61 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
         icon: LucideIcons.stickyNote,
         returnRoute: '/dashboard/board',
         sections: [
+          // ── Live-Vorschau: farbiger Notizzettel, aktualisiert beim Tippen ─
+          CreateCard(
+            title: 'create.preview'.tr(),
+            icon: LucideIcons.eye,
+            child: ListenableBuilder(
+              listenable: _content,
+              builder: (context, _) {
+                final cat = _categories.firstWhere(
+                    (c) => c.value == _category,
+                    orElse: () => _categories.first);
+                final text = _content.text.trim();
+                return Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: _colors[_color] ?? _colors.values.first,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.12),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(cat.emoji,
+                              style: const TextStyle(fontSize: 14)),
+                          const SizedBox(width: 6),
+                          Text(
+                            cat.i18n.tr(),
+                            style: AppTypography.label(
+                                size: 10, color: Colors.black54),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        text.isEmpty ? '…' : text,
+                        style: AppTypography.body(
+                            size: 14, color: Colors.black87, height: 1.4),
+                        maxLines: 5,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+
           // ── Kategorie ───────────────────────────────────────────────
           CreateCard(
             title: 'board.categoryLabel'.tr(),
