@@ -416,7 +416,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
       // Vorher ignoriert: bei Fehler verschwand die bereits hochgeladene
       // Sprachnachricht lautlos. Jetzt Hinweis statt stillem Verlust.
       unawaited(Haptics.error());
-      AppSnackBar.success(context, 'chat.messageNotSent'.tr());
+      AppSnackBar.error(context, 'chat.messageNotSent'.tr());
     }
   }
 
@@ -476,7 +476,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
         _ctrl.text = text;
       });
       unawaited(Haptics.error());
-      AppSnackBar.success(context, 'chat.messageNotSent'.tr());
+      AppSnackBar.error(context, 'chat.messageNotSent'.tr());
     }
     // Erfolg: pending bleibt drin, wird vom naechsten Stream-Tick
     // entfernt sobald die echte Message via Realtime ankommt
