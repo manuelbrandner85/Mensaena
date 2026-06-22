@@ -72,6 +72,11 @@ serve(async (req) => {
           contact_name: 'BBK',
           is_anonymous: false,
           is_verified: true,
+          // updated_at bei jedem Importlauf auffrischen → solange die Warnung
+          // im NINA-Feed bleibt, überlebt sie den 24h-Cleanup
+          // (cleanup_expired_crises). Verschwindet sie aus dem Feed, wird sie
+          // nicht mehr aufgefrischt und nach 24h automatisch entfernt.
+          updated_at: new Date().toISOString(),
         }
         try {
           const { data: existing } = await admin
