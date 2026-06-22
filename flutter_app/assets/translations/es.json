@@ -57,7 +57,10 @@
     "switchCamera": "Cambiar cámara",
     "showPassword": "Mostrar contraseña",
     "pin": "Anclar",
-    "crop": "Recortar"
+    "crop": "Recortar",
+    "viewList": "Lista",
+    "viewMap": "Mapa",
+    "viewCalendar": "Calendario"
   },
   "safe": {
     "critical_nearby_title": "Crisis crítica cerca de ti",
@@ -2210,7 +2213,7 @@
     },
     "typeVerschenken": "Regalar",
     "typeTauschen": "Intercambiar",
-    "typeVerkaufen": "Vender barato",
+    "typeVerkaufen": "Barato",
     "typeLeihen": "Prestar",
     "catHaushalt": "Hogar",
     "catKleidung": "Ropa",
@@ -2223,7 +2226,7 @@
     "catWerkzeug": "Herramientas",
     "catSonstiges": "Otros",
     "condNeu": "Nuevo",
-    "condSehrGut": "Muy bueno",
+    "condSehrGut": "Como nuevo",
     "condGut": "Bueno",
     "condGebraucht": "Usado",
     "condDefekt": "Defectuoso",
@@ -2242,7 +2245,17 @@
     "editListing": "Editar",
     "deleteListing": "Eliminar anuncio",
     "deleteListingDescription": "El anuncio se eliminará definitivamente y no será visible para otros.",
-    "createSubtitle": "Comprar · Vender · Intercambiar · Regalar"
+    "createSubtitle": "Comprar · Vender · Intercambiar · Regalar",
+    "catElectronics": "Electrónica",
+    "catClothing": "Ropa",
+    "catFurniture": "Muebles",
+    "catKitchen": "Cocina",
+    "catKids": "Niños",
+    "catBooks": "Libros",
+    "catSports": "Deporte",
+    "catGarden": "Jardín",
+    "catTools": "Herramientas",
+    "catOther": "Otros"
   },
   "trust": {
     "rate": "Valora a {name}",
@@ -2418,7 +2431,15 @@
       "title": "Sugerencias",
       "prefillHint": "Festivo prerrellenado – ajusta los detalles como quieras."
     },
-    "createSubtitle": "Invita a tus vecinos"
+    "createSubtitle": "Invita a tus vecinos",
+    "filtCommunity": "Comunidad",
+    "filtHelping": "Ayudar",
+    "filtSharing": "Compartir",
+    "filtLearning": "Aprender",
+    "filtCelebration": "Celebrar",
+    "filtSport": "Deporte",
+    "filtCrisis": "Crisis",
+    "filtOther": "Otros"
   },
   "challenges": {
     "rewardBadge": "Insignia de recompensa (opcional)",
@@ -2541,7 +2562,7 @@
     "saving": "Guardando…",
     "createButton": "Crear grupo",
     "catNachbarschaft": "Vecindario",
-    "catHobby": "Pasatiempo",
+    "catHobby": "Hobby",
     "catSport": "Deporte",
     "catEltern": "Padres",
     "catSenioren": "Mayores",
@@ -2595,7 +2616,7 @@
     "catInfo": "Info",
     "catWarnung": "Aviso",
     "catVerloren": "Perdido",
-    "catFundbuero": "Encontrado",
+    "catFundbuero": "Objetos perdidos",
     "image": "Imagen (opcional)",
     "addImage": "Añadir imagen",
     "expiryLabel": "Fecha de caducidad (opcional)",
@@ -2740,7 +2761,16 @@
       "catBrauerei": "Cervecería",
       "catHofladen": "Tienda agrícola",
       "catSonstiges": "Otros"
-    }
+    },
+    "noMatches": "Sin resultados.",
+    "noFarmsRegion": "No hay granjas en tu región.",
+    "tryOtherFilters": "Prueba otros filtros.",
+    "resetFilters": "Restablecer filtros",
+    "catFarm": "Granja",
+    "catShop": "Tienda agrícola",
+    "catMarket": "Mercado",
+    "catCsa": "CSA",
+    "catOrchard": "Huerto"
   },
   "knowledge": {
     "category": "Categoría",

@@ -57,7 +57,10 @@
     "switchCamera": "Switch camera",
     "showPassword": "Show password",
     "pin": "Pin",
-    "crop": "Crop"
+    "crop": "Crop",
+    "viewList": "List",
+    "viewMap": "Map",
+    "viewCalendar": "Calendar"
   },
   "safe": {
     "critical_nearby_title": "Critical crisis near you",
@@ -2210,7 +2213,7 @@
     },
     "typeVerschenken": "Give away",
     "typeTauschen": "Swap",
-    "typeVerkaufen": "Sell cheap",
+    "typeVerkaufen": "Cheap",
     "typeLeihen": "Lend",
     "catHaushalt": "Household",
     "catKleidung": "Clothing",
@@ -2223,7 +2226,7 @@
     "catWerkzeug": "Tools",
     "catSonstiges": "Other",
     "condNeu": "New",
-    "condSehrGut": "Very good",
+    "condSehrGut": "Like new",
     "condGut": "Good",
     "condGebraucht": "Used",
     "condDefekt": "Faulty",
@@ -2242,7 +2245,17 @@
     "editListing": "Edit",
     "deleteListing": "Delete listing",
     "deleteListingDescription": "The listing will be permanently deleted and no longer visible to others.",
-    "createSubtitle": "Buy · Sell · Swap · Give away"
+    "createSubtitle": "Buy · Sell · Swap · Give away",
+    "catElectronics": "Electronics",
+    "catClothing": "Clothing",
+    "catFurniture": "Furniture",
+    "catKitchen": "Kitchen",
+    "catKids": "Kids",
+    "catBooks": "Books",
+    "catSports": "Sports",
+    "catGarden": "Garden",
+    "catTools": "Tools",
+    "catOther": "Other"
   },
   "trust": {
     "rate": "Rate {name}",
@@ -2418,7 +2431,15 @@
       "title": "Suggestions",
       "prefillHint": "Holiday pre-filled – adjust details as you like."
     },
-    "createSubtitle": "Invite your neighbours"
+    "createSubtitle": "Invite your neighbours",
+    "filtCommunity": "Community",
+    "filtHelping": "Help",
+    "filtSharing": "Share",
+    "filtLearning": "Learn",
+    "filtCelebration": "Celebrate",
+    "filtSport": "Sports",
+    "filtCrisis": "Crisis",
+    "filtOther": "Other"
   },
   "challenges": {
     "rewardBadge": "Reward badge (optional)",
@@ -2540,7 +2561,7 @@
     "privateHint": "Joinable by invitation only",
     "saving": "Saving…",
     "createButton": "Create group",
-    "catNachbarschaft": "Neighborhood",
+    "catNachbarschaft": "Neighbourhood",
     "catHobby": "Hobby",
     "catSport": "Sports",
     "catEltern": "Parents",
@@ -2595,7 +2616,7 @@
     "catInfo": "Info",
     "catWarnung": "Warning",
     "catVerloren": "Lost",
-    "catFundbuero": "Found",
+    "catFundbuero": "Lost & Found",
     "image": "Image (optional)",
     "addImage": "Add image",
     "expiryLabel": "Expiry date (optional)",
@@ -2740,7 +2761,16 @@
       "catBrauerei": "Brewery",
       "catHofladen": "Farm shop",
       "catSonstiges": "Other"
-    }
+    },
+    "noMatches": "No matches.",
+    "noFarmsRegion": "No farms in your region.",
+    "tryOtherFilters": "Try other filters.",
+    "resetFilters": "Reset filters",
+    "catFarm": "Farm",
+    "catShop": "Farm shop",
+    "catMarket": "Market",
+    "catCsa": "CSA",
+    "catOrchard": "Orchard"
   },
   "knowledge": {
     "category": "Category",

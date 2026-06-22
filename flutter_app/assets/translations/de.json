@@ -57,7 +57,10 @@
     "switchCamera": "Kamera wechseln",
     "showPassword": "Passwort anzeigen",
     "pin": "Anpinnen",
-    "crop": "Zuschneiden"
+    "crop": "Zuschneiden",
+    "viewList": "Liste",
+    "viewMap": "Karte",
+    "viewCalendar": "Kalender"
   },
   "safe": {
     "critical_nearby_title": "Kritische Krise in deiner Nähe",
@@ -2209,7 +2212,7 @@
     },
     "typeVerschenken": "Verschenken",
     "typeTauschen": "Tauschen",
-    "typeVerkaufen": "Günstig abgeben",
+    "typeVerkaufen": "Günstig",
     "typeLeihen": "Leihen",
     "catHaushalt": "Haushalt",
     "catKleidung": "Kleidung",
@@ -2222,7 +2225,7 @@
     "catWerkzeug": "Werkzeug",
     "catSonstiges": "Sonstiges",
     "condNeu": "Neu",
-    "condSehrGut": "Sehr gut",
+    "condSehrGut": "Wie neu",
     "condGut": "Gut",
     "condGebraucht": "Gebraucht",
     "condDefekt": "Defekt",
@@ -2241,7 +2244,17 @@
     "editListing": "Bearbeiten",
     "deleteListing": "Inserat löschen",
     "deleteListingDescription": "Das Inserat wird unwiderruflich gelöscht und ist für andere nicht mehr sichtbar.",
-    "createSubtitle": "Kaufen · Verkaufen · Tauschen · Verschenken"
+    "createSubtitle": "Kaufen · Verkaufen · Tauschen · Verschenken",
+    "catElectronics": "Elektronik",
+    "catClothing": "Kleidung",
+    "catFurniture": "Möbel",
+    "catKitchen": "Küche",
+    "catKids": "Kinder",
+    "catBooks": "Bücher",
+    "catSports": "Sport",
+    "catGarden": "Garten",
+    "catTools": "Werkzeug",
+    "catOther": "Sonstiges"
   },
   "trust": {
     "rate": "Bewerte {name}",
@@ -2417,7 +2430,15 @@
       "title": "Vorschläge",
       "prefillHint": "Feiertag vorbefüllt – Details nach Wunsch anpassen."
     },
-    "createSubtitle": "Lade deine Nachbarn ein"
+    "createSubtitle": "Lade deine Nachbarn ein",
+    "filtCommunity": "Community",
+    "filtHelping": "Helfen",
+    "filtSharing": "Teilen",
+    "filtLearning": "Lernen",
+    "filtCelebration": "Feiern",
+    "filtSport": "Sport",
+    "filtCrisis": "Krise",
+    "filtOther": "Sonstiges"
   },
   "challenges": {
     "rewardBadge": "Belohnungs-Abzeichen (optional)",
@@ -2739,7 +2760,16 @@
       "catBrauerei": "Brauerei",
       "catHofladen": "Hofladen",
       "catSonstiges": "Sonstiges"
-    }
+    },
+    "noMatches": "Keine Treffer.",
+    "noFarmsRegion": "Keine Höfe in deiner Region.",
+    "tryOtherFilters": "Andere Filter probieren.",
+    "resetFilters": "Filter zurücksetzen",
+    "catFarm": "Hof",
+    "catShop": "Hofladen",
+    "catMarket": "Markt",
+    "catCsa": "Solawi",
+    "catOrchard": "Obstgarten"
   },
   "knowledge": {
     "category": "Kategorie",

@@ -57,7 +57,10 @@
     "switchCamera": "Cambia fotocamera",
     "showPassword": "Mostra password",
     "pin": "Fissa",
-    "crop": "Ritaglia"
+    "crop": "Ritaglia",
+    "viewList": "Elenco",
+    "viewMap": "Mappa",
+    "viewCalendar": "Calendario"
   },
   "safe": {
     "critical_nearby_title": "Crisi critica vicino a te",
@@ -2210,8 +2213,8 @@
     },
     "typeVerschenken": "Regala",
     "typeTauschen": "Scambia",
-    "typeVerkaufen": "Vendi a poco",
-    "typeLeihen": "Presta",
+    "typeVerkaufen": "Conveniente",
+    "typeLeihen": "Prestito",
     "catHaushalt": "Casa",
     "catKleidung": "Abbigliamento",
     "catKinder": "Bambini",
@@ -2223,7 +2226,7 @@
     "catWerkzeug": "Attrezzi",
     "catSonstiges": "Altro",
     "condNeu": "Nuovo",
-    "condSehrGut": "Ottimo",
+    "condSehrGut": "Come nuovo",
     "condGut": "Buono",
     "condGebraucht": "Usato",
     "condDefekt": "Difettoso",
@@ -2242,7 +2245,17 @@
     "editListing": "Modifica",
     "deleteListing": "Elimina annuncio",
     "deleteListingDescription": "L'annuncio verrà eliminato definitivamente e non sarà più visibile agli altri.",
-    "createSubtitle": "Compra · Vendi · Scambia · Regala"
+    "createSubtitle": "Compra · Vendi · Scambia · Regala",
+    "catElectronics": "Elettronica",
+    "catClothing": "Abbigliamento",
+    "catFurniture": "Mobili",
+    "catKitchen": "Cucina",
+    "catKids": "Bambini",
+    "catBooks": "Libri",
+    "catSports": "Sport",
+    "catGarden": "Giardino",
+    "catTools": "Attrezzi",
+    "catOther": "Altro"
   },
   "trust": {
     "rate": "Valuta {name}",
@@ -2418,7 +2431,15 @@
       "title": "Suggerimenti",
       "prefillHint": "Festività precompilata – modifica i dettagli come desideri."
     },
-    "createSubtitle": "Invita i tuoi vicini"
+    "createSubtitle": "Invita i tuoi vicini",
+    "filtCommunity": "Comunità",
+    "filtHelping": "Aiuto",
+    "filtSharing": "Condividi",
+    "filtLearning": "Imparare",
+    "filtCelebration": "Festeggiare",
+    "filtSport": "Sport",
+    "filtCrisis": "Crisi",
+    "filtOther": "Altro"
   },
   "challenges": {
     "rewardBadge": "Distintivo premio (facoltativo)",
@@ -2594,8 +2615,8 @@
     "catEvent": "Evento",
     "catInfo": "Info",
     "catWarnung": "Avviso",
-    "catVerloren": "Smarrito",
-    "catFundbuero": "Trovato",
+    "catVerloren": "Perso",
+    "catFundbuero": "Oggetti smarriti",
     "image": "Immagine (facoltativa)",
     "addImage": "Aggiungi immagine",
     "expiryLabel": "Data di scadenza (facoltativa)",
@@ -2740,7 +2761,16 @@
       "catBrauerei": "Birrificio",
       "catHofladen": "Spaccio agricolo",
       "catSonstiges": "Altro"
-    }
+    },
+    "noMatches": "Nessun risultato.",
+    "noFarmsRegion": "Nessuna fattoria nella tua regione.",
+    "tryOtherFilters": "Prova altri filtri.",
+    "resetFilters": "Reimposta filtri",
+    "catFarm": "Fattoria",
+    "catShop": "Bottega agricola",
+    "catMarket": "Mercato",
+    "catCsa": "CSA",
+    "catOrchard": "Frutteto"
   },
   "knowledge": {
     "category": "Categoria",

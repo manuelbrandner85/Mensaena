@@ -34,13 +34,14 @@ class SupplyScreen extends ConsumerStatefulWidget {
 }
 
 class _SupplyScreenState extends ConsumerState<SupplyScreen> {
-  static const List<FilterOption<String>> _categories = [
-    FilterOption(value: 'farm', label: '🚜 Hof'),
-    FilterOption(value: 'shop', label: '🏪 Hofladen'),
-    FilterOption(value: 'market', label: '🥬 Markt'),
-    FilterOption(value: 'csa', label: '🌱 Solawi'),
-    FilterOption(value: 'orchard', label: '🍎 Obstgarten'),
-  ];
+  List<FilterOption<String>> get _categories => [
+        FilterOption(value: 'farm', label: '🚜 ${'supply.catFarm'.tr()}'),
+        FilterOption(value: 'shop', label: '🏪 ${'supply.catShop'.tr()}'),
+        FilterOption(value: 'market', label: '🥬 ${'supply.catMarket'.tr()}'),
+        FilterOption(value: 'csa', label: '🌱 ${'supply.catCsa'.tr()}'),
+        FilterOption(
+            value: 'orchard', label: '🍎 ${'supply.catOrchard'.tr()}'),
+      ];
 
   _SupplyView _view = _SupplyView.list;
   String _search = '';
@@ -111,14 +112,14 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                   ViewToggle<_SupplyView>(
                     value: _view,
                     onChanged: (v) => setState(() => _view = v),
-                    options: const [
+                    options: [
                       ViewToggleOption(
                           value: _SupplyView.list,
-                          label: 'Liste',
+                          label: 'common.viewList'.tr(),
                           icon: LucideIcons.list),
                       ViewToggleOption(
                           value: _SupplyView.map,
-                          label: 'Karte',
+                          label: 'common.viewMap'.tr(),
                           icon: LucideIcons.mapPin),
                     ],
                   ),
@@ -228,16 +229,16 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                           EmptyStateCard(
                             icon: LucideIcons.wheat,
                             title: _hasFilters
-                                ? 'Keine Treffer.'
-                                : 'Keine Höfe in deiner Region.',
+                                ? 'supply.noMatches'.tr()
+                                : 'supply.noFarmsRegion'.tr(),
                             description: _hasFilters
-                                ? 'Andere Filter probieren.'
+                                ? 'supply.tryOtherFilters'.tr()
                                 : null,
                             // Smarter Leerzustand: ohne Filter die nächste
                             // sinnvolle Aktion anbieten (Hof eintragen) statt
                             // einer Sackgasse.
                             actionLabel: _hasFilters
-                                ? 'Filter zurücksetzen'
+                                ? 'supply.resetFilters'.tr()
                                 : 'supply.addFarm'.tr(),
                             onAction: _hasFilters
                                 ? () => setState(() {

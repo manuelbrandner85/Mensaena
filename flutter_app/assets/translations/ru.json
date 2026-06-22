@@ -57,7 +57,10 @@
     "switchCamera": "Сменить камеру",
     "showPassword": "Показать пароль",
     "pin": "Закрепить",
-    "crop": "Обрезать"
+    "crop": "Обрезать",
+    "viewList": "Список",
+    "viewMap": "Карта",
+    "viewCalendar": "Календарь"
   },
   "safe": {
     "critical_nearby_title": "Критический кризис рядом",
@@ -2209,8 +2212,8 @@
     },
     "typeVerschenken": "Отдать",
     "typeTauschen": "Обмен",
-    "typeVerkaufen": "Продать дёшево",
-    "typeLeihen": "Одолжить",
+    "typeVerkaufen": "Дёшево",
+    "typeLeihen": "Аренда",
     "catHaushalt": "Дом",
     "catKleidung": "Одежда",
     "catKinder": "Детям",
@@ -2222,7 +2225,7 @@
     "catWerkzeug": "Инструменты",
     "catSonstiges": "Другое",
     "condNeu": "Новое",
-    "condSehrGut": "Очень хорошее",
+    "condSehrGut": "Как новое",
     "condGut": "Хорошее",
     "condGebraucht": "Б/у",
     "condDefekt": "С дефектом",
@@ -2241,7 +2244,17 @@
     "editListing": "Редактировать",
     "deleteListing": "Удалить объявление",
     "deleteListingDescription": "Объявление будет удалено без возможности восстановления и станет недоступным для других пользователей.",
-    "createSubtitle": "Купить · Продать · Обменять · Отдать"
+    "createSubtitle": "Купить · Продать · Обменять · Отдать",
+    "catElectronics": "Электроника",
+    "catClothing": "Одежда",
+    "catFurniture": "Мебель",
+    "catKitchen": "Кухня",
+    "catKids": "Дети",
+    "catBooks": "Книги",
+    "catSports": "Спорт",
+    "catGarden": "Сад",
+    "catTools": "Инструменты",
+    "catOther": "Другое"
   },
   "trust": {
     "rate": "Оценить {name}",
@@ -2417,7 +2430,15 @@
       "title": "Предложения",
       "prefillHint": "Праздник заполнен заранее – отредактируйте детали по желанию."
     },
-    "createSubtitle": "Пригласите своих соседей"
+    "createSubtitle": "Пригласите своих соседей",
+    "filtCommunity": "Сообщество",
+    "filtHelping": "Помощь",
+    "filtSharing": "Поделиться",
+    "filtLearning": "Учиться",
+    "filtCelebration": "Праздновать",
+    "filtSport": "Спорт",
+    "filtCrisis": "Кризис",
+    "filtOther": "Другое"
   },
   "challenges": {
     "rewardBadge": "Награда-значок (необязательно)",
@@ -2594,7 +2615,7 @@
     "catInfo": "Инфо",
     "catWarnung": "Предупреждение",
     "catVerloren": "Потеряно",
-    "catFundbuero": "Найдено",
+    "catFundbuero": "Бюро находок",
     "image": "Изображение (необязательно)",
     "addImage": "Добавить изображение",
     "expiryLabel": "Срок действия (необязательно)",
@@ -2739,7 +2760,16 @@
       "catBrauerei": "Пивоварня",
       "catHofladen": "Фермерский магазин",
       "catSonstiges": "Другое"
-    }
+    },
+    "noMatches": "Нет совпадений.",
+    "noFarmsRegion": "В вашем регионе нет хозяйств.",
+    "tryOtherFilters": "Попробуйте другие фильтры.",
+    "resetFilters": "Сбросить фильтры",
+    "catFarm": "Хозяйство",
+    "catShop": "Фермерский магазин",
+    "catMarket": "Рынок",
+    "catCsa": "CSA",
+    "catOrchard": "Сад"
   },
   "knowledge": {
     "category": "Категория",

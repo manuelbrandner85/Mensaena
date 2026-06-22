@@ -57,7 +57,10 @@
     "switchCamera": "Changer de caméra",
     "showPassword": "Afficher le mot de passe",
     "pin": "Épingler",
-    "crop": "Recadrer"
+    "crop": "Recadrer",
+    "viewList": "Liste",
+    "viewMap": "Carte",
+    "viewCalendar": "Calendrier"
   },
   "safe": {
     "critical_nearby_title": "Crise critique près de toi",
@@ -2210,7 +2213,7 @@
     },
     "typeVerschenken": "Donner",
     "typeTauschen": "Échanger",
-    "typeVerkaufen": "Vendre à petit prix",
+    "typeVerkaufen": "Pas cher",
     "typeLeihen": "Prêter",
     "catHaushalt": "Maison",
     "catKleidung": "Vêtements",
@@ -2223,7 +2226,7 @@
     "catWerkzeug": "Outils",
     "catSonstiges": "Autre",
     "condNeu": "Neuf",
-    "condSehrGut": "Très bon",
+    "condSehrGut": "Comme neuf",
     "condGut": "Bon",
     "condGebraucht": "Occasion",
     "condDefekt": "Défectueux",
@@ -2242,7 +2245,17 @@
     "editListing": "Modifier",
     "deleteListing": "Supprimer l’annonce",
     "deleteListingDescription": "L’annonce sera définitivement supprimée et ne sera plus visible par les autres.",
-    "createSubtitle": "Acheter · Vendre · Échanger · Donner"
+    "createSubtitle": "Acheter · Vendre · Échanger · Donner",
+    "catElectronics": "Électronique",
+    "catClothing": "Vêtements",
+    "catFurniture": "Meubles",
+    "catKitchen": "Cuisine",
+    "catKids": "Enfants",
+    "catBooks": "Livres",
+    "catSports": "Sport",
+    "catGarden": "Jardin",
+    "catTools": "Outils",
+    "catOther": "Autres"
   },
   "trust": {
     "rate": "Évaluer {name}",
@@ -2418,7 +2431,15 @@
       "title": "Suggestions",
       "prefillHint": "Jour férié pré-rempli – ajustez les détails à votre convenance."
     },
-    "createSubtitle": "Invite tes voisins"
+    "createSubtitle": "Invite tes voisins",
+    "filtCommunity": "Communauté",
+    "filtHelping": "Aider",
+    "filtSharing": "Partager",
+    "filtLearning": "Apprendre",
+    "filtCelebration": "Fêter",
+    "filtSport": "Sport",
+    "filtCrisis": "Crise",
+    "filtOther": "Autres"
   },
   "challenges": {
     "rewardBadge": "Badge de récompense (facultatif)",
@@ -2549,7 +2570,7 @@
     "catBildung": "Éducation",
     "catTiere": "Animaux",
     "catHandwerk": "Artisanat",
-    "catSonstiges": "Autre",
+    "catSonstiges": "Autres",
     "deletePostConfirm": "Supprimer cette publication ?",
     "requestJoin": "Demander à rejoindre",
     "requestJoinTitle": "Demander à rejoindre",
@@ -2590,12 +2611,12 @@
     "screenTitle": "Tableau d'affichage",
     "catGeneral": "Général",
     "catGesucht": "Recherché",
-    "catBiete": "Je propose",
+    "catBiete": "J'offre",
     "catEvent": "Événement",
     "catInfo": "Info",
-    "catWarnung": "Avertissement",
+    "catWarnung": "Alerte",
     "catVerloren": "Perdu",
-    "catFundbuero": "Trouvé",
+    "catFundbuero": "Objets trouvés",
     "image": "Image (facultative)",
     "addImage": "Ajouter une image",
     "expiryLabel": "Date d'expiration (facultative)",
@@ -2740,7 +2761,16 @@
       "catBrauerei": "Brasserie",
       "catHofladen": "Magasin de ferme",
       "catSonstiges": "Autre"
-    }
+    },
+    "noMatches": "Aucun résultat.",
+    "noFarmsRegion": "Aucune ferme dans ta région.",
+    "tryOtherFilters": "Essaie d'autres filtres.",
+    "resetFilters": "Réinitialiser les filtres",
+    "catFarm": "Ferme",
+    "catShop": "Magasin de ferme",
+    "catMarket": "Marché",
+    "catCsa": "AMAP",
+    "catOrchard": "Verger"
   },
   "knowledge": {
     "category": "Catégorie",

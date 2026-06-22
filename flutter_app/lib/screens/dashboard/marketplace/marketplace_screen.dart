@@ -42,34 +42,56 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   ({double lat, double lng})? _myPos;
   _MpSort _sort = _MpSort.newest;
 
-  static const List<FilterOption<String>> _types = [
-    FilterOption(value: 'verschenken', label: '🎁 Verschenken'),
-    FilterOption(value: 'tauschen', label: '🔄 Tauschen'),
-    FilterOption(value: 'verkaufen', label: '💶 Günstig'),
-    FilterOption(value: 'leihen', label: '📅 Leihen'),
-  ];
+  List<FilterOption<String>> get _types => [
+        FilterOption(
+            value: 'verschenken',
+            label: '🎁 ${'marketplace.typeVerschenken'.tr()}'),
+        FilterOption(
+            value: 'tauschen',
+            label: '🔄 ${'marketplace.typeTauschen'.tr()}'),
+        FilterOption(
+            value: 'verkaufen',
+            label: '💶 ${'marketplace.typeVerkaufen'.tr()}'),
+        FilterOption(
+            value: 'leihen', label: '📅 ${'marketplace.typeLeihen'.tr()}'),
+      ];
 
   // Kategorien aus Web `marketplace/page.tsx` CATEGORY_OPTIONS.
-  static const List<FilterOption<String>> _categories = [
-    FilterOption(value: 'electronics', label: '📱 Elektronik'),
-    FilterOption(value: 'clothing', label: '👕 Kleidung'),
-    FilterOption(value: 'furniture', label: '🪑 Möbel'),
-    FilterOption(value: 'kitchen', label: '🍴 Küche'),
-    FilterOption(value: 'kids', label: '🧸 Kinder'),
-    FilterOption(value: 'books', label: '📚 Bücher'),
-    FilterOption(value: 'sports', label: '⚽ Sport'),
-    FilterOption(value: 'garden', label: '🌱 Garten'),
-    FilterOption(value: 'tools', label: '🔧 Werkzeug'),
-    FilterOption(value: 'other', label: '❓ Sonstiges'),
-  ];
+  List<FilterOption<String>> get _categories => [
+        FilterOption(
+            value: 'electronics',
+            label: '📱 ${'marketplace.catElectronics'.tr()}'),
+        FilterOption(
+            value: 'clothing',
+            label: '👕 ${'marketplace.catClothing'.tr()}'),
+        FilterOption(
+            value: 'furniture',
+            label: '🪑 ${'marketplace.catFurniture'.tr()}'),
+        FilterOption(
+            value: 'kitchen', label: '🍴 ${'marketplace.catKitchen'.tr()}'),
+        FilterOption(
+            value: 'kids', label: '🧸 ${'marketplace.catKids'.tr()}'),
+        FilterOption(
+            value: 'books', label: '📚 ${'marketplace.catBooks'.tr()}'),
+        FilterOption(
+            value: 'sports', label: '⚽ ${'marketplace.catSports'.tr()}'),
+        FilterOption(
+            value: 'garden', label: '🌱 ${'marketplace.catGarden'.tr()}'),
+        FilterOption(
+            value: 'tools', label: '🔧 ${'marketplace.catTools'.tr()}'),
+        FilterOption(
+            value: 'other', label: '❓ ${'marketplace.catOther'.tr()}'),
+      ];
 
   // Zustand aus Web CONDITION_OPTIONS.
-  static const List<FilterOption<String>> _conditions = [
-    FilterOption(value: 'neu', label: 'Neu'),
-    FilterOption(value: 'sehr_gut', label: 'Wie neu'),
-    FilterOption(value: 'gut', label: 'Gut'),
-    FilterOption(value: 'gebraucht', label: 'Gebraucht'),
-  ];
+  List<FilterOption<String>> get _conditions => [
+        FilterOption(value: 'neu', label: 'marketplace.condNeu'.tr()),
+        FilterOption(
+            value: 'sehr_gut', label: 'marketplace.condSehrGut'.tr()),
+        FilterOption(value: 'gut', label: 'marketplace.condGut'.tr()),
+        FilterOption(
+            value: 'gebraucht', label: 'marketplace.condGebraucht'.tr()),
+      ];
 
   bool get _hasFilters =>
       _search.isNotEmpty ||

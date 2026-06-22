@@ -30,18 +30,24 @@ class _GroupsScreenState extends ConsumerState<GroupsScreen> {
   String _filter = 'all';
   String _search = '';
 
-  static const List<FilterOption<String>> _categories = [
-    FilterOption(value: 'nachbarschaft', label: '🏘️ Nachbarschaft'),
-    FilterOption(value: 'hobby', label: '🎨 Hobby'),
-    FilterOption(value: 'sport', label: '⚽ Sport'),
-    FilterOption(value: 'eltern', label: '👨‍👩‍👧 Eltern'),
-    FilterOption(value: 'senioren', label: '👴 Senioren'),
-    FilterOption(value: 'umwelt', label: '🌱 Umwelt'),
-    FilterOption(value: 'bildung', label: '📚 Bildung'),
-    FilterOption(value: 'tiere', label: '🐾 Tiere'),
-    FilterOption(value: 'handwerk', label: '🔧 Handwerk'),
-    FilterOption(value: 'sonstiges', label: '❓ Sonstiges'),
-  ];
+  List<FilterOption<String>> get _categories => [
+        FilterOption(
+            value: 'nachbarschaft',
+            label: '🏘️ ${'groups.catNachbarschaft'.tr()}'),
+        FilterOption(value: 'hobby', label: '🎨 ${'groups.catHobby'.tr()}'),
+        FilterOption(value: 'sport', label: '⚽ ${'groups.catSport'.tr()}'),
+        FilterOption(
+            value: 'eltern', label: '👨‍👩‍👧 ${'groups.catEltern'.tr()}'),
+        FilterOption(
+            value: 'senioren', label: '👴 ${'groups.catSenioren'.tr()}'),
+        FilterOption(value: 'umwelt', label: '🌱 ${'groups.catUmwelt'.tr()}'),
+        FilterOption(value: 'bildung', label: '📚 ${'groups.catBildung'.tr()}'),
+        FilterOption(value: 'tiere', label: '🐾 ${'groups.catTiere'.tr()}'),
+        FilterOption(
+            value: 'handwerk', label: '🔧 ${'groups.catHandwerk'.tr()}'),
+        FilterOption(
+            value: 'sonstiges', label: '❓ ${'groups.catSonstiges'.tr()}'),
+      ];
 
   bool get _hasFilters => _filter != 'all' || _search.isNotEmpty;
 

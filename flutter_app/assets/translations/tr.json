@@ -57,7 +57,10 @@
     "switchCamera": "Kamerayı değiştir",
     "showPassword": "Şifreyi göster",
     "pin": "Sabitle",
-    "crop": "Kırp"
+    "crop": "Kırp",
+    "viewList": "Liste",
+    "viewMap": "Harita",
+    "viewCalendar": "Takvim"
   },
   "safe": {
     "critical_nearby_title": "Yakınında kritik bir kriz",
@@ -2208,9 +2211,9 @@
       "uploadFailed": "Görsel yüklenemedi"
     },
     "typeVerschenken": "Bağışla",
-    "typeTauschen": "Takas et",
-    "typeVerkaufen": "Ucuza ver",
-    "typeLeihen": "Ödünç ver",
+    "typeTauschen": "Takas",
+    "typeVerkaufen": "Uygun",
+    "typeLeihen": "Ödünç",
     "catHaushalt": "Ev",
     "catKleidung": "Giyim",
     "catKinder": "Çocuk",
@@ -2222,7 +2225,7 @@
     "catWerkzeug": "Aletler",
     "catSonstiges": "Diğer",
     "condNeu": "Yeni",
-    "condSehrGut": "Çok iyi",
+    "condSehrGut": "Yeni gibi",
     "condGut": "İyi",
     "condGebraucht": "Kullanılmış",
     "condDefekt": "Arızalı",
@@ -2241,7 +2244,17 @@
     "editListing": "Düzenle",
     "deleteListing": "İlanı sil",
     "deleteListingDescription": "İlan kalıcı olarak silinecek ve başkaları tarafından artık görülmeyecek.",
-    "createSubtitle": "Al · Sat · Takas · Bağışla"
+    "createSubtitle": "Al · Sat · Takas · Bağışla",
+    "catElectronics": "Elektronik",
+    "catClothing": "Giyim",
+    "catFurniture": "Mobilya",
+    "catKitchen": "Mutfak",
+    "catKids": "Çocuk",
+    "catBooks": "Kitaplar",
+    "catSports": "Spor",
+    "catGarden": "Bahçe",
+    "catTools": "Aletler",
+    "catOther": "Diğer"
   },
   "trust": {
     "rate": "{name} kullanıcısını değerlendir",
@@ -2417,7 +2430,15 @@
       "title": "Öneriler",
       "prefillHint": "Resmi tatil önceden dolduruldu – ayrıntıları istediğiniz gibi düzenleyin."
     },
-    "createSubtitle": "Komşularını davet et"
+    "createSubtitle": "Komşularını davet et",
+    "filtCommunity": "Topluluk",
+    "filtHelping": "Yardım",
+    "filtSharing": "Paylaş",
+    "filtLearning": "Öğren",
+    "filtCelebration": "Kutlama",
+    "filtSport": "Spor",
+    "filtCrisis": "Kriz",
+    "filtOther": "Diğer"
   },
   "challenges": {
     "rewardBadge": "Ödül rozeti (isteğe bağlı)",
@@ -2539,7 +2560,7 @@
     "privateHint": "Yalnızca davetle katılınır",
     "saving": "Kaydediliyor…",
     "createButton": "Grup oluştur",
-    "catNachbarschaft": "Komşuluk",
+    "catNachbarschaft": "Mahalle",
     "catHobby": "Hobi",
     "catSport": "Spor",
     "catEltern": "Ebeveynler",
@@ -2589,12 +2610,12 @@
     "screenTitle": "İlan tahtası",
     "catGeneral": "Genel",
     "catGesucht": "Aranıyor",
-    "catBiete": "Veriyorum",
+    "catBiete": "Sunuyorum",
     "catEvent": "Etkinlik",
     "catInfo": "Bilgi",
     "catWarnung": "Uyarı",
     "catVerloren": "Kayıp",
-    "catFundbuero": "Bulundu",
+    "catFundbuero": "Kayıp eşya",
     "image": "Görsel (isteğe bağlı)",
     "addImage": "Görsel ekle",
     "expiryLabel": "Son geçerlilik (isteğe bağlı)",
@@ -2739,7 +2760,16 @@
       "catBrauerei": "Bira üretimi",
       "catHofladen": "Çiftlik dükkanı",
       "catSonstiges": "Diğer"
-    }
+    },
+    "noMatches": "Sonuç yok.",
+    "noFarmsRegion": "Bölgende çiftlik yok.",
+    "tryOtherFilters": "Başka filtreler dene.",
+    "resetFilters": "Filtreleri sıfırla",
+    "catFarm": "Çiftlik",
+    "catShop": "Çiftlik dükkanı",
+    "catMarket": "Pazar",
+    "catCsa": "CSA",
+    "catOrchard": "Meyve bahçesi"
   },
   "knowledge": {
     "category": "Kategori",

@@ -37,16 +37,20 @@ class EventsScreen extends ConsumerStatefulWidget {
 }
 
 class _EventsScreenState extends ConsumerState<EventsScreen> {
-  static const List<FilterOption<String>> _categories = [
-    FilterOption(value: 'community', label: '🏘️ Community'),
-    FilterOption(value: 'helping', label: '💚 Helfen'),
-    FilterOption(value: 'sharing', label: '🔄 Teilen'),
-    FilterOption(value: 'learning', label: '📚 Lernen'),
-    FilterOption(value: 'celebration', label: '🎉 Feiern'),
-    FilterOption(value: 'sport', label: '⚽ Sport'),
-    FilterOption(value: 'crisis', label: '🚨 Krise'),
-    FilterOption(value: 'other', label: '❓ Sonstiges'),
-  ];
+  List<FilterOption<String>> get _categories => [
+        FilterOption(
+            value: 'community', label: '🏘️ ${'events.filtCommunity'.tr()}'),
+        FilterOption(value: 'helping', label: '💚 ${'events.filtHelping'.tr()}'),
+        FilterOption(value: 'sharing', label: '🔄 ${'events.filtSharing'.tr()}'),
+        FilterOption(
+            value: 'learning', label: '📚 ${'events.filtLearning'.tr()}'),
+        FilterOption(
+            value: 'celebration',
+            label: '🎉 ${'events.filtCelebration'.tr()}'),
+        FilterOption(value: 'sport', label: '⚽ ${'events.filtSport'.tr()}'),
+        FilterOption(value: 'crisis', label: '🚨 ${'events.filtCrisis'.tr()}'),
+        FilterOption(value: 'other', label: '❓ ${'events.filtOther'.tr()}'),
+      ];
 
   _EventView _view = _EventView.list;
   String? _category;
@@ -115,18 +119,18 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                   ViewToggle<_EventView>(
                     value: _view,
                     onChanged: (v) => setState(() => _view = v),
-                    options: const [
+                    options: [
                       ViewToggleOption(
                           value: _EventView.list,
-                          label: 'Liste',
+                          label: 'common.viewList'.tr(),
                           icon: LucideIcons.list),
                       ViewToggleOption(
                           value: _EventView.calendar,
-                          label: 'Kalender',
+                          label: 'common.viewCalendar'.tr(),
                           icon: LucideIcons.calendar),
                       ViewToggleOption(
                           value: _EventView.map,
-                          label: 'Karte',
+                          label: 'common.viewMap'.tr(),
                           icon: LucideIcons.mapPin),
                     ],
                   ),

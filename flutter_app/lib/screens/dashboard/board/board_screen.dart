@@ -31,16 +31,18 @@ class BoardScreen extends ConsumerStatefulWidget {
 
 class _BoardScreenState extends ConsumerState<BoardScreen> {
   // Mirror von CATEGORY_LABELS + CATEGORY_ICONS aus useBoard.ts.
-  static const List<FilterOption<String>> _categories = [
-    FilterOption(value: 'general', label: '📌 Allgemein'),
-    FilterOption(value: 'gesucht', label: '🔍 Gesucht'),
-    FilterOption(value: 'biete', label: '🎁 Biete'),
-    FilterOption(value: 'event', label: '📅 Event'),
-    FilterOption(value: 'info', label: 'ℹ️ Info'),
-    FilterOption(value: 'warnung', label: '⚠️ Warnung'),
-    FilterOption(value: 'verloren', label: '😢 Verloren'),
-    FilterOption(value: 'fundbuero', label: '🔑 Fundbüro'),
-  ];
+  List<FilterOption<String>> get _categories => [
+        FilterOption(value: 'general', label: '📌 ${'board.catGeneral'.tr()}'),
+        FilterOption(value: 'gesucht', label: '🔍 ${'board.catGesucht'.tr()}'),
+        FilterOption(value: 'biete', label: '🎁 ${'board.catBiete'.tr()}'),
+        FilterOption(value: 'event', label: '📅 ${'board.catEvent'.tr()}'),
+        FilterOption(value: 'info', label: 'ℹ️ ${'board.catInfo'.tr()}'),
+        FilterOption(value: 'warnung', label: '⚠️ ${'board.catWarnung'.tr()}'),
+        FilterOption(
+            value: 'verloren', label: '😢 ${'board.catVerloren'.tr()}'),
+        FilterOption(
+            value: 'fundbuero', label: '🔑 ${'board.catFundbuero'.tr()}'),
+      ];
 
   String _search = '';
   String _category = 'all';
