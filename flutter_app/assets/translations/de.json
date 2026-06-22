@@ -688,6 +688,11 @@
     "channelNameHint": "mein-kanal",
     "channelDescLabel": "Beschreibung (optional)",
     "channelDescHint": "Worum geht es in diesem Raum?",
+    "channelCategoryLabel": "Kategorie / Thema (optional)",
+    "channelCategoryHint": "z. B. Nachbarschaft, Hobby, Hilfe",
+    "channelPrivate": "Privater Raum",
+    "channelPrivateHint": "Nur Mitglieder sehen ihn. Admins haben immer Zugriff.",
+    "channelPublicHint": "Öffentlich – für alle sichtbar und beitretbar.",
     "createChannelCta": "Kanal erstellen",
     "channelCreated": "Raum erstellt!",
     "createChannelFailed": "Konnte Raum nicht erstellen."

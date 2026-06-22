@@ -689,6 +689,11 @@
     "channelNameHint": "my-channel",
     "channelDescLabel": "Description (optional)",
     "channelDescHint": "What is this room about?",
+    "channelCategoryLabel": "Category / topic (optional)",
+    "channelCategoryHint": "e.g. neighbourhood, hobby, help",
+    "channelPrivate": "Private room",
+    "channelPrivateHint": "Only members can see it. Admins always have access.",
+    "channelPublicHint": "Public – visible and joinable by everyone.",
     "createChannelCta": "Create channel",
     "channelCreated": "Room created!",
     "createChannelFailed": "Could not create room."

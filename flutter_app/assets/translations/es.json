@@ -689,6 +689,11 @@
     "channelNameHint": "mi-canal",
     "channelDescLabel": "Descripción (opcional)",
     "channelDescHint": "¿De qué trata esta sala?",
+    "channelCategoryLabel": "Categoría / tema (opcional)",
+    "channelCategoryHint": "p. ej. vecindario, afición, ayuda",
+    "channelPrivate": "Sala privada",
+    "channelPrivateHint": "Solo los miembros la ven. Los administradores siempre tienen acceso.",
+    "channelPublicHint": "Pública: visible y abierta para todos.",
     "createChannelCta": "Crear canal",
     "channelCreated": "¡Sala creada!",
     "createChannelFailed": "No se pudo crear la sala."

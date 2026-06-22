@@ -689,6 +689,11 @@
     "channelNameHint": "mio-canale",
     "channelDescLabel": "Descrizione (facoltativa)",
     "channelDescHint": "Di cosa tratta questa stanza?",
+    "channelCategoryLabel": "Categoria / tema (facoltativo)",
+    "channelCategoryHint": "es. vicinato, hobby, aiuto",
+    "channelPrivate": "Stanza privata",
+    "channelPrivateHint": "Solo i membri la vedono. Gli admin hanno sempre accesso.",
+    "channelPublicHint": "Pubblica – visibile e accessibile a tutti.",
     "createChannelCta": "Crea canale",
     "channelCreated": "Stanza creata!",
     "createChannelFailed": "Impossibile creare la stanza."

@@ -688,6 +688,11 @@
     "channelNameHint": "мой-канал",
     "channelDescLabel": "Описание (необязательно)",
     "channelDescHint": "О чём эта комната?",
+    "channelCategoryLabel": "Категория / тема (необязательно)",
+    "channelCategoryHint": "напр. соседство, хобби, помощь",
+    "channelPrivate": "Приватная комната",
+    "channelPrivateHint": "Видна только участникам. У админов всегда есть доступ.",
+    "channelPublicHint": "Публичная — видна и доступна всем.",
     "createChannelCta": "Создать канал",
     "channelCreated": "Комната создана!",
     "createChannelFailed": "Не удалось создать комнату."

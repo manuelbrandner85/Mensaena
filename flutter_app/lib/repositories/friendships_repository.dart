@@ -321,16 +321,21 @@ class FriendshipsRepository {
           .or('requester_id.eq.$me,addressee_id.eq.$me')
           .eq('status', 'accepted')
           .limit(500);
-      // Pick the OTHER profile for each row.
-      return (rows as List)
-          .whereType<Map<String, dynamic>>()
-          .map((r) {
-            final isReq = r['requester_id'] == me;
-            return (isReq ? r['profiles_addr'] : r['profiles_req'])
-                as Map<String, dynamic>?;
-          })
-          .whereType<Map<String, dynamic>>()
-          .toList();
+      // Pick the OTHER profile für jede Zeile + Dedup nach Freund-ID:
+      // Freundschaften können (je nach Annahme-Flow) in beiden Richtungen als
+      // Zeile existieren → sonst erscheint jeder Freund doppelt.
+      final seen = <String>{};
+      final result = <Map<String, dynamic>>[];
+      for (final r in (rows as List).whereType<Map<String, dynamic>>()) {
+        final isReq = r['requester_id'] == me;
+        final friend =
+            (isReq ? r['profiles_addr'] : r['profiles_req']) as Map?;
+        if (friend == null) continue;
+        final fid = friend['id'] as String?;
+        if (fid == null || !seen.add(fid)) continue;
+        result.add(friend.cast<String, dynamic>());
+      }
+      return result;
     } catch (_) {
       return const [];
     }

@@ -689,6 +689,11 @@
     "channelNameHint": "mon-salon",
     "channelDescLabel": "Description (facultatif)",
     "channelDescHint": "De quoi parle ce salon ?",
+    "channelCategoryLabel": "Catégorie / thème (facultatif)",
+    "channelCategoryHint": "ex. voisinage, loisir, entraide",
+    "channelPrivate": "Salon privé",
+    "channelPrivateHint": "Visible uniquement par les membres. Les admins ont toujours accès.",
+    "channelPublicHint": "Public – visible et ouvert à tous.",
     "createChannelCta": "Créer le salon",
     "channelCreated": "Salon créé !",
     "createChannelFailed": "Impossible de créer le salon."

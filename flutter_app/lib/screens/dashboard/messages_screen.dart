@@ -97,10 +97,12 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
     Haptics.tap();
     final nameCtrl = TextEditingController();
     final descCtrl = TextEditingController();
+    final catCtrl = TextEditingController();
     const emojis = [
       '💬', '🏘️', '🌿', '🤝', '🎉', '📢', '🛒', '📚', '🌍', '🍽️', '🐾', '💡'
     ];
     var emoji = '💬';
+    var isPrivate = false;
     var busy = false;
     final created = await showModalBottomSheet<bool>(
       context: context,
@@ -173,6 +175,35 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
                   hintText: 'chat.channelDescHint'.tr(),
                 ),
               ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: catCtrl,
+                maxLength: 30,
+                style: AppTypography.body(size: 14, color: AppColors.ink),
+                decoration: InputDecoration(
+                  labelText: 'chat.channelCategoryLabel'.tr(),
+                  hintText: 'chat.channelCategoryHint'.tr(),
+                  prefixIcon: const Icon(LucideIcons.tag, size: 16),
+                ),
+              ),
+              const SizedBox(height: 4),
+              SwitchListTile(
+                contentPadding: EdgeInsets.zero,
+                activeColor: AppColors.amber,
+                value: isPrivate,
+                onChanged: (v) => setSheet(() => isPrivate = v),
+                secondary: Icon(
+                    isPrivate ? LucideIcons.lock : LucideIcons.globe,
+                    size: 18, color: AppColors.bronze),
+                title: Text('chat.channelPrivate'.tr(),
+                    style: AppTypography.body(size: 14, color: AppColors.ink)),
+                subtitle: Text(
+                    isPrivate
+                        ? 'chat.channelPrivateHint'.tr()
+                        : 'chat.channelPublicHint'.tr(),
+                    style:
+                        AppTypography.body(size: 11, color: AppColors.inkSoft)),
+              ),
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
@@ -192,6 +223,10 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
                             name: nameCtrl.text,
                             emoji: emoji,
                             description: descCtrl.text,
+                            category: catCtrl.text.trim().isEmpty
+                                ? 'Community'
+                                : catCtrl.text.trim(),
+                            isPrivate: isPrivate,
                           );
                           if (ctx.mounted) Navigator.pop(ctx, ch != null);
                         },
@@ -213,6 +248,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
     );
     nameCtrl.dispose();
     descCtrl.dispose();
+    catCtrl.dispose();
     if (!mounted) return;
     if (created == true) {
       setState(_load);

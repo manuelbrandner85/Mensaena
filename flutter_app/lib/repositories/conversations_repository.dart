@@ -29,43 +29,35 @@ class ConversationsRepository {
   /// Button ohnehin nur berechtigten Nutzer:innen. Legt eine conversation
   /// (type 'group') + die chat_channels-Row an (1:1 zur Web-CreateChannelModal).
   /// Gibt die neue Channel-Row zurück oder null bei Fehler.
+  /// Erstellt einen Community-Raum atomar serverseitig (RPC, SECURITY DEFINER):
+  /// legt Conversation + Owner-Mitgliedschaft + Kanal an. Behebt den früheren
+  /// Fehler, dass der Readback nach dem Insert an der conv_select-RLS scheiterte
+  /// (Ersteller war noch kein Mitglied). Unterstützt Kategorie + öffentlich/privat.
   static Future<Map<String, dynamic>?> createChannel({
     required String name,
     String emoji = '💬',
     String? description,
+    String category = 'Community',
+    bool isPrivate = false,
   }) async {
     final trimmed = name.trim();
     if (trimmed.isEmpty) return null;
     try {
-      final conv = await sb
-          .from('conversations')
-          .insert({'type': 'group', 'title': trimmed})
-          .select('id')
-          .single();
-      final convId = conv['id'] as String;
-      var base = trimmed
-          .toLowerCase()
-          .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
-          .replaceAll(RegExp(r'^-+|-+$'), '');
-      if (base.isEmpty) base = 'kanal';
-      if (base.length > 36) base = base.substring(0, 36);
-      final slug =
-          '$base-${DateTime.now().millisecondsSinceEpoch.toRadixString(36)}';
-      final desc = description?.trim();
-      final ch = await sb
-          .from('chat_channels')
-          .insert({
-            'name': trimmed,
-            'slug': slug,
-            'emoji': emoji,
-            'description': (desc == null || desc.isEmpty) ? null : desc,
-            'category': 'Community',
-            'conversation_id': convId,
-          })
-          .select(
-              'id, conversation_id, name, emoji, slug, description, category')
-          .single();
-      return ch;
+      final res = await sb.rpc<dynamic>(
+        'create_community_channel',
+        params: {
+          'p_name': trimmed,
+          'p_emoji': emoji,
+          'p_description': description?.trim(),
+          'p_category': category,
+          'p_is_private': isPrivate,
+        },
+      );
+      if (res is Map) return res.cast<String, dynamic>();
+      if (res is List && res.isNotEmpty && res.first is Map) {
+        return (res.first as Map).cast<String, dynamic>();
+      }
+      return null;
     } catch (_) {
       return null;
     }

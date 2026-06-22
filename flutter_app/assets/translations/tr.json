@@ -688,6 +688,11 @@
     "channelNameHint": "kanalım",
     "channelDescLabel": "Açıklama (isteğe bağlı)",
     "channelDescHint": "Bu oda ne hakkında?",
+    "channelCategoryLabel": "Kategori / konu (isteğe bağlı)",
+    "channelCategoryHint": "ör. komşuluk, hobi, yardım",
+    "channelPrivate": "Özel oda",
+    "channelPrivateHint": "Yalnızca üyeler görür. Yöneticilerin her zaman erişimi vardır.",
+    "channelPublicHint": "Herkese açık – herkes görebilir ve katılabilir.",
     "createChannelCta": "Kanal oluştur",
     "channelCreated": "Oda oluşturuldu!",
     "createChannelFailed": "Oda oluşturulamadı."
