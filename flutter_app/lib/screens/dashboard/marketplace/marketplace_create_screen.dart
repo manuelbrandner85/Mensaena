@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
@@ -11,6 +12,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../repositories/extra_repositories.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
@@ -22,6 +24,7 @@ import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/forms/location_picker_field.dart';
 import '../../shared/barcode_scanner_screen.dart';
 import '../../../utils/form_validators.dart';
+import '../../../utils/lost_image_recovery.dart';
 
 class MarketplaceCreateScreen extends ConsumerStatefulWidget {
   const MarketplaceCreateScreen({super.key});
@@ -57,6 +60,22 @@ class _MarketplaceCreateScreenState
   bool _shipping = false;
   double _radiusKm = 0; // 0 = egal
   DateTime? _expiresAt;
+
+  @override
+  void initState() {
+    super.initState();
+    // Android verliert das gewählte Bild, wenn die Activity während der
+    // geöffneten Galerie unter Speicherdruck zerstört wird (RAM-schwache
+    // Geräte) → beim Wiederaufbau zurückholen, sonst „kein Bild, kein Fehler".
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final lost = await recoverLostImages(_picker);
+      if (lost.isNotEmpty && mounted) {
+        setState(() => _images.addAll(
+              lost.take(_maxImages - _images.length).map((x) => File(x.path)),
+            ));
+      }
+    });
+  }
 
   static const List<({String value, String i18n, String emoji})> _types = [
     (value: 'verschenken', i18n: 'marketplace.typeVerschenken', emoji: '🎁'),
@@ -236,8 +255,21 @@ class _MarketplaceCreateScreenState
         imageQuality: 80,
       );
       if (picked == null || !mounted) return;
-      setState(() => _images.add(File(picked.path)));
-    } catch (_) {
+      // Diagnose: ist die gewählte Datei überhaupt lesbar? (klärt „kein Bild")
+      final f = File(picked.path);
+      final exists = await f.exists();
+      final len = exists ? await f.length() : 0;
+      unawaited(ErrorLogsRepository.log(
+        errorType: 'image_picked',
+        message: 'exists=$exists len=$len path=${picked.path}',
+      ));
+      if (!mounted) return;
+      setState(() => _images.add(f));
+    } catch (e) {
+      unawaited(ErrorLogsRepository.log(
+        errorType: 'image_pick_error',
+        message: '$e',
+      ));
       if (!mounted) return;
       AppSnackBar.error(context, 'marketplace.create.uploadFailed'.tr());
     }
@@ -366,14 +398,20 @@ class _MarketplaceCreateScreenState
                               fit: BoxFit.cover,
                               cacheWidth: 128,
                               cacheHeight: 128,
-                              errorBuilder: (_, __, ___) => Container(
-                                    width: 64,
-                                    height: 64,
-                                    color: AppColors.surface,
-                                    alignment: Alignment.center,
-                                    child: const Icon(LucideIcons.imageOff,
-                                        color: AppColors.herzrot, size: 24),
-                                  ))
+                              errorBuilder: (_, err, __) {
+                                unawaited(ErrorLogsRepository.log(
+                                  errorType: 'image_decode_failed',
+                                  message: '$err',
+                                ));
+                                return Container(
+                                  width: 64,
+                                  height: 64,
+                                  color: AppColors.surface,
+                                  alignment: Alignment.center,
+                                  child: const Icon(LucideIcons.imageOff,
+                                      color: AppColors.herzrot, size: 24),
+                                );
+                              })
                           : Container(
                               width: 64,
                               height: 64,
