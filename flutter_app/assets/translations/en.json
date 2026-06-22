@@ -589,7 +589,11 @@
     },
     "previewStatus": "Effect strength {strength}% · {mode}",
     "previewForced": "Maximum effects",
-    "previewAuto": "Automatic"
+    "previewAuto": "Automatic",
+    "weatherAdaptive": {
+      "label": "Weather-adaptive mood",
+      "hint": "The background adapts to the real weather at your location (rain, fog, snow, storm)."
+    }
   },
   "chat": {
     "writeMessage": "Write a message …",

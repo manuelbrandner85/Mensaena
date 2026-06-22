@@ -79,6 +79,16 @@ class CinemaOverlay extends ConsumerWidget {
     final strength = ref.watch(cinemaEffectStrengthProvider) / 100.0;
     final intensity =
         (isLight ? (baseIntensity * 0.3) : baseIntensity) * strength;
+    // Wetter-adaptiver Tint (Regen/Nebel/Schnee/Gewitter) — leichtgewichtig,
+    // mit der Intensität skaliert.
+    final weatherBase = ref.watch(cinemaWeatherAdaptiveProvider)
+        ? ref.watch(cinemaWeatherTintProvider).value
+        : null;
+    // Intensitäts-Skalierung via lerp von transparent → Tint (kein Color.a,
+    // versionsunabhängig).
+    final weatherTint = weatherBase == null
+        ? null
+        : Color.lerp(Colors.transparent, weatherBase, intensity);
 
     return KeyedSubtree(
       key: const ValueKey('cinema_overlay_on'),
@@ -98,6 +108,13 @@ class CinemaOverlay extends ConsumerWidget {
             ),
           ),
         ),
+
+        // 1b. Wetter-Tint (Regen/Nebel/Schnee/Gewitter) — eine Farb-Ebene
+        // über dem Mesh, passt die Stimmung ans echte Wetter an.
+        if (weatherTint != null)
+          Positioned.fill(
+            child: IgnorePointer(child: ColoredBox(color: weatherTint)),
+          ),
 
         // 2. Atmospheric Haze (Tiefen-Eindruck oben→unten)
         RepaintBoundary(

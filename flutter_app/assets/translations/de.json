@@ -589,7 +589,11 @@
     },
     "previewStatus": "Effektstärke {strength}% · {mode}",
     "previewForced": "Maximale Effekte",
-    "previewAuto": "Automatisch"
+    "previewAuto": "Automatisch",
+    "weatherAdaptive": {
+      "label": "Wetter-adaptive Stimmung",
+      "hint": "Der Hintergrund passt sich ans echte Wetter am Standort an (Regen, Nebel, Schnee, Gewitter)."
+    }
   },
   "chat": {
     "writeMessage": "Nachricht schreiben …",

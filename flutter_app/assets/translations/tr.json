@@ -589,7 +589,11 @@
     },
     "previewStatus": "Efekt gücü {strength}% · {mode}",
     "previewForced": "Maksimum efektler",
-    "previewAuto": "Otomatik"
+    "previewAuto": "Otomatik",
+    "weatherAdaptive": {
+      "label": "Hava durumuna uyumlu atmosfer",
+      "hint": "Arka plan konumundaki gerçek hava durumuna uyum sağlar (yağmur, sis, kar, fırtına)."
+    }
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",

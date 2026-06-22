@@ -17,6 +17,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/theme/cinema_theme.dart';
 import '../repositories/profiles_repository.dart';
 import '../services/sunrise_sunset_service.dart';
+import '../services/weather_service.dart';
 
 const _modeStorageKey = 'cinema_mode_v1';
 const _intensityStorageKey = 'cinema_intensity_v1';
@@ -88,6 +89,76 @@ class CinemaEffectStrengthNotifier extends StateNotifier<int> {
 final cinemaEffectStrengthProvider =
     StateNotifierProvider<CinemaEffectStrengthNotifier, int>(
         (ref) => CinemaEffectStrengthNotifier());
+
+const _weatherAdaptiveStorageKey = 'cinema_weather_adaptive_v1';
+
+/// Schalter: Cinema-Stimmung an das ECHTE Wetter am Standort anpassen
+/// (Regen/Nebel/Schnee/Gewitter legen einen subtilen Tint über den
+/// Hintergrund). Default an — sehr leichtgewichtig (eine Farb-Ebene).
+class CinemaWeatherAdaptiveNotifier extends StateNotifier<bool> {
+  CinemaWeatherAdaptiveNotifier() : super(true) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    try {
+      final raw = await _storage.read(key: _weatherAdaptiveStorageKey);
+      final loaded = raw == null ? true : raw == '1';
+      if (!mounted) return;
+      if (loaded != state) state = loaded;
+    } catch (_) {}
+  }
+
+  Future<void> set(bool value) async {
+    if (!mounted) return;
+    state = value;
+    try {
+      await _storage.write(
+          key: _weatherAdaptiveStorageKey, value: value ? '1' : '0');
+    } catch (_) {}
+  }
+}
+
+final cinemaWeatherAdaptiveProvider =
+    StateNotifierProvider<CinemaWeatherAdaptiveNotifier, bool>(
+        (ref) => CinemaWeatherAdaptiveNotifier());
+
+/// Aktueller Wetter-Tint (Farbe inkl. Alpha) basierend auf der WMO-Wetterlage
+/// am Standort; null = klar / keine Anpassung. Refresht alle 20 Minuten.
+final cinemaWeatherTintProvider = StreamProvider<Color?>((ref) async* {
+  Future<Color?> resolve() async {
+    try {
+      final p = await ProfilesRepository.getMine();
+      final lat = p?.latitude ?? p?.homeLat;
+      final lng = p?.longitude ?? p?.homeLng;
+      if (lat == null || lng == null) return null;
+      final hours =
+          await WeatherService.hourly(latitude: lat, longitude: lng);
+      if (hours.isEmpty) return null;
+      return _weatherTintForCode(hours.first.code);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  yield await resolve();
+  await for (final _ in Stream<void>.periodic(const Duration(minutes: 20))) {
+    yield await resolve();
+  }
+});
+
+/// WMO-Wettercode → subtiler Stimmungs-Tint (Alpha im Hex enthalten).
+Color? _weatherTintForCode(int code) {
+  if (code <= 1) return null; // klar / überwiegend klar
+  if (code == 2 || code == 3) return const Color(0x12889098); // bewölkt
+  if (code == 45 || code == 48) return const Color(0x24B0B4BA); // Nebel
+  if ((code >= 71 && code <= 77) || code == 85 || code == 86) {
+    return const Color(0x20D8E4F0); // Schnee
+  }
+  if (code >= 95) return const Color(0x30243042); // Gewitter
+  if (code >= 51 && code <= 82) return const Color(0x2435506E); // Regen
+  return null;
+}
 
 class CinemaModeNotifier extends StateNotifier<CinemaMode> {
   CinemaModeNotifier() : super(CinemaMode.auto) {

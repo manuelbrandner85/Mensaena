@@ -589,7 +589,11 @@
     },
     "previewStatus": "Intensità effetti {strength}% · {mode}",
     "previewForced": "Effetti massimi",
-    "previewAuto": "Automatico"
+    "previewAuto": "Automatico",
+    "weatherAdaptive": {
+      "label": "Atmosfera adattiva al meteo",
+      "hint": "Lo sfondo si adatta al meteo reale della tua posizione (pioggia, nebbia, neve, temporale)."
+    }
   },
   "chat": {
     "writeMessage": "Scrivi un messaggio …",

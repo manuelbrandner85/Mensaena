@@ -589,7 +589,11 @@
     },
     "previewStatus": "Intensidad de efectos {strength}% · {mode}",
     "previewForced": "Efectos máximos",
-    "previewAuto": "Automático"
+    "previewAuto": "Automático",
+    "weatherAdaptive": {
+      "label": "Ambiente según el clima",
+      "hint": "El fondo se adapta al clima real de tu ubicación (lluvia, niebla, nieve, tormenta)."
+    }
   },
   "chat": {
     "writeMessage": "Escribe un mensaje …",
