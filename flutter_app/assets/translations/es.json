@@ -1649,6 +1649,8 @@
     }
   },
   "create": {
+    "locationPickHint": "Mueve el mapa para fijar el punto",
+    "locationPickEmpty": "Elige una ubicación – mueve el mapa o usa GPS",
     "availFrom": "Disponible desde",
     "availTo": "Disponible hasta",
     "titleRequired": "El título es obligatorio.",

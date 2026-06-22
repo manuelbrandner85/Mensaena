@@ -1648,6 +1648,8 @@
     }
   },
   "create": {
+    "locationPickHint": "Noktayı ayarlamak için haritayı kaydır",
+    "locationPickEmpty": "Konum seç – haritayı kaydır veya GPS",
     "availFrom": "Şu saatten itibaren",
     "availTo": "Şu saate kadar",
     "titleRequired": "Başlık gerekli.",

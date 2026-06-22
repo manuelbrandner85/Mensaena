@@ -19,6 +19,7 @@ import '../../../widgets/shared/app_snackbar.dart';
 import '../../../services/open_food_facts_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/forms/create_post_scaffold.dart';
+import '../../../widgets/forms/location_picker_field.dart';
 import '../../shared/barcode_scanner_screen.dart';
 import '../../../utils/form_validators.dart';
 
@@ -686,32 +687,46 @@ class _MarketplaceCreateScreenState
           CreateCard(
             title: 'create.sectionLocation'.tr(),
             icon: LucideIcons.mapPin,
-            child: TextField(
-              controller: _location,
-              style: AppTypography.body(size: 14, color: AppColors.ink),
-              decoration: InputDecoration(
-                labelText: 'create.location'.tr(),
-                suffixIcon: IconButton(
-                  onPressed: _locating ? null : _useGps,
-                  tooltip: 'marketplace.useGps'.tr(),
-                  icon: _locating
-                      ? const SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2, color: AppColors.bronze),
-                        )
-                      : Icon(
-                          _lat != null
-                              ? LucideIcons.mapPin
-                              : LucideIcons.locate,
-                          size: 18,
-                          color: _lat != null
-                              ? AppColors.bronze
-                              : AppColors.inkSoft,
-                        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                LocationPickerField(
+                  initialLat: _lat,
+                  initialLng: _lng,
+                  onChanged: (la, lo) => setState(() {
+                    _lat = la;
+                    _lng = lo;
+                  }),
                 ),
-              ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _location,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'create.location'.tr(),
+                    suffixIcon: IconButton(
+                      onPressed: _locating ? null : _useGps,
+                      tooltip: 'marketplace.useGps'.tr(),
+                      icon: _locating
+                          ? const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: AppColors.bronze),
+                            )
+                          : Icon(
+                              _lat != null
+                                  ? LucideIcons.mapPin
+                                  : LucideIcons.locate,
+                              size: 18,
+                              color: _lat != null
+                                  ? AppColors.bronze
+                                  : AppColors.inkSoft,
+                            ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
 

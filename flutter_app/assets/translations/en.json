@@ -1649,6 +1649,8 @@
     }
   },
   "create": {
+    "locationPickHint": "Move the map to set the spot",
+    "locationPickEmpty": "Pick a location – move the map or use GPS",
     "availFrom": "Available from",
     "availTo": "Available until",
     "titleRequired": "Title is required.",
