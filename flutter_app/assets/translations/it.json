@@ -1649,6 +1649,7 @@
     }
   },
   "create": {
+    "preview": "Anteprima",
     "locationPickHint": "Sposta la mappa per impostare il punto",
     "locationPickEmpty": "Scegli un luogo – sposta la mappa o usa il GPS",
     "availFrom": "Disponibile dalle",

@@ -1648,6 +1648,7 @@
     }
   },
   "create": {
+    "preview": "Vorschau",
     "locationPickHint": "Karte verschieben, um den Punkt zu setzen",
     "locationPickEmpty": "Standort wählen – Karte verschieben oder GPS",
     "availFrom": "Erreichbar ab",

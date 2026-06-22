@@ -1648,6 +1648,7 @@
     }
   },
   "create": {
+    "preview": "Предпросмотр",
     "locationPickHint": "Двигайте карту, чтобы задать точку",
     "locationPickEmpty": "Выберите место — двигайте карту или GPS",
     "availFrom": "Доступно с",

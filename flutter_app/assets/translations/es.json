@@ -1649,6 +1649,7 @@
     }
   },
   "create": {
+    "preview": "Vista previa",
     "locationPickHint": "Mueve el mapa para fijar el punto",
     "locationPickEmpty": "Elige una ubicación – mueve el mapa o usa GPS",
     "availFrom": "Disponible desde",

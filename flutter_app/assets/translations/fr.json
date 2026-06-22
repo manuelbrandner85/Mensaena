@@ -1649,6 +1649,7 @@
     }
   },
   "create": {
+    "preview": "Aperçu",
     "locationPickHint": "Déplace la carte pour définir le point",
     "locationPickEmpty": "Choisis un lieu – déplace la carte ou GPS",
     "availFrom": "Disponible à partir de",

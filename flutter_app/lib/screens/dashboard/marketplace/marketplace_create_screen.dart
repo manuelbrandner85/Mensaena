@@ -335,6 +335,90 @@ class _MarketplaceCreateScreenState
         icon: Icons.storefront,
         returnRoute: '/dashboard/marketplace',
         sections: [
+          // ── Live-Vorschau: zeigt, wie die Anzeige in der Liste aussieht ──
+          CreateCard(
+            title: 'create.preview'.tr(),
+            icon: LucideIcons.eye,
+            child: ListenableBuilder(
+              listenable: Listenable.merge([_title, _price]),
+              builder: (context, _) {
+                final title = _title.text.trim();
+                final typeOpt = _types.firstWhere(
+                    (t) => t.value == _listingType,
+                    orElse: () => _types.first);
+                final isSell = _listingType == 'verkaufen';
+                final priceTxt = _price.text.trim().isEmpty
+                    ? '—'
+                    : '${_price.text.trim()} €';
+                return Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: _images.isNotEmpty
+                          ? Image.file(_images.first,
+                              width: 64,
+                              height: 64,
+                              fit: BoxFit.cover,
+                              cacheWidth: 128,
+                              cacheHeight: 128)
+                          : Container(
+                              width: 64,
+                              height: 64,
+                              color: AppColors.surface,
+                              alignment: Alignment.center,
+                              child: const Icon(Icons.storefront,
+                                  color: AppColors.mute, size: 26),
+                            ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            title.isEmpty ? 'create.title'.tr() : title,
+                            style: AppTypography.display(
+                                size: 15, color: AppColors.ink),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color:
+                                      AppColors.amber.withValues(alpha: 0.18),
+                                  borderRadius: BorderRadius.circular(999),
+                                ),
+                                child: Text(
+                                  '${typeOpt.emoji} ${typeOpt.i18n.tr()}',
+                                  style: AppTypography.label(
+                                      size: 10, color: AppColors.amber),
+                                ),
+                              ),
+                              const Spacer(),
+                              Text(
+                                isSell ? priceTxt : '🎁',
+                                style: AppTypography.body(
+                                    size: 14,
+                                    color: AppColors.ink,
+                                    weight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+
           // ── Art + Barcode-Scan ──────────────────────────────────────
           CreateCard(
             title: 'marketplace.type'.tr(),
