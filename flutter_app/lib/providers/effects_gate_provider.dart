@@ -56,6 +56,10 @@ final effectsProfileProvider = Provider<EffectsProfile>((ref) {
   final reduceMotion = ref.watch(a11yProvider).effectiveReduceMotion;
   if (reduceMotion) return EffectsProfile.none;
 
+  // User-Override „Maximale Kino-Effekte": volle Effekte trotz Lite-Tier
+  // und Watchdog-Deckel (A11y oben gewinnt aber weiterhin).
+  if (ref.watch(forceFullEffectsProvider)) return EffectsProfile.full;
+
   final lite = ref.watch(liteModeActiveProvider);
   final intensity = ref.watch(cinemaIntensityProvider);
 

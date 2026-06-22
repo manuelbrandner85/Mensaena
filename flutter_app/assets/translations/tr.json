@@ -582,6 +582,10 @@
       "zeitbank": "⏱ Zaman Bankası",
       "crisis": "🚨 Krizler ve Acil Durumlar",
       "marketing": "📢 Pazarlama ve İpuçları"
+    },
+    "forceFullEffects": {
+      "label": "Maksimum sinema efektleri",
+      "hint": "Tüm efektleri (güneş/ay, parçacıklar, film greni …) zayıf cihazlarda bile zorlar. Takılabilir veya daha çok pil harcayabilir."
     }
   },
   "chat": {

@@ -582,6 +582,10 @@
       "zeitbank": "⏱ Banco de Tiempo",
       "crisis": "🚨 Crisis y Emergencias",
       "marketing": "📢 Marketing y Consejos"
+    },
+    "forceFullEffects": {
+      "label": "Efectos cine al máximo",
+      "hint": "Fuerza todos los efectos (sol/luna, partículas, grano …) incluso en dispositivos más débiles. Puede ralentizar o gastar más batería."
     }
   },
   "chat": {

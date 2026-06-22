@@ -55,7 +55,10 @@ class CinemaOverlay extends ConsumerWidget {
     final isLight = ref.watch(isLightModeProvider);
     // PERF: Lite-Mode bleibt STRENGER als das Gate (komplett aus statt
     // reduced) — die 9+ AnimationControllers crashten ARM32/Android<9.
-    final liteMode = ref.watch(liteModeActiveProvider);
+    // forceFull-Override hebt die strengere Lite-Mode-Sperre auf, damit der
+    // User die vollen Effekte auch auf schwachen Geräten sehen kann.
+    final forceFull = ref.watch(forceFullEffectsProvider);
+    final liteMode = ref.watch(liteModeActiveProvider) && !forceFull;
     final baseIntensity = profile.intensityFactor;
 
     // CRASH-FIX: Off-Mode (phase null oder intensity ~0) und On-Mode

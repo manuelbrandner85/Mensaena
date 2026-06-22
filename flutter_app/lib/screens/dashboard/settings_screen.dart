@@ -288,47 +288,6 @@ class _AppVersionInfo extends ConsumerWidget {
                 ],
               ),
             ),
-            const SizedBox(height: 8),
-            // Manuell "Nach Update suchen" — triggert die gesamte
-            // Pipeline (Shorebird-Check + Download + Stream-Event) und
-            // gibt sofortiges Feedback via SnackBar.
-            OutlinedButton.icon(
-              icon: const Icon(LucideIcons.refreshCw, size: 14),
-              label: Text('settings.checkForUpdate'.tr()),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.bronze,
-                side: BorderSide(color: AppColors.bronze.withValues(alpha: 0.5)),
-                padding: const EdgeInsets.symmetric(vertical: 12),
-              ),
-              onPressed: () async {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  backgroundColor: AppColors.surface,
-                  duration: const Duration(seconds: 2),
-                  content: Text('settings.checkingForUpdate'.tr(),
-                      style: AppTypography.body(
-                          size: 13, color: AppColors.ink)),
-                ));
-                await ShorebirdPatchService.instance.checkAndDownloadPatch();
-                ref.invalidate(currentPatchNumberProvider);
-                if (!context.mounted) return;
-                // Status-Check: ist nach dem Versuch ein neuer Patch da?
-                final ready = await ShorebirdPatchService.instance
-                    .checkPatchReady();
-                if (!context.mounted) return;
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  backgroundColor: AppColors.surface,
-                  duration: const Duration(seconds: 4),
-                  content: Text(
-                    ready.patchReady
-                        ? 'settings.patchReady'.tr(namedArgs: {
-                            'n': '${ready.nextPatchNumber ?? "?"}'
-                          })
-                        : 'settings.noUpdate'.tr(),
-                    style: AppTypography.body(size: 13, color: AppColors.ink),
-                  ),
-                ));
-              },
-            ),
           ],
         );
       },
@@ -1155,6 +1114,8 @@ class _AppearanceTab extends ConsumerWidget {
             style: AppTypography.label(size: 10, color: AppColors.mute)),
         const SizedBox(height: 8),
         _IntensityTiles(),
+        const SizedBox(height: 12),
+        const _ForceFullEffectsToggle(),
         const SizedBox(height: 16),
         Text('settings.sections.sound'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
@@ -1592,6 +1553,50 @@ class _IntensityTiles extends ConsumerWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// „Maximale Kino-Effekte erzwingen" — entsperrt die vollen Effekte auch auf
+/// als schwach erkannten Geräten (Override des Lite-Mode + Watchdog-Deckels).
+class _ForceFullEffectsToggle extends ConsumerWidget {
+  const _ForceFullEffectsToggle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final on = ref.watch(forceFullEffectsProvider);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        border: Border.all(color: on ? AppColors.amber : AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(LucideIcons.palette,
+              size: 18, color: on ? AppColors.amber : AppColors.mute),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('settings.forceFullEffects.label'.tr(),
+                    style: AppTypography.body(size: 14, color: AppColors.ink)),
+                const SizedBox(height: 2),
+                Text('settings.forceFullEffects.hint'.tr(),
+                    style: AppTypography.caption()),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: on,
+            activeColor: AppColors.amber,
+            onChanged: (v) =>
+                ref.read(forceFullEffectsProvider.notifier).set(v),
+          ),
+        ],
+      ),
     );
   }
 }

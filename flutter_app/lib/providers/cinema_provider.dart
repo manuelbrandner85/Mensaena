@@ -20,7 +20,40 @@ import '../services/sunrise_sunset_service.dart';
 
 const _modeStorageKey = 'cinema_mode_v1';
 const _intensityStorageKey = 'cinema_intensity_v1';
+const _forceFullStorageKey = 'cinema_force_full_v1';
 const _storage = FlutterSecureStorage();
+
+/// User-Override: erzwingt die VOLLEN Kino-Effekte (Sonne/Mond, Partikel,
+/// Film-Korn, Nebel, God-Rays …) auch auf als „schwach" erkannten Geräten
+/// (Lite-Mode) und ignoriert den Frame-Watchdog-Deckel. Bewusst opt-in mit
+/// Warnung — kann auf RAM-schwachen Geräten ruckeln/Akku kosten. A11y
+/// (reduceMotion) gewinnt weiterhin.
+class ForceFullEffectsNotifier extends StateNotifier<bool> {
+  ForceFullEffectsNotifier() : super(false) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    try {
+      final raw = await _storage.read(key: _forceFullStorageKey);
+      final loaded = raw == '1';
+      if (!mounted) return;
+      if (loaded != state) state = loaded;
+    } catch (_) {}
+  }
+
+  Future<void> set(bool value) async {
+    if (!mounted) return;
+    state = value;
+    try {
+      await _storage.write(key: _forceFullStorageKey, value: value ? '1' : '0');
+    } catch (_) {}
+  }
+}
+
+final forceFullEffectsProvider =
+    StateNotifierProvider<ForceFullEffectsNotifier, bool>(
+        (ref) => ForceFullEffectsNotifier());
 
 class CinemaModeNotifier extends StateNotifier<CinemaMode> {
   CinemaModeNotifier() : super(CinemaMode.auto) {

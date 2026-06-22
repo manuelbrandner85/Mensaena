@@ -582,6 +582,10 @@
       "zeitbank": "⏱ Time Bank",
       "crisis": "🚨 Crises & Emergencies",
       "marketing": "📢 Marketing & Tips"
+    },
+    "forceFullEffects": {
+      "label": "Maximum cinema effects",
+      "hint": "Forces all effects (sun/moon, particles, film grain …) even on weaker devices. May stutter or use more battery."
     }
   },
   "chat": {

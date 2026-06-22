@@ -582,6 +582,10 @@
       "zeitbank": "⏱ Zeitbank",
       "crisis": "🚨 Krisen & Notfälle",
       "marketing": "📢 Marketing & Tipps"
+    },
+    "forceFullEffects": {
+      "label": "Maximale Kino-Effekte",
+      "hint": "Erzwingt alle Effekte (Sonne/Mond, Partikel, Film-Korn …) auch auf schwächeren Geräten. Kann ruckeln oder mehr Akku brauchen."
     }
   },
   "chat": {
