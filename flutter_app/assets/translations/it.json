@@ -2109,6 +2109,13 @@
     "voteDownTooltip": "Pollice giù"
   },
   "marketplace": {
+    "moreDetails": "Altri dettagli",
+    "quantity": "Quantità",
+    "shippingAvailable": "Spedizione disponibile",
+    "deliveryRadiusAny": "Raggio ritiro/consegna: qualsiasi",
+    "deliveryRadiusKm": "Raggio ritiro/consegna: {km} km",
+    "autoExpireNone": "Nessuna scadenza automatica",
+    "autoExpireOn": "Scade il {date}",
     "listing": "Annuncio",
     "listingNotFound": "Annuncio non trovato.",
     "condition": "Condizione: {state}",

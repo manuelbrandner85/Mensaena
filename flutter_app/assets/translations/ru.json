@@ -2108,6 +2108,13 @@
     "voteDownTooltip": "Не нравится"
   },
   "marketplace": {
+    "moreDetails": "Подробнее",
+    "quantity": "Количество",
+    "shippingAvailable": "Доставка возможна",
+    "deliveryRadiusAny": "Радиус выдачи/доставки: любой",
+    "deliveryRadiusKm": "Радиус выдачи/доставки: {km} км",
+    "autoExpireNone": "Без автоматического срока",
+    "autoExpireOn": "Истекает {date}",
     "listing": "Объявление",
     "listingNotFound": "Объявление не найдено.",
     "condition": "Состояние: {state}",

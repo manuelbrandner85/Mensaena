@@ -51,6 +51,11 @@ class _MarketplaceCreateScreenState
   final List<File> _images = [];
   static const int _maxImages = 5;
   final ImagePicker _picker = ImagePicker();
+  // Mehrwert-Felder (Batch B): Menge, Versand, Abhol-/Lieferradius, Auto-Ablauf.
+  final _quantity = TextEditingController();
+  bool _shipping = false;
+  double _radiusKm = 0; // 0 = egal
+  DateTime? _expiresAt;
 
   static const List<({String value, String i18n, String emoji})> _types = [
     (value: 'verschenken', i18n: 'marketplace.typeVerschenken', emoji: '🎁'),
@@ -88,6 +93,7 @@ class _MarketplaceCreateScreenState
     _location.dispose();
     _price.dispose();
     _tags.dispose();
+    _quantity.dispose();
     super.dispose();
   }
 
@@ -287,6 +293,10 @@ class _MarketplaceCreateScreenState
       latitude: _lat,
       longitude: _lng,
       tags: _parseTags(),
+      quantity: int.tryParse(_quantity.text.trim()),
+      shippingAvailable: _shipping,
+      radiusKm: _radiusKm <= 0 ? null : _radiusKm.round(),
+      expiresAt: _expiresAt,
     );
 
     if (!mounted) return;
@@ -554,6 +564,105 @@ class _MarketplaceCreateScreenState
                             size: 14, color: AppColors.ink)),
                   ),
                 ],
+              ],
+            ),
+          ),
+
+          // ── Mehr Details: Menge, Versand, Radius, Ablauf ───────────
+          CreateCard(
+            title: 'marketplace.moreDetails'.tr(),
+            icon: LucideIcons.sliders,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _quantity,
+                  keyboardType: TextInputType.number,
+                  style: AppTypography.body(size: 14, color: AppColors.ink),
+                  decoration: InputDecoration(
+                    labelText: 'marketplace.quantity'.tr(),
+                    hintText: '1',
+                    prefixIcon: const Icon(LucideIcons.hash, size: 18),
+                  ),
+                ),
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: AppColors.amber,
+                  value: _shipping,
+                  onChanged: (v) => setState(() => _shipping = v),
+                  secondary: const Icon(LucideIcons.truck,
+                      size: 18, color: AppColors.bronze),
+                  title: Text('marketplace.shippingAvailable'.tr(),
+                      style:
+                          AppTypography.body(size: 14, color: AppColors.ink)),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  _radiusKm <= 0
+                      ? 'marketplace.deliveryRadiusAny'.tr()
+                      : 'marketplace.deliveryRadiusKm'.tr(
+                          namedArgs: {'km': _radiusKm.round().toString()}),
+                  style:
+                      AppTypography.label(size: 11, color: AppColors.inkSoft),
+                ),
+                Slider(
+                  value: _radiusKm,
+                  min: 0,
+                  max: 100,
+                  divisions: 20,
+                  activeColor: AppColors.amber,
+                  label: _radiusKm <= 0 ? '∞' : '${_radiusKm.round()} km',
+                  onChanged: (v) => setState(() => _radiusKm = v),
+                ),
+                const SizedBox(height: 4),
+                InkWell(
+                  onTap: () async {
+                    final now = DateTime.now();
+                    final picked = await showDatePicker(
+                      context: context,
+                      initialDate:
+                          _expiresAt ?? now.add(const Duration(days: 30)),
+                      firstDate: now.add(const Duration(days: 1)),
+                      lastDate: now.add(const Duration(days: 365)),
+                    );
+                    if (picked != null) setState(() => _expiresAt = picked);
+                  },
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: AppColors.elevated,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppColors.line),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(LucideIcons.calendarClock,
+                            size: 18, color: AppColors.bronze),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            _expiresAt == null
+                                ? 'marketplace.autoExpireNone'.tr()
+                                : 'marketplace.autoExpireOn'.tr(namedArgs: {
+                                    'date':
+                                        '${_expiresAt!.day}.${_expiresAt!.month}.${_expiresAt!.year}'
+                                  }),
+                            style: AppTypography.body(
+                                size: 13, color: AppColors.ink),
+                          ),
+                        ),
+                        if (_expiresAt != null)
+                          GestureDetector(
+                            onTap: () => setState(() => _expiresAt = null),
+                            child: const Icon(LucideIcons.x,
+                                size: 16, color: AppColors.mute),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ),

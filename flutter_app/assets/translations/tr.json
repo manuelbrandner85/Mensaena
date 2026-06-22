@@ -2108,6 +2108,13 @@
     "voteDownTooltip": "Beğenme"
   },
   "marketplace": {
+    "moreDetails": "Daha fazla ayrıntı",
+    "quantity": "Adet",
+    "shippingAvailable": "Kargo mümkün",
+    "deliveryRadiusAny": "Teslim/alım yarıçapı: farketmez",
+    "deliveryRadiusKm": "Teslim/alım yarıçapı: {km} km",
+    "autoExpireNone": "Otomatik sona erme yok",
+    "autoExpireOn": "{date} tarihinde sona erer",
     "listing": "İlan",
     "listingNotFound": "İlan bulunamadı.",
     "condition": "Durum: {state}",

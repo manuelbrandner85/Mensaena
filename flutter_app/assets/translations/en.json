@@ -2109,6 +2109,13 @@
     "voteDownTooltip": "Thumbs down"
   },
   "marketplace": {
+    "moreDetails": "More details",
+    "quantity": "Quantity",
+    "shippingAvailable": "Shipping available",
+    "deliveryRadiusAny": "Pickup/delivery radius: any",
+    "deliveryRadiusKm": "Pickup/delivery radius: {km} km",
+    "autoExpireNone": "No automatic expiry",
+    "autoExpireOn": "Expires on {date}",
     "listing": "Listing",
     "reserve_request": "Reserve",
     "reserve_hint": "Send the seller a reservation request.",

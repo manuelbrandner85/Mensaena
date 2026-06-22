@@ -2109,6 +2109,13 @@
     "voteDownTooltip": "Pulgar abajo"
   },
   "marketplace": {
+    "moreDetails": "Más detalles",
+    "quantity": "Cantidad",
+    "shippingAvailable": "Envío disponible",
+    "deliveryRadiusAny": "Radio de recogida/entrega: cualquiera",
+    "deliveryRadiusKm": "Radio de recogida/entrega: {km} km",
+    "autoExpireNone": "Sin caducidad automática",
+    "autoExpireOn": "Caduca el {date}",
     "listing": "Anuncio",
     "listingNotFound": "Anuncio no encontrado.",
     "condition": "Estado: {state}",

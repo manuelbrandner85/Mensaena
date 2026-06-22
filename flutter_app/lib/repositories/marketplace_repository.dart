@@ -129,6 +129,10 @@ class MarketplaceRepository {
     double? latitude,
     double? longitude,
     List<String> tags = const [],
+    int? quantity,
+    bool shippingAvailable = false,
+    int? radiusKm,
+    DateTime? expiresAt,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -149,6 +153,10 @@ class MarketplaceRepository {
             'latitude': latitude != null ? LocationAnonymizer.lat(latitude) : null,
             'longitude': longitude != null ? LocationAnonymizer.lng(longitude) : null,
             if (tags.isNotEmpty) 'tags': tags,
+            if (quantity != null) 'quantity': quantity,
+            'shipping_available': shippingAvailable,
+            if (radiusKm != null) 'radius_km': radiusKm,
+            if (expiresAt != null) 'expires_at': expiresAt.toIso8601String(),
             'status': 'active',
           })
           .select()

@@ -2108,6 +2108,13 @@
     "voteDownTooltip": "Daumen runter"
   },
   "marketplace": {
+    "moreDetails": "Mehr Details",
+    "quantity": "Menge / Stückzahl",
+    "shippingAvailable": "Versand möglich",
+    "deliveryRadiusAny": "Abhol-/Lieferradius: egal",
+    "deliveryRadiusKm": "Abhol-/Lieferradius: {km} km",
+    "autoExpireNone": "Kein automatisches Ablaufdatum",
+    "autoExpireOn": "Läuft ab am {date}",
     "listing": "Inserat",
     "listingNotFound": "Inserat nicht gefunden.",
     "condition": "Zustand: {state}",
