@@ -14,14 +14,29 @@
 ///   - Skeleton-Loading + ImageOff-Fallback statt nacktem grauem Rechteck.
 library;
 
+import 'dart:async';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
+import '../../repositories/extra_repositories.dart';
 import '../../services/device_tier_service.dart';
 import '../effects/shimmer_skeleton.dart';
+
+// Diagnose: jede fehlgeschlagene Bild-URL EINMAL pro Session nach error_logs
+// melden (mit URL + Fehler). So lässt sich „Bilder werden nicht angezeigt"
+// gezielt eingrenzen (403/404/Timeout/Decode) statt im Dunkeln zu raten.
+final Set<String> _loggedImageFailures = <String>{};
+void _logImageFailure(String url, Object error) {
+  if (!_loggedImageFailures.add(url)) return;
+  unawaited(ErrorLogsRepository.log(
+    errorType: 'image_load_failed',
+    message: '$url :: $error',
+  ));
+}
 
 class PremiumImage extends ConsumerWidget {
   const PremiumImage({
@@ -89,7 +104,10 @@ class PremiumImage extends ConsumerWidget {
                 height: height ?? 180,
                 borderRadius: radius.topLeft.x,
               ),
-        errorWidget: (_, __, ___) => _buildPlaceholder(width, height, radius),
+        errorWidget: (_, failedUrl, error) {
+          _logImageFailure(failedUrl, error);
+          return _buildPlaceholder(width, height, radius);
+        },
       );
     }
 

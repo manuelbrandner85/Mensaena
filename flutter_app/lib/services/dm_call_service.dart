@@ -452,7 +452,7 @@ class LiveStreamService {
     // schreiben. Deshalb über SECURITY-DEFINER-RPC (bypassed RLS sauber,
     // setzt actor_id = auth.uid() serverseitig).
     try {
-      await sb.rpc('invite_to_livestream', params: {
+      await sb.rpc<dynamic>('invite_to_livestream', params: {
         'p_invitee': inviteeId,
         'p_room': roomName,
         'p_title': streamTitle,

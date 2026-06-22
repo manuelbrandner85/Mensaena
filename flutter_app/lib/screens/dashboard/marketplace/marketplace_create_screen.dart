@@ -365,7 +365,15 @@ class _MarketplaceCreateScreenState
                               height: 64,
                               fit: BoxFit.cover,
                               cacheWidth: 128,
-                              cacheHeight: 128)
+                              cacheHeight: 128,
+                              errorBuilder: (_, __, ___) => Container(
+                                    width: 64,
+                                    height: 64,
+                                    color: AppColors.surface,
+                                    alignment: Alignment.center,
+                                    child: const Icon(LucideIcons.imageOff,
+                                        color: AppColors.herzrot, size: 24),
+                                  ))
                           : Container(
                               width: 64,
                               height: 64,

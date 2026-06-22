@@ -107,7 +107,7 @@ class ChatMessageBubble extends ConsumerWidget {
       if (lat != null && lng != null) {
         return Align(
           alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-          child: _LocationCard(lat: lat, lng: lng, mine: mine),
+          child: _LocationCard(lat: lat, lng: lng),
         );
       }
     }
@@ -905,10 +905,9 @@ class _MentionAwareTextState extends State<_MentionAwareText> {
 /// (Google Maps). Bewusst KEINE inline-Karte pro Bubble (Perf in langen
 /// Listen) — die externe Karte ist die robuste WhatsApp-ähnliche Lösung.
 class _LocationCard extends StatelessWidget {
-  const _LocationCard({required this.lat, required this.lng, required this.mine});
+  const _LocationCard({required this.lat, required this.lng});
   final double lat;
   final double lng;
-  final bool mine;
 
   @override
   Widget build(BuildContext context) {
