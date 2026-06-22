@@ -101,6 +101,11 @@ class CallEventBus {
       _contexts[callId] = ctx;
 
       final state = pending['state'] as String?;
+      unawaited(ErrorLogsRepository.log(
+        errorType: 'call_coldstart',
+        message: 'recover callkit call=$callId state=$state '
+            'room=${ctx.roomName.isEmpty ? "EMPTY" : "ok"}',
+      ));
       if (state == 'accepted' || state == 'connected') {
         await _onAccept(ctx);
       }
@@ -169,7 +174,13 @@ class CallEventBus {
   /// am Ende einen Call-Screen-Aufbau. Der Context wird ggf. aus der DB
   /// nachgeladen, falls _contexts den Eintrag noch nicht kennt.
   static Future<void> acceptFromOverlay(String callId) async {
-    if (_handledAccepts.contains(callId)) return;
+    if (_handledAccepts.contains(callId)) {
+      unawaited(ErrorLogsRepository.log(
+        errorType: 'call_accept_dup',
+        message: 'acceptFromOverlay blocked (already handled) call=$callId',
+      ));
+      return;
+    }
     // CallKit-Notification (falls parallel aktiv) beenden.
     unawaited(CallkitService.endCall(callId));
 
@@ -328,7 +339,16 @@ class CallEventBus {
   static Future<void> _onAccept(CallContext ctx) async {
     // Atomic check-and-add: Set.add() liefert false wenn schon vorhanden.
     // Verhindert Doppel-Accept-Race wenn User auf Lock-Screen zwei mal tappt.
-    if (!_handledAccepts.add(ctx.callId)) return;
+    if (!_handledAccepts.add(ctx.callId)) {
+      // Diagnose Kaltstart-„zweimal annehmen": erster Accept hat geblockt,
+      // aber evtl. nicht navigiert/verbunden.
+      unawaited(ErrorLogsRepository.log(
+        errorType: 'call_accept_dup',
+        message: 'onAccept blocked (already handled) call=${ctx.callId} '
+            'room=${ctx.roomName.isEmpty ? "EMPTY" : "ok"}',
+      ));
+      return;
+    }
 
     _contexts.remove(ctx.callId);
 

@@ -28,6 +28,11 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL"/>
+    <!-- Bildschirm teilen im Call: ohne FOREGROUND_SERVICE_MEDIA_PROJECTION
+         kann flutter_webrtc den MediaProjection-Capture-Dienst auf Android 14+
+         nicht im Hintergrund halten → beim Minimieren stirbt die Aufnahme,
+         die App wird neu gestartet und Teilnehmer sehen nichts. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
     <!-- Wake-Lock damit Audio-Call nicht beim Screen-Off abbricht -->
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <!-- Akku-Optimierung ausnehmen: ohne das drosseln aggressive OEMs

@@ -19,6 +19,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../providers/active_call_provider.dart';
 import '../../../repositories/conversations_repository.dart';
+import '../../../repositories/extra_repositories.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../services/call_busy_state.dart';
 import '../../../services/call_room_holder.dart';
@@ -673,7 +674,13 @@ class _CallScreenState extends ConsumerState<CallScreen> {
       await lp.setScreenShareEnabled(next);
       if (!mounted) return;
       setState(() => _screenShareEnabled = next);
-    } catch (e) {
+    } catch (e, st) {
+      // Diagnose: echte Ursache erfassen (FGS-Permission/MediaProjection).
+      unawaited(ErrorLogsRepository.log(
+        errorType: 'screen_share_failed',
+        message: '$e',
+        stack: st.toString(),
+      ));
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
