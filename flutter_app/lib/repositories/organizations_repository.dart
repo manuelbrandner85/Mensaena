@@ -403,6 +403,7 @@ class FarmsRepository {
     List<String> deliveryOptions = const [],
     List<String> subcategories = const [],
     List<String> mediaUrls = const [],
+    String? openingHours,
     bool isBio = false,
     bool isSeasonal = false,
     String? region,
@@ -443,6 +444,8 @@ class FarmsRepository {
         if (deliveryOptions.isNotEmpty)
           'delivery_options': deliveryOptions,
         if (subcategories.isNotEmpty) 'subcategories': subcategories,
+        if (openingHours != null && openingHours.trim().isNotEmpty)
+          'opening_hours': {'text': openingHours.trim()},
         'is_bio': isBio,
         'is_seasonal': isSeasonal,
         'is_verified': false,

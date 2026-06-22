@@ -2667,6 +2667,8 @@
     "farmCreate": {
       "fSubcategories": "Subcategories (comma-separated)",
       "fSubcategoriesHint": "Vegetables, fruit, eggs, honey",
+      "fOpeningHours": "Opening hours",
+      "fOpeningHoursHint": "e.g. Mon–Fri 9am–6pm, Sat 9am–1pm",
       "intro": "Add a farm, farm shop or direct marketer from your region.",
       "secBasics": "Basics",
       "secLocation": "Location",

@@ -2666,6 +2666,8 @@
     "farmCreate": {
       "fSubcategories": "Unterkategorien (kommagetrennt)",
       "fSubcategoriesHint": "Gemüse, Obst, Eier, Honig",
+      "fOpeningHours": "Öffnungszeiten",
+      "fOpeningHoursHint": "z. B. Mo–Fr 9–18 Uhr, Sa 9–13 Uhr",
       "intro": "Trage einen Bauernhof, Hofladen oder Direktvermarkter aus deiner Region ein.",
       "secBasics": "Grunddaten",
       "secLocation": "Standort",

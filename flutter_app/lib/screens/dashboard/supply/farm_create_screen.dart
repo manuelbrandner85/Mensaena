@@ -51,6 +51,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
   final _servicesRaw = TextEditingController();
   final _deliveryRaw = TextEditingController();
   final _subcatRaw = TextEditingController();
+  final _hoursRaw = TextEditingController();
 
   String _category = 'Bauernhof';
   String _country = 'AT';
@@ -99,6 +100,7 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
       _servicesRaw,
       _deliveryRaw,
       _subcatRaw,
+      _hoursRaw,
     ]) {
       c.dispose();
     }
@@ -207,6 +209,8 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
       services: _csv(_servicesRaw.text),
       deliveryOptions: _csv(_deliveryRaw.text),
       subcategories: _csv(_subcatRaw.text),
+      openingHours:
+          _hoursRaw.text.trim().isEmpty ? null : _hoursRaw.text.trim(),
       isBio: _isBio,
       isSeasonal: _isSeasonal,
       mediaUrls: _mediaUrls,
@@ -371,6 +375,9 @@ class _FarmCreateScreenState extends ConsumerState<FarmCreateScreen> {
               const SizedBox(height: 10),
               _field(_subcatRaw, 'supply.farmCreate.fSubcategories'.tr(),
                   'supply.farmCreate.fSubcategoriesHint'.tr()),
+              const SizedBox(height: 10),
+              _field(_hoursRaw, 'supply.farmCreate.fOpeningHours'.tr(),
+                  'supply.farmCreate.fOpeningHoursHint'.tr()),
               const SizedBox(height: 10),
               _field(_servicesRaw, 'supply.farmCreate.fServices'.tr(),
                   'supply.farmCreate.fServicesHint'.tr()),

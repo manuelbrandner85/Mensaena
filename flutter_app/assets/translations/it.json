@@ -2667,6 +2667,8 @@
     "farmCreate": {
       "fSubcategories": "Sottocategorie (separate da virgola)",
       "fSubcategoriesHint": "Verdura, frutta, uova, miele",
+      "fOpeningHours": "Orari di apertura",
+      "fOpeningHoursHint": "es. Lun–Ven 9–18, Sab 9–13",
       "intro": "Aggiungi una fattoria, uno spaccio agricolo o un produttore diretto della tua zona.",
       "secBasics": "Dati principali",
       "secLocation": "Posizione",

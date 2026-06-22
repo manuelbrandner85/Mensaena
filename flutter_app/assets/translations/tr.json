@@ -2666,6 +2666,8 @@
     "farmCreate": {
       "fSubcategories": "Alt kategoriler (virgülle ayrılmış)",
       "fSubcategoriesHint": "Sebze, meyve, yumurta, bal",
+      "fOpeningHours": "Açılış saatleri",
+      "fOpeningHoursHint": "ör. Pzt–Cum 9–18, Cmt 9–13",
       "intro": "Bölgenden bir çiftlik, çiftlik dükkanı veya doğrudan üretici ekle.",
       "secBasics": "Temel bilgiler",
       "secLocation": "Konum",

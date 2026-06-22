@@ -2667,6 +2667,8 @@
     "farmCreate": {
       "fSubcategories": "Subcategorías (separadas por comas)",
       "fSubcategoriesHint": "Verduras, fruta, huevos, miel",
+      "fOpeningHours": "Horario",
+      "fOpeningHoursHint": "p. ej. Lun–Vie 9–18, Sáb 9–13",
       "intro": "Añade una granja, tienda agrícola o productor directo de tu región.",
       "secBasics": "Datos básicos",
       "secLocation": "Ubicación",

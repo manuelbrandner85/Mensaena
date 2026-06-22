@@ -2667,6 +2667,8 @@
     "farmCreate": {
       "fSubcategories": "Sous-catégories (séparées par des virgules)",
       "fSubcategoriesHint": "Légumes, fruits, œufs, miel",
+      "fOpeningHours": "Horaires d'ouverture",
+      "fOpeningHoursHint": "ex. Lun–Ven 9h–18h, Sam 9h–13h",
       "intro": "Ajoutez une ferme, un magasin de ferme ou un producteur direct de votre région.",
       "secBasics": "Données de base",
       "secLocation": "Lieu",

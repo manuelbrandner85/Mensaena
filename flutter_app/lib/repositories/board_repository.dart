@@ -54,6 +54,7 @@ class BoardRepository {
     String? contactInfo,
     DateTime? expiresAt,
     String? imageUrl,
+    List<String> mediaUrls = const [],
     double? latitude,
     double? longitude,
   }) async {
@@ -70,6 +71,7 @@ class BoardRepository {
             'contact_info': contactInfo,
             'expires_at': expiresAt?.toUtc().toIso8601String(),
             if (imageUrl != null) 'image_url': imageUrl,
+            if (mediaUrls.isNotEmpty) 'media_urls': mediaUrls,
             if (latitude != null) 'latitude': LocationAnonymizer.lat(latitude),
             if (longitude != null) 'longitude': LocationAnonymizer.lng(longitude),
             'status': 'active',

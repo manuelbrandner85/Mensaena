@@ -32,7 +32,8 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
   final _contactInfo = TextEditingController();
   String _category = 'general';
   String _color = 'yellow';
-  File? _image;
+  final List<File> _images = [];
+  static const int _maxImages = 4;
   DateTime? _expiresAt;
   double? _lat;
   double? _lng;
@@ -59,6 +60,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
   }
 
   Future<void> _pickImage() async {
+    if (_images.length >= _maxImages) return;
     final picker = ImagePicker();
     final result = await picker.pickImage(
       source: ImageSource.gallery,
@@ -67,7 +69,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
       imageQuality: 80,
     );
     if (result == null) return;
-    setState(() => _image = File(result.path));
+    setState(() => _images.add(File(result.path)));
   }
 
   Future<void> _pickExpiry() async {
@@ -117,14 +119,15 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
       _error = null;
     });
     String? imageUrl;
-    if (_image != null) {
+    List<String> mediaUrls = const [];
+    if (_images.isNotEmpty) {
       String? uploadErr;
       final urls = await ImageUploadService.upload(
-        [_image!],
+        _images,
         onError: (_, e) => uploadErr = e,
       );
       if (urls.isEmpty) {
-        // Bild war gewählt, Upload schlug fehl → NICHT stillschweigend ohne
+        // Bilder gewählt, Upload schlug fehl → NICHT stillschweigend ohne
         // Bild posten, sondern Fehler zeigen.
         Haptics.error();
         setState(() {
@@ -134,7 +137,8 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
         debugPrint('board image upload failed: $uploadErr');
         return;
       }
-      imageUrl = urls.first;
+      mediaUrls = urls;
+      imageUrl = urls.first; // Rückwärtskompatibel: erstes Bild als image_url.
     }
     final id = await BoardRepository.create(
       content: _content.text.trim(),
@@ -145,6 +149,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
           : _contactInfo.text.trim(),
       expiresAt: _expiresAt,
       imageUrl: imageUrl,
+      mediaUrls: mediaUrls,
       latitude: _lat,
       longitude: _lng,
     );
@@ -283,59 +288,69 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
             ),
           ),
 
-          // ── Bild (optional) ─────────────────────────────────────────
+          // ── Bilder (optional, bis zu 4) ─────────────────────────────
           CreateCard(
             title: 'board.image'.tr(),
             icon: LucideIcons.image,
-            child: _image != null
-                ? Stack(
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (var i = 0; i < _images.length; i++)
+                  Stack(
+                    clipBehavior: Clip.none,
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Image.file(_image!,
-                            height: 140,
-                            width: double.infinity,
-                            fit: BoxFit.cover),
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.file(_images[i],
+                            width: 84,
+                            height: 84,
+                            fit: BoxFit.cover,
+                            cacheWidth: 168,
+                            cacheHeight: 168),
                       ),
                       Positioned(
-                        right: 8,
-                        top: 8,
+                        right: -4,
+                        top: -4,
                         child: GestureDetector(
-                          onTap: () => setState(() => _image = null),
+                          onTap: () => setState(() => _images.removeAt(i)),
                           child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(
-                              color: Colors.black54,
+                            padding: const EdgeInsets.all(3),
+                            decoration: BoxDecoration(
+                              color: AppColors.herzrot,
                               shape: BoxShape.circle,
+                              border: Border.all(
+                                  color: AppColors.surface, width: 2),
                             ),
                             child: const Icon(LucideIcons.x,
-                                size: 16, color: Colors.white),
+                                size: 12, color: Colors.white),
                           ),
                         ),
                       ),
                     ],
-                  )
-                : GestureDetector(
+                  ),
+                if (_images.length < _maxImages)
+                  GestureDetector(
                     onTap: _pickImage,
                     child: Container(
-                      height: 64,
+                      width: 84,
+                      height: 84,
                       decoration: BoxDecoration(
                         color: AppColors.surface.withValues(alpha: 0.5),
                         border: Border.all(color: AppColors.line),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Row(
+                      child: const Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(LucideIcons.camera,
+                          Icon(LucideIcons.camera,
                               color: AppColors.bronze, size: 20),
-                          const SizedBox(width: 8),
-                          Text('board.addImage'.tr(),
-                              style: AppTypography.caption()),
                         ],
                       ),
                     ),
                   ),
+              ],
+            ),
           ),
 
           // ── Optionen (Ablauf, Standort) ─────────────────────────────
