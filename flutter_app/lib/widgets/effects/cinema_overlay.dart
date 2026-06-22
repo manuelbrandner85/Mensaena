@@ -75,7 +75,10 @@ class CinemaOverlay extends ConsumerWidget {
     }
 
     final spec = CinemaTheme.specFor(phase);
-    final intensity = isLight ? (baseIntensity * 0.3) : baseIntensity;
+    // Feinregler (0–100 %) skaliert die atmosphärische Stärke stufenlos.
+    final strength = ref.watch(cinemaEffectStrengthProvider) / 100.0;
+    final intensity =
+        (isLight ? (baseIntensity * 0.3) : baseIntensity) * strength;
 
     return KeyedSubtree(
       key: const ValueKey('cinema_overlay_on'),

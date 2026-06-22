@@ -1114,6 +1114,8 @@ class _AppearanceTab extends ConsumerWidget {
         const SizedBox(height: 8),
         _IntensityTiles(),
         const SizedBox(height: 12),
+        const _EffectStrengthSlider(),
+        const SizedBox(height: 12),
         const _ForceFullEffectsToggle(),
         const SizedBox(height: 16),
         Text('settings.sections.sound'.tr(),
@@ -1551,6 +1553,43 @@ class _IntensityTiles extends ConsumerWidget {
               ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+/// Feinregler 0–100 % für die atmosphärische Effektstärke (stufenlos,
+/// ergänzt die groben Stufen voll/reduziert/minimal).
+class _EffectStrengthSlider extends ConsumerWidget {
+  const _EffectStrengthSlider();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final value = ref.watch(cinemaEffectStrengthProvider);
+    return Row(
+      children: [
+        Expanded(
+          child: Slider(
+            value: value.toDouble(),
+            min: 0,
+            max: 100,
+            divisions: 20,
+            activeColor: AppColors.amber,
+            inactiveColor: AppColors.line,
+            label: '$value%',
+            onChanged: (v) => ref
+                .read(cinemaEffectStrengthProvider.notifier)
+                .set(v.round()),
+          ),
+        ),
+        SizedBox(
+          width: 46,
+          child: Text(
+            '$value%',
+            textAlign: TextAlign.end,
+            style: AppTypography.mono(size: 12, color: AppColors.inkSoft),
+          ),
+        ),
       ],
     );
   }

@@ -55,6 +55,40 @@ final forceFullEffectsProvider =
     StateNotifierProvider<ForceFullEffectsNotifier, bool>(
         (ref) => ForceFullEffectsNotifier());
 
+const _strengthStorageKey = 'cinema_effect_strength_v1';
+
+/// Feinregler 0–100 % für die Stärke der atmosphärischen Cinema-Ebenen
+/// (Multiplikator auf die Overlay-Intensität — ergänzt die groben Stufen
+/// full/reduced/minimal um stufenlose Kontrolle). Default 100 %.
+class CinemaEffectStrengthNotifier extends StateNotifier<int> {
+  CinemaEffectStrengthNotifier() : super(100) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    try {
+      final raw = await _storage.read(key: _strengthStorageKey);
+      final loaded = int.tryParse(raw ?? '') ?? 100;
+      final clamped = loaded.clamp(0, 100);
+      if (!mounted) return;
+      if (clamped != state) state = clamped;
+    } catch (_) {}
+  }
+
+  Future<void> set(int value) async {
+    final clamped = value.clamp(0, 100);
+    if (!mounted) return;
+    state = clamped;
+    try {
+      await _storage.write(key: _strengthStorageKey, value: '$clamped');
+    } catch (_) {}
+  }
+}
+
+final cinemaEffectStrengthProvider =
+    StateNotifierProvider<CinemaEffectStrengthNotifier, int>(
+        (ref) => CinemaEffectStrengthNotifier());
+
 class CinemaModeNotifier extends StateNotifier<CinemaMode> {
   CinemaModeNotifier() : super(CinemaMode.auto) {
     // V2: Deferred — nicht im ersten Frame.
