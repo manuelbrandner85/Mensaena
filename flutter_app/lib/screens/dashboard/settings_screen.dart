@@ -1025,6 +1025,9 @@ class _AppearanceTab extends ConsumerWidget {
     final phase = ref.watch(effectiveCinemaPhaseProvider);
     final spec =
         phase != null ? CinemaTheme.specFor(phase) : null;
+    // Live-Vorschau-Status: aktuelle Effektstärke + ob „Maximale Effekte" an.
+    final effectStrength = ref.watch(cinemaEffectStrengthProvider);
+    final forcedEffects = ref.watch(forceFullEffectsProvider);
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -1092,6 +1095,16 @@ class _AppearanceTab extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: AppColors.line),
                   ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'settings.previewStatus'.tr(namedArgs: {
+                    'strength': '$effectStrength',
+                    'mode': forcedEffects
+                        ? 'settings.previewForced'.tr()
+                        : 'settings.previewAuto'.tr(),
+                  }),
+                  style: AppTypography.caption(),
                 ),
               ],
             ],

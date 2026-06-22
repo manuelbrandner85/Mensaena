@@ -586,7 +586,10 @@
     "forceFullEffects": {
       "label": "Maksimum sinema efektleri",
       "hint": "Tüm efektleri (güneş/ay, parçacıklar, film greni …) zayıf cihazlarda bile zorlar. Takılabilir veya daha çok pil harcayabilir."
-    }
+    },
+    "previewStatus": "Efekt gücü {strength}% · {mode}",
+    "previewForced": "Maksimum efektler",
+    "previewAuto": "Otomatik"
   },
   "chat": {
     "writeMessage": "Mesaj yaz …",

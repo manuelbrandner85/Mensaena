@@ -586,7 +586,10 @@
     "forceFullEffects": {
       "label": "Efectos cine al máximo",
       "hint": "Fuerza todos los efectos (sol/luna, partículas, grano …) incluso en dispositivos más débiles. Puede ralentizar o gastar más batería."
-    }
+    },
+    "previewStatus": "Intensidad de efectos {strength}% · {mode}",
+    "previewForced": "Efectos máximos",
+    "previewAuto": "Automático"
   },
   "chat": {
     "writeMessage": "Escribe un mensaje …",

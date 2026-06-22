@@ -586,7 +586,10 @@
     "forceFullEffects": {
       "label": "Effets ciné au maximum",
       "hint": "Force tous les effets (soleil/lune, particules, grain …) même sur les appareils plus faibles. Peut saccader ou consommer plus de batterie."
-    }
+    },
+    "previewStatus": "Intensité des effets {strength}% · {mode}",
+    "previewForced": "Effets maximum",
+    "previewAuto": "Automatique"
   },
   "chat": {
     "writeMessage": "Écrire un message …",

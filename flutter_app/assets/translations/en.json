@@ -586,7 +586,10 @@
     "forceFullEffects": {
       "label": "Maximum cinema effects",
       "hint": "Forces all effects (sun/moon, particles, film grain …) even on weaker devices. May stutter or use more battery."
-    }
+    },
+    "previewStatus": "Effect strength {strength}% · {mode}",
+    "previewForced": "Maximum effects",
+    "previewAuto": "Automatic"
   },
   "chat": {
     "writeMessage": "Write a message …",
