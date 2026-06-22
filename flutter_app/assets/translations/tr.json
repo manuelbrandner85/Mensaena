@@ -3094,6 +3094,10 @@
     "hubDescription": "Mahallede eşya ve zaman paylaşmanın üç yolu — ücretsizden zamana karşı zamana kadar."
   },
   "organizations": {
+    "zip": "Posta kodu",
+    "openingHoursHint": "ör. Pzt–Cum 9–18, Cmt 9–13",
+    "services": "Sunulan hizmetler",
+    "commaHint": "virgülle ayrılmış",
     "notFound": "Kuruluş bulunamadı.",
     "offers": "Teklifler",
     "suggestOrg": "Kuruluş öner",

@@ -40,6 +40,11 @@ class _OrganizationSuggestScreenState
   final _phone = TextEditingController();
   final _email = TextEditingController();
   final _website = TextEditingController();
+  final _zip = TextEditingController();
+  final _hours = TextEditingController();
+  final _services = TextEditingController();
+  final _languages = TextEditingController();
+  final _accessibility = TextEditingController();
   String? _category;
   String _country = 'DE';
   File? _logoFile;
@@ -57,8 +62,19 @@ class _OrganizationSuggestScreenState
     _phone.dispose();
     _email.dispose();
     _website.dispose();
+    _zip.dispose();
+    _hours.dispose();
+    _services.dispose();
+    _languages.dispose();
+    _accessibility.dispose();
     super.dispose();
   }
+
+  List<String> _csv(String s) => s
+      .split(',')
+      .map((e) => e.trim())
+      .where((e) => e.isNotEmpty)
+      .toList();
 
   void _resetForm() {
     _formKey.currentState?.reset();
@@ -69,6 +85,11 @@ class _OrganizationSuggestScreenState
     _phone.clear();
     _email.clear();
     _website.clear();
+    _zip.clear();
+    _hours.clear();
+    _services.clear();
+    _languages.clear();
+    _accessibility.clear();
     setState(() {
       _category = null;
       _country = 'DE';
@@ -206,6 +227,11 @@ class _OrganizationSuggestScreenState
       email: _email.text.trim().isEmpty ? null : _email.text.trim(),
       website: _website.text.trim().isEmpty ? null : _website.text.trim(),
       logoUrl: logoUrl,
+      zipCode: _zip.text.trim().isEmpty ? null : _zip.text.trim(),
+      openingHours: _hours.text.trim().isEmpty ? null : _hours.text.trim(),
+      services: _csv(_services.text),
+      languages: _csv(_languages.text),
+      accessibility: _csv(_accessibility.text),
     );
     if (!mounted) return;
     setState(() {
@@ -418,6 +444,43 @@ class _OrganizationSuggestScreenState
               keyboardType: TextInputType.url,
               style: AppTypography.body(size: 14, color: AppColors.ink),
               decoration: _inputDeco(hint: 'https://...'),
+            ),
+            const SizedBox(height: 16),
+            _label('organizations.zip'.tr()),
+            TextFormField(
+              controller: _zip,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: _inputDeco(hint: '12345'),
+            ),
+            const SizedBox(height: 16),
+            _label('organizations.openingHours'.tr()),
+            TextFormField(
+              controller: _hours,
+              maxLines: 2,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration:
+                  _inputDeco(hint: 'organizations.openingHoursHint'.tr()),
+            ),
+            const SizedBox(height: 16),
+            _label('organizations.services'.tr()),
+            TextFormField(
+              controller: _services,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: _inputDeco(hint: 'organizations.commaHint'.tr()),
+            ),
+            const SizedBox(height: 16),
+            _label('organizations.languagesLabel'.tr()),
+            TextFormField(
+              controller: _languages,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: _inputDeco(hint: 'organizations.commaHint'.tr()),
+            ),
+            const SizedBox(height: 16),
+            _label('organizations.accessibility'.tr()),
+            TextFormField(
+              controller: _accessibility,
+              style: AppTypography.body(size: 14, color: AppColors.ink),
+              decoration: _inputDeco(hint: 'organizations.commaHint'.tr()),
             ),
             if (_error != null) ...[
               const SizedBox(height: 14),

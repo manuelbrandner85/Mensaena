@@ -92,6 +92,11 @@ class OrganizationsRepository {
     String? email,
     String? website,
     String? logoUrl,
+    String? zipCode,
+    String? openingHours,
+    List<String> services = const [],
+    List<String> languages = const [],
+    List<String> accessibility = const [],
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
@@ -109,6 +114,13 @@ class OrganizationsRepository {
         'website': website,
         'status': 'pending',
         if (logoUrl != null) 'logo_url': logoUrl,
+        if (zipCode != null && zipCode.trim().isNotEmpty)
+          'zip_code': zipCode.trim(),
+        if (openingHours != null && openingHours.trim().isNotEmpty)
+          'opening_hours': openingHours.trim(),
+        if (services.isNotEmpty) 'services': services,
+        if (languages.isNotEmpty) 'languages': languages,
+        if (accessibility.isNotEmpty) 'accessibility': accessibility,
       });
       return true;
     } catch (_) {

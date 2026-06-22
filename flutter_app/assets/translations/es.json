@@ -3095,6 +3095,10 @@
     "hubDescription": "Tres formas de compartir cosas y tiempo en el vecindario — del gratis al tiempo-por-tiempo."
   },
   "organizations": {
+    "zip": "Código postal",
+    "openingHoursHint": "p. ej. Lun–Vie 9–18, Sáb 9–13",
+    "services": "Servicios ofrecidos",
+    "commaHint": "separados por comas",
     "notFound": "Organización no encontrada.",
     "offers": "Ofertas",
     "suggestOrg": "Sugerir organización",

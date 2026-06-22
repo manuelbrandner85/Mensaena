@@ -3095,6 +3095,10 @@
     "hubDescription": "Trois façons de partager choses et temps dans le quartier — du gratuit au temps-contre-temps."
   },
   "organizations": {
+    "zip": "Code postal",
+    "openingHoursHint": "ex. Lun–Ven 9h–18h, Sam 9h–13h",
+    "services": "Services proposés",
+    "commaHint": "séparés par des virgules",
     "notFound": "Organisation introuvable.",
     "offers": "Offres",
     "suggestOrg": "Suggérer une organisation",

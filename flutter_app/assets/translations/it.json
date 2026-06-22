@@ -3095,6 +3095,10 @@
     "hubDescription": "Tre modi per condividere cose e tempo nel vicinato — dal gratuito al tempo-per-tempo."
   },
   "organizations": {
+    "zip": "CAP",
+    "openingHoursHint": "es. Lun–Ven 9–18, Sab 9–13",
+    "services": "Servizi offerti",
+    "commaHint": "separati da virgola",
     "notFound": "Organizzazione non trovata.",
     "offers": "Offerte",
     "suggestOrg": "Suggerisci org.",

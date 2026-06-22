@@ -3095,6 +3095,10 @@
     "hubDescription": "Three ways to share things and time in the neighbourhood — from free to time-for-time."
   },
   "organizations": {
+    "zip": "ZIP code",
+    "openingHoursHint": "e.g. Mon–Fri 9am–6pm, Sat 9am–1pm",
+    "services": "Services offered",
+    "commaHint": "comma-separated",
     "notFound": "Organisation not found.",
     "offers": "Offers",
     "suggestOrg": "Suggest org.",

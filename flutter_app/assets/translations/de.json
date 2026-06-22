@@ -3094,6 +3094,10 @@
     "hubDescription": "Drei Wege, Dinge und Zeit in der Nachbarschaft auszutauschen — von gratis bis Zeit-für-Zeit."
   },
   "organizations": {
+    "zip": "PLZ",
+    "openingHoursHint": "z. B. Mo–Fr 9–18 Uhr, Sa 9–13 Uhr",
+    "services": "Angebotene Leistungen",
+    "commaHint": "kommagetrennt",
     "notFound": "Organisation nicht gefunden.",
     "offers": "Angebote",
     "suggestOrg": "Org. vorschlagen",
