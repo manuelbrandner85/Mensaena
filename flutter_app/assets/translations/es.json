@@ -706,7 +706,9 @@
     "createChannelFailed": "No se pudo crear la sala.",
     "share_location_title": "Compartir ubicación",
     "share_current_location": "Enviar ubicación actual",
-    "location_message": "Ubicación"
+    "location_message": "Ubicación",
+    "deleteLocationTitle": "¿Eliminar ubicación?",
+    "deleteLocationBody": "Esta ubicación compartida se eliminará del chat."
   },
   "languages": {
     "de": "Alemán",

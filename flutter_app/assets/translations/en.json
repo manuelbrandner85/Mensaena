@@ -706,7 +706,9 @@
     "createChannelFailed": "Could not create room.",
     "share_location_title": "Share location",
     "share_current_location": "Send current location",
-    "location_message": "Location"
+    "location_message": "Location",
+    "deleteLocationTitle": "Delete location?",
+    "deleteLocationBody": "This shared location will be removed from the chat."
   },
   "languages": {
     "de": "German",

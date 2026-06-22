@@ -80,6 +80,11 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   lk.Room? _room;
   lk.EventsListener<lk.RoomEvent>? _listener;
   _CallState _state = _CallState.connecting;
+  // Re-Entry-Schutz: _connect() darf pro Screen-Instanz NUR EINMAL einen
+  // LiveKit-Room aufbauen. Ohne Guard rief der Status-Listener bei jedem
+  // Re-Emit von status='active' (Realtime-Resubscribe/Reattach) erneut
+  // _connect() auf → zweiter Room-Join → „verbindet/verbunden"-Flackern.
+  bool _connectStarted = false;
   bool _micEnabled = true;
   // FIX Audio-Aussetzer: Track-Publication-Bestätigung. Falls trotz mehrerer
   // Retries kein LocalTrackPublishedEvent für AUDIO kam, wissen wir, dass die
@@ -215,6 +220,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
             final r = rows.first;
             final s = r['status'] as String?;
             if (s == 'active') {
+              // Nur EINMAL verbinden — Re-Emits desselben 'active'-Status
+              // dürfen keinen zweiten Connect/State-Wechsel auslösen.
+              if (_connectStarted) return;
               _ringingTimeout?.cancel();
               await _stopRingback();
               if (!mounted) return;
@@ -333,6 +341,9 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   }
 
   Future<void> _connect() async {
+    // Re-Entry-Schutz (synchron, vor jedem await) gegen doppelten Room-Join.
+    if (_connectStarted) return;
+    _connectStarted = true;
     // Permissions
     final mic = await Permission.microphone.request();
     if (mic.isDenied || mic.isPermanentlyDenied) {

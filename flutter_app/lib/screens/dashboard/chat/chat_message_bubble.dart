@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -107,7 +109,12 @@ class ChatMessageBubble extends ConsumerWidget {
       if (lat != null && lng != null) {
         return Align(
           alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-          child: _LocationCard(lat: lat, lng: lng),
+          child: _LocationCard(
+            lat: lat,
+            lng: lng,
+            mine: mine,
+            onDelete: onDelete,
+          ),
         );
       }
     }
@@ -902,17 +909,48 @@ class _MentionAwareTextState extends State<_MentionAwareText> {
 
 /// Standort-Karte für [LOC:lat:lng]-Nachrichten. Zeigt eine kompakte
 /// Vorschau (Pin + Koordinaten) und öffnet bei Tap die Karte extern
-/// (Google Maps). Bewusst KEINE inline-Karte pro Bubble (Perf in langen
-/// Listen) — die externe Karte ist die robuste WhatsApp-ähnliche Lösung.
+/// (Google Maps). Zeigt — wie WhatsApp — eine echte Mini-Karte (statisch,
+/// nicht interaktiv) mit Pin. Tippen öffnet die Karte extern; Long-Press auf
+/// EIGENE Standort-Nachrichten erlaubt das Löschen.
 class _LocationCard extends StatelessWidget {
-  const _LocationCard({required this.lat, required this.lng});
+  const _LocationCard({
+    required this.lat,
+    required this.lng,
+    required this.mine,
+    this.onDelete,
+  });
   final double lat;
   final double lng;
+  final bool mine;
+  final VoidCallback? onDelete;
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    if (!mine || onDelete == null) return;
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('chat.deleteLocationTitle'.tr()),
+        content: Text('chat.deleteLocationBody'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('common.delete'.tr(),
+                style: const TextStyle(color: AppColors.herzrot)),
+          ),
+        ],
+      ),
+    );
+    if (ok == true) onDelete!.call();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final coords =
-        '${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}';
+    final center = LatLng(lat, lng);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
       child: InkWell(
@@ -920,6 +958,12 @@ class _LocationCard extends StatelessWidget {
         onTap: () => safeLaunchUrl(
           'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
         ),
+        onLongPress: (mine && onDelete != null)
+            ? () {
+                Haptics.longPress();
+                _confirmDelete(context);
+              }
+            : null,
         child: Container(
           width: 240,
           decoration: BoxDecoration(
@@ -931,44 +975,54 @@ class _LocationCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Stilisierter „Karten"-Streifen mit Pin (kein Netzwerk-Tile).
-              Container(
-                height: 84,
-                decoration: BoxDecoration(
-                  borderRadius:
-                      const BorderRadius.vertical(top: Radius.circular(13)),
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.bronze.withValues(alpha: 0.22),
-                      AppColors.bronze.withValues(alpha: 0.08),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+              // Echte (statische) Mini-Karte — wie WhatsApp.
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(13)),
+                child: SizedBox(
+                  height: 120,
+                  child: AbsorbPointer(
+                    child: FlutterMap(
+                      options: MapOptions(
+                        initialCenter: center,
+                        initialZoom: 15,
+                        interactionOptions: const InteractionOptions(
+                          flags: InteractiveFlag.none,
+                        ),
+                      ),
+                      children: [
+                        TileLayer(
+                          urlTemplate:
+                              'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                          userAgentPackageName: 'de.mensaena.app',
+                        ),
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: center,
+                              width: 40,
+                              height: 40,
+                              child: const Icon(LucideIcons.mapPin,
+                                  size: 34, color: AppColors.herzrot),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                child: const Center(
-                  child: Icon(LucideIcons.mapPin,
-                      size: 34, color: AppColors.bronze),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.all(10),
                 child: Row(
                   children: [
+                    const Icon(LucideIcons.mapPin,
+                        size: 14, color: AppColors.bronze),
+                    const SizedBox(width: 6),
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('chat.location_message'.tr(),
-                              style: AppTypography.label(
-                                  size: 12, color: AppColors.ink)),
-                          const SizedBox(height: 2),
-                          Text(coords,
-                              style: AppTypography.caption(),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis),
-                        ],
-                      ),
+                      child: Text('chat.location_message'.tr(),
+                          style: AppTypography.label(
+                              size: 12, color: AppColors.ink)),
                     ),
                     const Icon(LucideIcons.externalLink,
                         size: 16, color: AppColors.bronze),

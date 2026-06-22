@@ -14,13 +14,17 @@
 library;
 
 import 'dart:async';
+import 'dart:io' show Platform;
 
+import 'package:android_intent_plus/android_intent.dart';
+import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/foundation.dart' show debugPrint, kDebugMode;
 import 'package:flutter_callkit_incoming/entities/entities.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 
 import '../config/routes/app_router.dart' show rootNavigatorKey;
+import '../repositories/extra_repositories.dart';
 import 'callkit_service.dart';
 import 'dm_call_service.dart';
 import 'incoming_call_overlay.dart';
@@ -298,12 +302,39 @@ class CallEventBus {
     }
   }
 
+  /// Holt MainActivity in den Vordergrund (Android). Im CallKit-Accept-Pfad
+  /// fehlte das bisher (nur der Overlay-Pfad tat es) → die Call-Route wurde
+  /// zwar gepusht, war aber erst nach einem ZWEITEN Annehmen sichtbar
+  /// („zweimal annehmen"-Bug). REORDER_TO_FRONT+SINGLE_TOP nutzt die
+  /// bestehende Activity (kein State-Reset).
+  static Future<void> _bringAppToForeground() async {
+    if (!Platform.isAndroid) return;
+    try {
+      // ignore: prefer_const_constructors
+      final intent = AndroidIntent(
+        action: 'android.intent.action.MAIN',
+        package: 'de.mensaena.app',
+        componentName: 'de.mensaena.app/.MainActivity',
+        flags: const <int>[
+          Flag.FLAG_ACTIVITY_NEW_TASK,
+          Flag.FLAG_ACTIVITY_REORDER_TO_FRONT,
+          Flag.FLAG_ACTIVITY_SINGLE_TOP,
+        ],
+      );
+      await intent.launch();
+    } catch (_) {/* non-fatal */}
+  }
+
   static Future<void> _onAccept(CallContext ctx) async {
     // Atomic check-and-add: Set.add() liefert false wenn schon vorhanden.
     // Verhindert Doppel-Accept-Race wenn User auf Lock-Screen zwei mal tappt.
     if (!_handledAccepts.add(ctx.callId)) return;
 
     _contexts.remove(ctx.callId);
+
+    // FIX „zweimal annehmen": App SOFORT in den Vordergrund holen, damit die
+    // gleich gepushte Call-Route sichtbar wird (ohne zweites Tippen).
+    unawaited(_bringAppToForeground());
 
     // System-Overlay (falls offen) sofort schließen, damit nicht parallel
     // zur Call-Screen-Animation noch das Vollbild-Ringen rendert.
@@ -323,12 +354,21 @@ class CallEventBus {
         '/dashboard/call/${ctx.callId}?room=$encRoom&peer=$encName&accepted=1';
 
     final navState = rootNavigatorKey.currentState;
+    unawaited(ErrorLogsRepository.log(
+      errorType: 'call_accept',
+      message: 'onAccept call=${ctx.callId} navReady=${navState != null}',
+    ));
     if (navState != null) {
       try {
         // ignore: use_build_context_synchronously
         navState.context.push(route);
         return;
-      } catch (_) {}
+      } catch (e) {
+        unawaited(ErrorLogsRepository.log(
+          errorType: 'call_accept_pusherr',
+          message: 'immediate push failed: $e',
+        ));
+      }
     }
     // Cold-Start-Retry: GoRouter braucht teils mehrere Sekunden bis ready
     // (Flutter-Engine-Boot + Firebase-Init + Auth-Restore + Provider-Setup).
@@ -345,10 +385,20 @@ class CallEventBus {
           n.context.push(route);
           _pendingAcceptRoute = null;
           t.cancel();
+          unawaited(ErrorLogsRepository.log(
+            errorType: 'call_accept',
+            message: 'navigated after ${tries * 80}ms retry',
+          ));
           return;
         } catch (_) {}
       }
-      if (tries > 375) t.cancel(); // 30s max
+      if (tries > 375) {
+        t.cancel(); // 30s max
+        unawaited(ErrorLogsRepository.log(
+          errorType: 'call_accept_timeout',
+          message: 'router not ready after 30s',
+        ));
+      }
     });
   }
 

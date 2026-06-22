@@ -705,7 +705,9 @@
     "createChannelFailed": "Oda oluşturulamadı.",
     "share_location_title": "Konum paylaş",
     "share_current_location": "Mevcut konumu gönder",
-    "location_message": "Konum"
+    "location_message": "Konum",
+    "deleteLocationTitle": "Konum silinsin mi?",
+    "deleteLocationBody": "Bu paylaşılan konum sohbetten kaldırılacak."
   },
   "languages": {
     "de": "Almanca",

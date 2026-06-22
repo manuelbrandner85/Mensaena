@@ -705,7 +705,9 @@
     "createChannelFailed": "Не удалось создать комнату.",
     "share_location_title": "Поделиться местоположением",
     "share_current_location": "Отправить текущее местоположение",
-    "location_message": "Местоположение"
+    "location_message": "Местоположение",
+    "deleteLocationTitle": "Удалить местоположение?",
+    "deleteLocationBody": "Это местоположение будет удалено из чата."
   },
   "languages": {
     "de": "Немецкий",

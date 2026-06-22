@@ -706,7 +706,9 @@
     "createChannelFailed": "Impossible de créer le salon.",
     "share_location_title": "Partager la position",
     "share_current_location": "Envoyer la position actuelle",
-    "location_message": "Position"
+    "location_message": "Position",
+    "deleteLocationTitle": "Supprimer la position ?",
+    "deleteLocationBody": "Cette position partagée sera retirée du chat."
   },
   "languages": {
     "de": "Allemand",

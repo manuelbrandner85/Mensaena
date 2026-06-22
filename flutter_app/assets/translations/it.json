@@ -706,7 +706,9 @@
     "createChannelFailed": "Impossibile creare la stanza.",
     "share_location_title": "Condividi posizione",
     "share_current_location": "Invia posizione attuale",
-    "location_message": "Posizione"
+    "location_message": "Posizione",
+    "deleteLocationTitle": "Eliminare la posizione?",
+    "deleteLocationBody": "Questa posizione condivisa verrà rimossa dalla chat."
   },
   "languages": {
     "de": "Tedesco",
