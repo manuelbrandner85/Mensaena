@@ -147,6 +147,38 @@ final cinemaWeatherTintProvider = StreamProvider<Color?>((ref) async* {
   }
 });
 
+const _parallaxStorageKey = 'cinema_parallax_v1';
+
+/// Schalter: Parallax/Neige-Tiefe — der Hintergrund verschiebt sich subtil
+/// beim Neigen des Geräts (Sensor). Default AUS (opt-in); nur bei vollen
+/// Effekten aktiv, sonst kein Sensor/keine Last.
+class CinemaParallaxNotifier extends StateNotifier<bool> {
+  CinemaParallaxNotifier() : super(false) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
+  }
+
+  Future<void> _load() async {
+    try {
+      final raw = await _storage.read(key: _parallaxStorageKey);
+      final loaded = raw == '1';
+      if (!mounted) return;
+      if (loaded != state) state = loaded;
+    } catch (_) {}
+  }
+
+  Future<void> set(bool value) async {
+    if (!mounted) return;
+    state = value;
+    try {
+      await _storage.write(key: _parallaxStorageKey, value: value ? '1' : '0');
+    } catch (_) {}
+  }
+}
+
+final cinemaParallaxProvider =
+    StateNotifierProvider<CinemaParallaxNotifier, bool>(
+        (ref) => CinemaParallaxNotifier());
+
 const _videoBackdropStorageKey = 'cinema_video_backdrop_v1';
 
 /// Schalter: bewegter Video-Hintergrund je Tageszeit (statt statischem

@@ -27,8 +27,9 @@ const _smoothing = 0.15;
 const _sampleInterval = SensorInterval.normalInterval;
 
 /// Singleton broadcast stream über sensors_plus. Nur EINE native
-/// subscription für alle TiltCards.
-class _SharedAccelerometer {
+/// subscription für ALLE Verbraucher (TiltCards + Cinema-Parallax) — niemals
+/// eine zweite native Subscription anlegen (Race-Conditions beim dispose).
+class SharedAccelerometer {
   static StreamController<AccelerometerEvent>? _controller;
   static StreamSubscription<AccelerometerEvent>? _nativeSub;
   static int _listenerCount = 0;
@@ -109,7 +110,7 @@ class _TiltCardState extends ConsumerState<TiltCard> {
 
   void _subscribe() {
     try {
-      _sub = _SharedAccelerometer.stream().listen(
+      _sub = SharedAccelerometer.stream().listen(
         _onSample,
         onError: (_) {},
         cancelOnError: false,

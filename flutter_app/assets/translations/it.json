@@ -601,6 +601,10 @@
     "videoBackdrop": {
       "label": "Sfondo video",
       "hint": "Video in loop per fascia oraria invece del gradiente. Pesante per la GPU — su dispositivi più deboli viene mostrata automaticamente un'immagine fissa."
+    },
+    "parallax": {
+      "label": "Parallasse / profondità",
+      "hint": "Lo sfondo si sposta lievemente inclinando il dispositivo (profondità 3D). Attivo solo con effetti pieni."
     }
   },
   "chat": {

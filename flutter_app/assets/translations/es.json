@@ -601,6 +601,10 @@
     "videoBackdrop": {
       "label": "Fondo de vídeo",
       "hint": "Vídeo en bucle según la hora del día en vez del degradado. Exige GPU — en dispositivos más débiles se muestra automáticamente una imagen fija."
+    },
+    "parallax": {
+      "label": "Parallax / profundidad",
+      "hint": "El fondo se desplaza sutilmente al inclinar el dispositivo (profundidad 3D). Solo activo con efectos completos."
     }
   },
   "chat": {

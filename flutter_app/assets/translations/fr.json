@@ -601,6 +601,10 @@
     "videoBackdrop": {
       "label": "Arrière-plan vidéo",
       "hint": "Vidéo en boucle selon l'heure au lieu du dégradé. Gourmand en GPU — sur les appareils plus faibles, une image fixe est affichée automatiquement."
+    },
+    "parallax": {
+      "label": "Parallaxe / profondeur",
+      "hint": "L'arrière-plan se décale subtilement quand tu inclines l'appareil (profondeur 3D). Actif uniquement avec les effets complets."
     }
   },
   "chat": {

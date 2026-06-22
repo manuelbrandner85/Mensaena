@@ -601,6 +601,10 @@
     "videoBackdrop": {
       "label": "Video background",
       "hint": "Looping video per time of day instead of a gradient. GPU-heavy — on weaker devices the app automatically shows a still image."
+    },
+    "parallax": {
+      "label": "Parallax / tilt depth",
+      "hint": "The background shifts subtly as you tilt the device (3D depth). Active only with full effects."
     }
   },
   "chat": {

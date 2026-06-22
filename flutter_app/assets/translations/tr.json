@@ -601,6 +601,10 @@
     "videoBackdrop": {
       "label": "Video arka plan",
       "hint": "Degrade yerine günün saatine göre döngülü video. GPU yoğun — zayıf cihazlarda otomatik olarak sabit görsel gösterilir."
+    },
+    "parallax": {
+      "label": "Paralaks / eğim derinliği",
+      "hint": "Cihazı eğdikçe arka plan hafifçe kayar (3B derinlik). Yalnızca tam efektlerde etkin."
     }
   },
   "chat": {

@@ -601,6 +601,10 @@
     "videoBackdrop": {
       "label": "Video-Hintergrund",
       "hint": "Bewegtes Loop-Video je Tageszeit statt Farbverlauf. Render-intensiv — auf schwächeren Geräten zeigt die App automatisch ein Standbild."
+    },
+    "parallax": {
+      "label": "Parallax / Neige-Tiefe",
+      "hint": "Der Hintergrund verschiebt sich subtil beim Neigen des Geräts (3D-Tiefe). Nur bei vollen Effekten aktiv."
     }
   },
   "chat": {

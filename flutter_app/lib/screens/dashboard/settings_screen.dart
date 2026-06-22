@@ -1136,6 +1136,8 @@ class _AppearanceTab extends ConsumerWidget {
         const _SeasonalToggle(),
         const SizedBox(height: 12),
         const _VideoBackdropToggle(),
+        const SizedBox(height: 12),
+        const _ParallaxToggle(),
         const SizedBox(height: 16),
         Text('settings.sections.sound'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
@@ -1610,6 +1612,49 @@ class _EffectStrengthSlider extends ConsumerWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// „Parallax/Neige-Tiefe" — Hintergrund verschiebt sich beim Neigen (Sensor).
+class _ParallaxToggle extends ConsumerWidget {
+  const _ParallaxToggle();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final on = ref.watch(cinemaParallaxProvider);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.elevated,
+        border: Border.all(color: on ? AppColors.amber : AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(LucideIcons.layers,
+              size: 18, color: on ? AppColors.amber : AppColors.mute),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('settings.parallax.label'.tr(),
+                    style: AppTypography.body(size: 14, color: AppColors.ink)),
+                const SizedBox(height: 2),
+                Text('settings.parallax.hint'.tr(),
+                    style: AppTypography.caption()),
+              ],
+            ),
+          ),
+          Switch.adaptive(
+            value: on,
+            activeColor: AppColors.amber,
+            onChanged: (v) =>
+                ref.read(cinemaParallaxProvider.notifier).set(v),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -32,6 +32,7 @@ import '../../providers/theme_mode_provider.dart';
 import '../../services/device_tier_service.dart';
 import 'atmospheric_layers.dart';
 import 'chromatic_aberration.dart';
+import 'cinema_parallax.dart';
 import 'cinematic_video_backdrop.dart';
 import 'film_grain.dart';
 import 'lens_flare.dart';
@@ -113,26 +114,28 @@ class CinemaOverlay extends ConsumerWidget {
 
         // 1. Hintergrund: bewegtes Video je Tageszeit (nur full + Schalter an)
         // ODER der animierte Mesh-Gradient (Standard / bei Crash-Schutz).
-        if (phaseVideo != null)
-          RepaintBoundary(
-            child: CinematicVideoBackdrop(
-              key: ValueKey('video_${phase.name}'),
-              videoAsset: phaseVideo.video,
-              stillAsset: phaseVideo.still,
-              topScrim: 0.25,
-              bottomScrim: 0.7,
-            ),
-          )
-        else
-          RepaintBoundary(
-            child: AnimatedSwitcher(
-              duration: const Duration(seconds: 8),
-              child: _MeshBackground(
-                key: ValueKey('mesh_${phase.name}'),
-                spec: spec,
-              ),
-            ),
-          ),
+        // In CinemaParallax gewrappt → subtile Neige-Tiefe (nur full + an).
+        CinemaParallax(
+          child: phaseVideo != null
+              ? RepaintBoundary(
+                  child: CinematicVideoBackdrop(
+                    key: ValueKey('video_${phase.name}'),
+                    videoAsset: phaseVideo.video,
+                    stillAsset: phaseVideo.still,
+                    topScrim: 0.25,
+                    bottomScrim: 0.7,
+                  ),
+                )
+              : RepaintBoundary(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(seconds: 8),
+                    child: _MeshBackground(
+                      key: ValueKey('mesh_${phase.name}'),
+                      spec: spec,
+                    ),
+                  ),
+                ),
+        ),
 
         // 1a2. Saisonaler Tint (Winter/Frühling/Sommer/Herbst).
         if (seasonalTint != null)
