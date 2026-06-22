@@ -1649,6 +1649,8 @@
     }
   },
   "create": {
+    "availFrom": "Available from",
+    "availTo": "Available until",
     "titleRequired": "Title is required.",
     "nameRequired": "Name is required.",
     "descRequired": "Description is required.",
@@ -2401,6 +2403,8 @@
   },
   "challenges": {
     "rewardBadge": "Reward badge (optional)",
+    "coverImage": "Cover image (optional)",
+    "addCover": "Add image",
     "create": "Create challenge",
     "createFailed": "Challenge could not be created.",
     "createSuccess": "Challenge created!",

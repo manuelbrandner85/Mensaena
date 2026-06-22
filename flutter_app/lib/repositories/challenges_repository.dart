@@ -91,6 +91,7 @@ class ChallengesRepository {
     int? maxParticipants,
     bool isWeekly = false,
     String? rewardBadge,
+    String? coverUrl,
   }) async {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return null;
@@ -118,6 +119,7 @@ class ChallengesRepository {
               'max_participants': maxParticipants,
             if (rewardBadge != null && rewardBadge.trim().isNotEmpty)
               'reward_badge': rewardBadge.trim(),
+            if (coverUrl != null && coverUrl.isNotEmpty) 'cover_url': coverUrl,
             'is_weekly': isWeekly,
           })
           .select('id')

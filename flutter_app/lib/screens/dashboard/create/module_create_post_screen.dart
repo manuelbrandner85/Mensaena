@@ -63,6 +63,56 @@ class _ModuleCreatePostScreenState
   final _whatsappCtrl = TextEditingController();
   final _meetingCtrl = TextEditingController();
   final _timeHoursCtrl = TextEditingController();
+  // Verfügbarkeits-Zeitfenster (optional) → posts.availability_start/end.
+  TimeOfDay? _availStart;
+  TimeOfDay? _availEnd;
+
+  String _fmtTime(TimeOfDay t) =>
+      '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}:00';
+
+  Widget _availTile({
+    required String label,
+    required TimeOfDay? value,
+    required ValueChanged<TimeOfDay?> onChanged,
+  }) {
+    return InkWell(
+      onTap: () async {
+        final picked = await showTimePicker(
+          context: context,
+          initialTime: value ?? const TimeOfDay(hour: 9, minute: 0),
+        );
+        if (picked != null) onChanged(picked);
+      },
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 12),
+        decoration: BoxDecoration(
+          color: AppColors.elevated,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: AppColors.line),
+        ),
+        child: Row(
+          children: [
+            const Icon(LucideIcons.clock, size: 14, color: AppColors.bronze),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                value == null ? label : value.format(context),
+                style: AppTypography.body(size: 12, color: AppColors.ink),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (value != null)
+              GestureDetector(
+                onTap: () => onChanged(null),
+                child: const Icon(LucideIcons.x,
+                    size: 14, color: AppColors.mute),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
   final _tagsCtrl = TextEditingController();
   bool _privacyPhone = false;
   bool _privacyEmail = false;
@@ -384,6 +434,8 @@ class _ModuleCreatePostScreenState
                 : _meetingCtrl.text.trim(),
             'time_hours':
                 double.tryParse(_timeHoursCtrl.text.replaceAll(',', '.').trim()),
+            if (_availStart != null) 'availability_start': _fmtTime(_availStart!),
+            if (_availEnd != null) 'availability_end': _fmtTime(_availEnd!),
             // DB-Spalte ist TEXT (Enum 'low'|'medium'|'high'|'critical').
             'urgency': _urgency <= 1
                 ? 'low'
@@ -801,6 +853,27 @@ class _ModuleCreatePostScreenState
                     labelText: 'create.meetingPoint'.tr(),
                     isDense: true,
                   ),
+                ),
+                // Verfügbarkeits-Zeitfenster (optional): wann erreichbar.
+                const SizedBox(height: 6),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _availTile(
+                        label: 'create.availFrom'.tr(),
+                        value: _availStart,
+                        onChanged: (t) => setState(() => _availStart = t),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _availTile(
+                        label: 'create.availTo'.tr(),
+                        value: _availEnd,
+                        onChanged: (t) => setState(() => _availEnd = t),
+                      ),
+                    ),
+                  ],
                 ),
                 // Zeitbank-Bezug: nur sinnvoll bei Hilfe-Posts.
                 if (_type == 'sharing' ||

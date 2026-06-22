@@ -1649,6 +1649,8 @@
     }
   },
   "create": {
+    "availFrom": "Disponible à partir de",
+    "availTo": "Disponible jusqu'à",
     "titleRequired": "Le titre est obligatoire.",
     "nameRequired": "Le nom est obligatoire.",
     "descRequired": "La description est obligatoire.",
@@ -2401,6 +2403,8 @@
   },
   "challenges": {
     "rewardBadge": "Badge de récompense (facultatif)",
+    "coverImage": "Image de couverture (facultatif)",
+    "addCover": "Ajouter une image",
     "create": "Créer un défi",
     "createFailed": "Impossible de créer le défi.",
     "createSuccess": "Défi créé !",

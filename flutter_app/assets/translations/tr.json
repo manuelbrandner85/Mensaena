@@ -1648,6 +1648,8 @@
     }
   },
   "create": {
+    "availFrom": "Şu saatten itibaren",
+    "availTo": "Şu saate kadar",
     "titleRequired": "Başlık gerekli.",
     "nameRequired": "İsim gerekli.",
     "descRequired": "Açıklama gerekli.",
@@ -2400,6 +2402,8 @@
   },
   "challenges": {
     "rewardBadge": "Ödül rozeti (isteğe bağlı)",
+    "coverImage": "Kapak görseli (isteğe bağlı)",
+    "addCover": "Görsel ekle",
     "create": "Meydan okuma oluştur",
     "createFailed": "Meydan okuma oluşturulamadı.",
     "createSuccess": "Meydan okuma oluşturuldu!",

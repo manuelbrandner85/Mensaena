@@ -1648,6 +1648,8 @@
     }
   },
   "create": {
+    "availFrom": "Erreichbar ab",
+    "availTo": "Erreichbar bis",
     "titleRequired": "Titel ist erforderlich.",
     "nameRequired": "Name ist erforderlich.",
     "descRequired": "Beschreibung ist erforderlich.",
@@ -2400,6 +2402,8 @@
   },
   "challenges": {
     "rewardBadge": "Belohnungs-Abzeichen (optional)",
+    "coverImage": "Cover-Bild (optional)",
+    "addCover": "Bild hinzufügen",
     "create": "Challenge erstellen",
     "createFailed": "Challenge konnte nicht erstellt werden.",
     "createSuccess": "Challenge erstellt!",

@@ -3,16 +3,20 @@
 /// Felder: Titel, Beschreibung, Kategorie, Schwierigkeit, Punkte, Dauer.
 library;
 
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/challenges_repository.dart';
 import '../../../services/haptics.dart';
+import '../../../services/image_upload_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../widgets/forms/create_post_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
@@ -38,6 +42,18 @@ class _ChallengeCreateScreenState
   bool _isWeekly = false;
   bool _busy = false;
   String? _rewardBadge; // Belohnungs-Abzeichen (Emoji), optional
+  File? _cover; // Cover-Bild, optional
+
+  Future<void> _pickCover() async {
+    final picker = ImagePicker();
+    final r = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1400,
+      maxHeight: 900,
+      imageQuality: 82,
+    );
+    if (r != null) setState(() => _cover = File(r.path));
+  }
   static const List<String> _badgeChoices = [
     '🏆', '🌱', '💪', '🧠', '🎨', '🥗', '🤝', '⭐', '🔥', '❤️'
   ];
@@ -71,6 +87,11 @@ class _ChallengeCreateScreenState
       return;
     }
     setState(() => _busy = true);
+    String? coverUrl;
+    if (_cover != null) {
+      final urls = await ImageUploadService.upload([_cover!]);
+      if (urls.isNotEmpty) coverUrl = urls.first;
+    }
     final id = await ChallengesRepository.create(
       title: _title.text,
       description: _desc.text,
@@ -81,6 +102,7 @@ class _ChallengeCreateScreenState
       maxParticipants: _maxParticipants > 0 ? _maxParticipants : null,
       isWeekly: _isWeekly,
       rewardBadge: _rewardBadge,
+      coverUrl: coverUrl,
     );
     if (!mounted) return;
     setState(() => _busy = false);
@@ -177,6 +199,59 @@ class _ChallengeCreateScreenState
                       ))
                   .toList(),
             ),
+          ),
+
+          // ── Cover-Bild (optional) ───────────────────────────────────
+          CreateCard(
+            title: 'challenges.coverImage'.tr(),
+            icon: LucideIcons.image,
+            child: _cover != null
+                ? Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(_cover!,
+                            height: 140,
+                            width: double.infinity,
+                            fit: BoxFit.cover),
+                      ),
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: GestureDetector(
+                          onTap: () => setState(() => _cover = null),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.black54, shape: BoxShape.circle),
+                            child: const Icon(LucideIcons.x,
+                                size: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : GestureDetector(
+                    onTap: _pickCover,
+                    child: Container(
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: AppColors.surface.withValues(alpha: 0.5),
+                        border: Border.all(color: AppColors.line),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(LucideIcons.camera,
+                              color: AppColors.bronze, size: 20),
+                          const SizedBox(width: 8),
+                          Text('challenges.addCover'.tr(),
+                              style: AppTypography.caption()),
+                        ],
+                      ),
+                    ),
+                  ),
           ),
 
           // ── Belohnungs-Abzeichen (optional) ─────────────────────────
