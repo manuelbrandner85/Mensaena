@@ -2591,6 +2591,8 @@
     "addImage": "Görsel ekle",
     "expiryLabel": "Son geçerlilik (isteğe bağlı)",
     "setExpiry": "Tarih seç",
+    "expiresInDays": "{n}g sonra sona erer",
+    "expiresToday": "bugün sona erer",
     "noExpiry": "Süresiz",
     "expiresOn": "Bitiş: {date}",
     "location": "Konum (isteğe bağlı)",

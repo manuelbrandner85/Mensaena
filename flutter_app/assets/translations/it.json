@@ -2592,6 +2592,8 @@
     "addImage": "Aggiungi immagine",
     "expiryLabel": "Data di scadenza (facoltativa)",
     "setExpiry": "Scegli data",
+    "expiresInDays": "scade tra {n}g",
+    "expiresToday": "scade oggi",
     "noExpiry": "Nessuna scadenza",
     "expiresOn": "Scade il {date}",
     "location": "Posizione (facoltativa)",

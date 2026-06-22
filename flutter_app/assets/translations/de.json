@@ -2591,6 +2591,8 @@
     "addImage": "Bild hinzufügen",
     "expiryLabel": "Ablaufdatum (optional)",
     "setExpiry": "Datum wählen",
+    "expiresInDays": "läuft in {n} Tagen ab",
+    "expiresToday": "läuft heute ab",
     "noExpiry": "Kein Ablauf",
     "expiresOn": "Läuft ab am {date}",
     "location": "Standort (optional)",

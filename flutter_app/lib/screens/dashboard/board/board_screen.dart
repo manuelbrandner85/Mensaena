@@ -304,6 +304,31 @@ class _Note extends StatelessWidget {
                 ],
               ],
             ),
+            if (post.expiresAt != null) ...[
+              const SizedBox(height: 4),
+              Builder(
+                builder: (_) {
+                  final days = post.expiresAt!
+                      .difference(DateTime.now().toUtc())
+                      .inDays;
+                  return Row(
+                    children: [
+                      const Icon(LucideIcons.timer,
+                          size: 11, color: AppColors.mute),
+                      const SizedBox(width: 3),
+                      Text(
+                        days <= 0
+                            ? 'board.expiresToday'.tr()
+                            : 'board.expiresInDays'
+                                .tr(namedArgs: {'n': '$days'}),
+                        style: AppTypography.label(
+                            size: 9, color: AppColors.mute),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
           ],
         ),
       ),

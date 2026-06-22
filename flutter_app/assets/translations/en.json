@@ -2592,6 +2592,8 @@
     "addImage": "Add image",
     "expiryLabel": "Expiry date (optional)",
     "setExpiry": "Pick date",
+    "expiresInDays": "expires in {n}d",
+    "expiresToday": "expires today",
     "noExpiry": "No expiry",
     "expiresOn": "Expires on {date}",
     "location": "Location (optional)",

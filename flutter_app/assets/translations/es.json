@@ -2592,6 +2592,8 @@
     "addImage": "Añadir imagen",
     "expiryLabel": "Fecha de caducidad (opcional)",
     "setExpiry": "Elegir fecha",
+    "expiresInDays": "caduca en {n}d",
+    "expiresToday": "caduca hoy",
     "noExpiry": "Sin caducidad",
     "expiresOn": "Caduca el {date}",
     "location": "Ubicación (opcional)",
