@@ -2122,6 +2122,10 @@
     "voteDownTooltip": "Pulgar abajo"
   },
   "marketplace": {
+    "sortTooltip": "Ordenar",
+    "sortNewest": "Más recientes",
+    "sortNearest": "Más cercanos",
+    "sortExpiring": "Caducan pronto",
     "moreDetails": "Más detalles",
     "quantity": "Cantidad",
     "shippingAvailable": "Envío disponible",
@@ -2762,6 +2766,9 @@
     "publicVisibleHint": "Visible también para visitantes no registrados."
   },
   "air": {
+    "ventilateGood": "Aire bueno – ideal para ventilar",
+    "ventilateModerate": "Moderado – basta ventilar un poco",
+    "ventilateBad": "Aire malo – mejor mantener las ventanas cerradas",
     "title": "Calidad del aire",
     "subtitle": "Mediciones actuales en {city} ({country})",
     "noStations": "No se encontraron estaciones cercanas.",

@@ -22,6 +22,8 @@ import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/image_carousel.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 
+enum _MpSort { newest, nearest, expiring }
+
 class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
 
@@ -38,6 +40,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   double? _maxPrice;
   double? _maxDistanceKm;
   ({double lat, double lng})? _myPos;
+  _MpSort _sort = _MpSort.newest;
 
   static const List<FilterOption<String>> _types = [
     FilterOption(value: 'verschenken', label: '🎁 Verschenken'),
@@ -78,7 +81,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
 
   List<MarketplaceListing> _apply(List<MarketplaceListing> all) {
     final q = _search.trim().toLowerCase();
-    return all.where((m) {
+    final list = all.where((m) {
       if (_category != null && m.category != _category) return false;
       if (_condition != null && m.condition != _condition) return false;
       if (_maxPrice != null && m.price != null && m.price! > _maxPrice!) {
@@ -96,6 +99,22 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       return m.title.toLowerCase().contains(q) ||
           m.description.toLowerCase().contains(q);
     }).toList();
+    // Sortierung
+    if (_sort == _MpSort.newest) {
+      list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    } else if (_sort == _MpSort.nearest && _myPos != null) {
+      double dist(MarketplaceListing m) =>
+          (m.latitude == null || m.longitude == null)
+              ? double.infinity
+              : LocationService.haversineKm(
+                  _myPos!.lat, _myPos!.lng, m.latitude!, m.longitude!);
+      list.sort((a, b) => dist(a).compareTo(dist(b)));
+    } else if (_sort == _MpSort.expiring) {
+      final far = DateTime(9999);
+      list.sort(
+          (a, b) => (a.expiresAt ?? far).compareTo(b.expiresAt ?? far));
+    }
+    return list;
   }
 
   Future<void> _ensureMyPos() async {
@@ -187,6 +206,33 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                       icon: const Icon(LucideIcons.slidersHorizontal,
                           size: 18, color: AppColors.amber),
                       onPressed: _openAdvancedFilters,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.elevated,
+                      border: Border.all(color: AppColors.line),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: PopupMenuButton<_MpSort>(
+                      tooltip: 'marketplace.sortTooltip'.tr(),
+                      initialValue: _sort,
+                      color: AppColors.surface,
+                      icon: const Icon(Icons.sort,
+                          size: 18, color: AppColors.bronze),
+                      onSelected: (v) => setState(() => _sort = v),
+                      itemBuilder: (_) => [
+                        PopupMenuItem(
+                            value: _MpSort.newest,
+                            child: Text('marketplace.sortNewest'.tr())),
+                        PopupMenuItem(
+                            value: _MpSort.nearest,
+                            child: Text('marketplace.sortNearest'.tr())),
+                        PopupMenuItem(
+                            value: _MpSort.expiring,
+                            child: Text('marketplace.sortExpiring'.tr())),
+                      ],
                     ),
                   ),
                 ],

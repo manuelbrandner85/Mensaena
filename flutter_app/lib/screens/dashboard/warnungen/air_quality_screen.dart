@@ -266,6 +266,32 @@ class _AirQualityScreenState extends ConsumerState<AirQualityScreen> {
                 }),
                 style: AppTypography.caption(),
               ),
+              const SizedBox(height: 10),
+              // Empfehlung „heute lüften?" abgeleitet aus dem schlechtesten Wert.
+              Row(
+                children: [
+                  Icon(
+                      worst <= 1
+                          ? LucideIcons.checkCircle
+                          : LucideIcons.alertTriangle,
+                      size: 16,
+                      color: _levelColors[worst]),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      worst <= 1
+                          ? 'air.ventilateGood'.tr()
+                          : worst == 2
+                              ? 'air.ventilateModerate'.tr()
+                              : 'air.ventilateBad'.tr(),
+                      style: AppTypography.body(
+                          size: 13,
+                          color: AppColors.ink,
+                          weight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),

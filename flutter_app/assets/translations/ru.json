@@ -2121,6 +2121,10 @@
     "voteDownTooltip": "Не нравится"
   },
   "marketplace": {
+    "sortTooltip": "Сортировать",
+    "sortNewest": "Сначала новые",
+    "sortNearest": "Сначала ближайшие",
+    "sortExpiring": "Скоро истекают",
     "moreDetails": "Подробнее",
     "quantity": "Количество",
     "shippingAvailable": "Доставка возможна",
@@ -2761,6 +2765,9 @@
     "publicVisibleHint": "Видно также незарегистрированным посетителям."
   },
   "air": {
+    "ventilateGood": "Воздух хороший – самое время проветрить",
+    "ventilateModerate": "Умеренно – достаточно ненадолго проветрить",
+    "ventilateBad": "Плохой воздух – лучше закрыть окна",
     "title": "Качество воздуха",
     "subtitle": "Актуальные значения в {city} ({country})",
     "noStations": "Поблизости станций измерения не найдено.",

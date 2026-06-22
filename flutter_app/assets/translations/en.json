@@ -2122,6 +2122,10 @@
     "voteDownTooltip": "Thumbs down"
   },
   "marketplace": {
+    "sortTooltip": "Sort",
+    "sortNewest": "Newest first",
+    "sortNearest": "Nearest first",
+    "sortExpiring": "Expiring soon",
     "moreDetails": "More details",
     "quantity": "Quantity",
     "shippingAvailable": "Shipping available",
@@ -2762,6 +2766,9 @@
     "publicVisibleHint": "Also visible to logged-out visitors."
   },
   "air": {
+    "ventilateGood": "Good air – great time to ventilate",
+    "ventilateModerate": "Moderate – brief airing is fine",
+    "ventilateBad": "Poor air – better keep windows closed",
     "title": "Air quality",
     "subtitle": "Current readings in {city} ({country})",
     "noStations": "No measurement stations found nearby.",

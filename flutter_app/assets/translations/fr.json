@@ -2122,6 +2122,10 @@
     "voteDownTooltip": "Pouce vers le bas"
   },
   "marketplace": {
+    "sortTooltip": "Trier",
+    "sortNewest": "Plus récents",
+    "sortNearest": "Plus proches",
+    "sortExpiring": "Bientôt expirés",
     "moreDetails": "Plus de détails",
     "quantity": "Quantité",
     "shippingAvailable": "Livraison possible",
@@ -2762,6 +2766,9 @@
     "publicVisibleHint": "Visible aussi pour les visiteurs non connectés."
   },
   "air": {
+    "ventilateGood": "Bon air – idéal pour aérer",
+    "ventilateModerate": "Modéré – aérer brièvement suffit",
+    "ventilateBad": "Air médiocre – mieux vaut garder les fenêtres fermées",
     "title": "Qualité de l'air",
     "subtitle": "Mesures actuelles à {city} ({country})",
     "noStations": "Aucune station de mesure à proximité.",

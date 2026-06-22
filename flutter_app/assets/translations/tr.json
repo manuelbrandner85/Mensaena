@@ -2121,6 +2121,10 @@
     "voteDownTooltip": "Beğenme"
   },
   "marketplace": {
+    "sortTooltip": "Sırala",
+    "sortNewest": "En yeni",
+    "sortNearest": "En yakın",
+    "sortExpiring": "Yakında sona erecek",
     "moreDetails": "Daha fazla ayrıntı",
     "quantity": "Adet",
     "shippingAvailable": "Kargo mümkün",
@@ -2761,6 +2765,9 @@
     "publicVisibleHint": "Giriş yapmamış ziyaretçilere de görünür."
   },
   "air": {
+    "ventilateGood": "Hava iyi – havalandırmak için ideal",
+    "ventilateModerate": "Orta – kısa havalandırma yeterli",
+    "ventilateBad": "Hava kötü – pencereleri kapalı tutun",
     "title": "Hava kalitesi",
     "subtitle": "{city} ({country}) için güncel ölçümler",
     "noStations": "Yakında ölçüm istasyonu bulunamadı.",

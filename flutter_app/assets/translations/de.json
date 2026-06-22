@@ -2121,6 +2121,10 @@
     "voteDownTooltip": "Daumen runter"
   },
   "marketplace": {
+    "sortTooltip": "Sortieren",
+    "sortNewest": "Neueste zuerst",
+    "sortNearest": "Nächste zuerst",
+    "sortExpiring": "Bald ablaufend",
     "moreDetails": "Mehr Details",
     "quantity": "Menge / Stückzahl",
     "shippingAvailable": "Versand möglich",
@@ -2761,6 +2765,9 @@
     "publicVisibleHint": "Auch für nicht eingeloggte Besucher sichtbar."
   },
   "air": {
+    "ventilateGood": "Gute Luft – ideal zum Lüften",
+    "ventilateModerate": "Mäßig – kurz lüften reicht",
+    "ventilateBad": "Schlechte Luft – Fenster besser zu lassen",
     "title": "Luftqualität",
     "subtitle": "Aktuelle Werte in {city} ({country})",
     "noStations": "Keine Messstationen in deiner Nähe gefunden.",
