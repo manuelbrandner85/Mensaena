@@ -235,10 +235,14 @@ class _RequestCard extends ConsumerWidget {
 
   String _relative(DateTime t) {
     final diff = DateTime.now().difference(t);
-    if (diff.inMinutes < 1) return 'gerade eben';
-    if (diff.inMinutes < 60) return 'vor ${diff.inMinutes} Min.';
-    if (diff.inHours < 24) return 'vor ${diff.inHours} Std.';
-    return 'vor ${diff.inDays} Tg.';
+    if (diff.inMinutes < 1) return 'common.justNow'.tr();
+    if (diff.inMinutes < 60) {
+      return 'common.minAgo'.tr(namedArgs: {'n': '${diff.inMinutes}'});
+    }
+    if (diff.inHours < 24) {
+      return 'common.hoursAgo'.tr(namedArgs: {'n': '${diff.inHours}'});
+    }
+    return 'common.daysAgo'.tr(namedArgs: {'n': '${diff.inDays}'});
   }
 }
 

@@ -447,30 +447,15 @@ class LiveStreamService {
     final host = SupabaseService.currentUser?.id;
     if (host == null || host == inviteeId) return false;
     await SupabaseService.ensureFreshSession();
-    String hostName = 'Jemand';
+    // Die notifications-INSERT-RLS erlaubt nur user_id = auth.uid() — der Host
+    // kann also NICHT direkt eine Benachrichtigung für den Eingeladenen
+    // schreiben. Deshalb über SECURITY-DEFINER-RPC (bypassed RLS sauber,
+    // setzt actor_id = auth.uid() serverseitig).
     try {
-      final p = await sb
-          .from('profiles')
-          .select('display_name, name')
-          .eq('id', host)
-          .maybeSingle();
-      hostName = (p?['display_name'] as String?) ??
-          (p?['name'] as String?) ??
-          hostName;
-    } catch (_) {}
-    try {
-      await sb.from('notifications').insert({
-        'user_id': inviteeId,
-        'actor_id': host,
-        'type': 'livestream_invite',
-        'category': 'system',
-        'title': 'Livestream-Einladung',
-        'body': '$hostName lädt dich in einen Livestream ein.',
-        'link': '/dashboard/live/${Uri.encodeComponent(roomName)}?host=0',
-        'metadata': {
-          'room_name': roomName,
-          if (streamTitle != null) 'title': streamTitle,
-        },
+      await sb.rpc('invite_to_livestream', params: {
+        'p_invitee': inviteeId,
+        'p_room': roomName,
+        'p_title': streamTitle,
       });
       return true;
     } catch (e, st) {

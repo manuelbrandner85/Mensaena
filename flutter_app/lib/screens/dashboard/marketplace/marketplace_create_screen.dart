@@ -275,6 +275,11 @@ class _MarketplaceCreateScreenState
       }
       if (!mounted) return;
       setState(() => _uploading = false);
+      // Teil-/Totalausfall des Uploads sichtbar machen statt stillschweigend
+      // ein Inserat ohne Bilder zu erstellen.
+      if (imageUrls.length < _images.length) {
+        AppSnackBar.error(context, 'marketplace.create.uploadFailed'.tr());
+      }
     }
 
     // Create listing.

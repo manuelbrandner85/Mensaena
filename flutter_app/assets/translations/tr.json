@@ -60,7 +60,11 @@
     "crop": "Kırp",
     "viewList": "Liste",
     "viewMap": "Harita",
-    "viewCalendar": "Takvim"
+    "viewCalendar": "Takvim",
+    "justNow": "az önce",
+    "minAgo": "{n} dk önce",
+    "hoursAgo": "{n} sa önce",
+    "daysAgo": "{n} g önce"
   },
   "safe": {
     "critical_nearby_title": "Yakınında kritik bir kriz",
@@ -698,7 +702,10 @@
     "channelPublicHint": "Herkese açık – herkes görebilir ve katılabilir.",
     "createChannelCta": "Kanal oluştur",
     "channelCreated": "Oda oluşturuldu!",
-    "createChannelFailed": "Oda oluşturulamadı."
+    "createChannelFailed": "Oda oluşturulamadı.",
+    "share_location_title": "Konum paylaş",
+    "share_current_location": "Mevcut konumu gönder",
+    "location_message": "Konum"
   },
   "languages": {
     "de": "Almanca",
@@ -2651,7 +2658,11 @@
     "searchUser": "Komşu ara …",
     "noUsersFound": "Komşu bulunamadı.",
     "noUsersForQuery": "Bu isimde kimse yok.",
-    "newDmFailed": "Sohbet oluşturulamadı."
+    "newDmFailed": "Sohbet oluşturulamadı.",
+    "deleteChannelTitle": "Oda silinsin mi?",
+    "deleteChannelBody": "\"{name}\" ve içindeki tüm mesajlar kalıcı olarak silinecek.",
+    "deleteChannelDone": "Oda silindi.",
+    "deleteChannelFailed": "Silme başarısız."
   },
   "legal": {
     "donate": "Bağış yap",
@@ -2769,7 +2780,8 @@
     "catShop": "Çiftlik dükkanı",
     "catMarket": "Pazar",
     "catCsa": "CSA",
-    "catOrchard": "Meyve bahçesi"
+    "catOrchard": "Meyve bahçesi",
+    "intro": "Burada yakınındaki topluluk destekli tarım (CSA), gıda bankaları, çiftlik dükkanları ve foodsharing noktalarını bulursun — ayrıca kendi takas ve paylaşım tekliflerini."
   },
   "knowledge": {
     "category": "Kategori",
@@ -3043,7 +3055,13 @@
     "deleteAllTitle": "Tümünü sil?",
     "screenTitle": "Bildirimler",
     "activities": "Etkinlik",
-    "tooltipClearAll": "Tümünü sil"
+    "tooltipClearAll": "Tümünü sil",
+    "filtAll": "Tümü",
+    "filtUnread": "Okunmamış",
+    "filtMessage": "Mesajlar",
+    "filtMention": "Bahsetmeler",
+    "filtInteraction": "Etkileşimler",
+    "filtSystem": "Sistem"
   },
   "timebank": {
     "history": "Geçmiş",

@@ -737,7 +737,7 @@ class _NonContactRow extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: () {
             Share.share(
-              '${post.title}\nhttps://www.mensaena.de/dashboard/posts/${post.id}',
+              '${post.title}\nmensaena://dashboard/posts/${post.id}',
             );
           },
           icon: const Icon(LucideIcons.share2, size: 14),

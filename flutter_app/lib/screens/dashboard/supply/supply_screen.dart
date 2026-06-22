@@ -305,9 +305,7 @@ class _SupplyIntro extends StatelessWidget {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                'Hier findest du Solidarische Landwirtschaft (Solawi), '
-                'Tafeln, Hofläden und Foodsharing-Stellen in deiner '
-                'Nähe — plus eigene Tausch- und Mitnehm-Angebote.',
+                'supply.intro'.tr(),
                 style: AppTypography.body(
                     size: 12, color: AppColors.inkSoft, height: 1.4),
               ),

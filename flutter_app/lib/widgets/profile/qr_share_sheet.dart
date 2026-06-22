@@ -36,7 +36,7 @@ class QrShareSheet extends StatelessWidget {
     );
   }
 
-  String get _url => 'https://www.mensaena.de/dashboard/profile/$userId';
+  String get _url => 'mensaena://dashboard/profile/$userId';
 
   @override
   Widget build(BuildContext context) {

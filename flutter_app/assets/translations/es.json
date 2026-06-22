@@ -60,7 +60,11 @@
     "crop": "Recortar",
     "viewList": "Lista",
     "viewMap": "Mapa",
-    "viewCalendar": "Calendario"
+    "viewCalendar": "Calendario",
+    "justNow": "ahora mismo",
+    "minAgo": "hace {n} min",
+    "hoursAgo": "hace {n} h",
+    "daysAgo": "hace {n} d"
   },
   "safe": {
     "critical_nearby_title": "Crisis crítica cerca de ti",
@@ -699,7 +703,10 @@
     "channelPublicHint": "Pública: visible y abierta para todos.",
     "createChannelCta": "Crear canal",
     "channelCreated": "¡Sala creada!",
-    "createChannelFailed": "No se pudo crear la sala."
+    "createChannelFailed": "No se pudo crear la sala.",
+    "share_location_title": "Compartir ubicación",
+    "share_current_location": "Enviar ubicación actual",
+    "location_message": "Ubicación"
   },
   "languages": {
     "de": "Alemán",
@@ -2652,7 +2659,11 @@
     "searchUser": "Buscar vecino …",
     "noUsersFound": "Sin vecinos encontrados.",
     "noUsersForQuery": "Nadie con ese nombre.",
-    "newDmFailed": "No se pudo crear el chat."
+    "newDmFailed": "No se pudo crear el chat.",
+    "deleteChannelTitle": "¿Eliminar sala?",
+    "deleteChannelBody": "\"{name}\" y todos sus mensajes se eliminarán permanentemente.",
+    "deleteChannelDone": "Sala eliminada.",
+    "deleteChannelFailed": "Error al eliminar."
   },
   "legal": {
     "donate": "Donar",
@@ -2770,7 +2781,8 @@
     "catShop": "Tienda agrícola",
     "catMarket": "Mercado",
     "catCsa": "CSA",
-    "catOrchard": "Huerto"
+    "catOrchard": "Huerto",
+    "intro": "Aquí encuentras agricultura apoyada por la comunidad (CSA), bancos de alimentos, tiendas agrícolas y puntos de foodsharing cerca de ti — además de tus propias ofertas de intercambio y para llevar."
   },
   "knowledge": {
     "category": "Categoría",
@@ -3044,7 +3056,13 @@
     "deleteAllTitle": "¿Eliminar todas?",
     "screenTitle": "Notificaciones",
     "activities": "Actividad",
-    "tooltipClearAll": "Borrar todo"
+    "tooltipClearAll": "Borrar todo",
+    "filtAll": "Todas",
+    "filtUnread": "No leídas",
+    "filtMessage": "Mensajes",
+    "filtMention": "Menciones",
+    "filtInteraction": "Interacciones",
+    "filtSystem": "Sistema"
   },
   "timebank": {
     "history": "Historial",

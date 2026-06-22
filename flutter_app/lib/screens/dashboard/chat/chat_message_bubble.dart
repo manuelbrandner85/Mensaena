@@ -14,6 +14,7 @@ import '../../../repositories/profiles_repository.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/link_preview_service.dart';
+import '../../../services/safe_url.dart';
 import '../../../services/supabase_service.dart';
 import '../../../services/voice_recorder_service.dart';
 import '../../../widgets/chat/chat_link_preview_card.dart';
@@ -68,6 +69,9 @@ class ChatMessageBubble extends ConsumerWidget {
       RegExp(r'^\[SYSTEM_CALL:([a-z]+):([^:]*):([0-9]+):([^\]]*)\]$');
   static final _sysRegex = RegExp(r'^\[SYSTEM(?::([\w_]+))?\]\s*(.*)$');
   static final _forwardedRegex = RegExp(r'^\[FORWARDED\]\n?');
+  // Standort-Nachricht: [LOC:lat:lng] → tippbare Karten-Vorschau.
+  static final _locRegex =
+      RegExp(r'^\[LOC:(-?\d+(?:\.\d+)?):(-?\d+(?:\.\d+)?)\]$');
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -92,6 +96,20 @@ class ChatMessageBubble extends ConsumerWidget {
         conversationId: conversationId,
         viewerIsMine: mine,
       );
+    }
+
+    // Standort-Karte — Pattern [LOC:lat:lng] → tippbare Vorschau, öffnet
+    // die Karte extern. MUSS vor der SYSTEM-Detection laufen.
+    final locMatch = _locRegex.firstMatch(content.trim());
+    if (locMatch != null && !deleted) {
+      final lat = double.tryParse(locMatch.group(1) ?? '');
+      final lng = double.tryParse(locMatch.group(2) ?? '');
+      if (lat != null && lng != null) {
+        return Align(
+          alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
+          child: _LocationCard(lat: lat, lng: lng, mine: mine),
+        );
+      }
     }
 
     // #15 System-Messages — Pattern [SYSTEM:type] body wird als zentrierte
@@ -879,5 +897,89 @@ class _MentionAwareTextState extends State<_MentionAwareText> {
       return Text(widget.text, style: widget.baseStyle);
     }
     return RichText(text: TextSpan(children: _spans));
+  }
+}
+
+/// Standort-Karte für [LOC:lat:lng]-Nachrichten. Zeigt eine kompakte
+/// Vorschau (Pin + Koordinaten) und öffnet bei Tap die Karte extern
+/// (Google Maps). Bewusst KEINE inline-Karte pro Bubble (Perf in langen
+/// Listen) — die externe Karte ist die robuste WhatsApp-ähnliche Lösung.
+class _LocationCard extends StatelessWidget {
+  const _LocationCard({required this.lat, required this.lng, required this.mine});
+  final double lat;
+  final double lng;
+  final bool mine;
+
+  @override
+  Widget build(BuildContext context) {
+    final coords =
+        '${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3, horizontal: 8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () => safeLaunchUrl(
+          'https://www.google.com/maps/search/?api=1&query=$lat,$lng',
+        ),
+        child: Container(
+          width: 240,
+          decoration: BoxDecoration(
+            color: AppColors.elevated.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+                color: AppColors.bronze.withValues(alpha: 0.35), width: 1),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Stilisierter „Karten"-Streifen mit Pin (kein Netzwerk-Tile).
+              Container(
+                height: 84,
+                decoration: BoxDecoration(
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(13)),
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.bronze.withValues(alpha: 0.22),
+                      AppColors.bronze.withValues(alpha: 0.08),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: const Center(
+                  child: Icon(LucideIcons.mapPin,
+                      size: 34, color: AppColors.bronze),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('chat.location_message'.tr(),
+                              style: AppTypography.label(
+                                  size: 12, color: AppColors.ink)),
+                          const SizedBox(height: 2),
+                          Text(coords,
+                              style: AppTypography.caption(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                        ],
+                      ),
+                    ),
+                    const Icon(LucideIcons.externalLink,
+                        size: 16, color: AppColors.bronze),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

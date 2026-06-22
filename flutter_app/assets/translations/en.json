@@ -60,7 +60,11 @@
     "crop": "Crop",
     "viewList": "List",
     "viewMap": "Map",
-    "viewCalendar": "Calendar"
+    "viewCalendar": "Calendar",
+    "justNow": "just now",
+    "minAgo": "{n} min ago",
+    "hoursAgo": "{n} h ago",
+    "daysAgo": "{n} d ago"
   },
   "safe": {
     "critical_nearby_title": "Critical crisis near you",
@@ -699,7 +703,10 @@
     "channelPublicHint": "Public – visible and joinable by everyone.",
     "createChannelCta": "Create channel",
     "channelCreated": "Room created!",
-    "createChannelFailed": "Could not create room."
+    "createChannelFailed": "Could not create room.",
+    "share_location_title": "Share location",
+    "share_current_location": "Send current location",
+    "location_message": "Location"
   },
   "languages": {
     "de": "German",
@@ -2652,7 +2659,11 @@
     "searchUser": "Search neighbor …",
     "noUsersFound": "No neighbors found.",
     "noUsersForQuery": "No one with that name.",
-    "newDmFailed": "Could not create chat."
+    "newDmFailed": "Could not create chat.",
+    "deleteChannelTitle": "Delete room?",
+    "deleteChannelBody": "\"{name}\" and all its messages will be permanently deleted.",
+    "deleteChannelDone": "Room deleted.",
+    "deleteChannelFailed": "Deletion failed."
   },
   "legal": {
     "donate": "Donate",
@@ -2770,7 +2781,8 @@
     "catShop": "Farm shop",
     "catMarket": "Market",
     "catCsa": "CSA",
-    "catOrchard": "Orchard"
+    "catOrchard": "Orchard",
+    "intro": "Here you'll find community-supported agriculture (CSA), food banks, farm shops and foodsharing points near you — plus your own swap and take-along offers."
   },
   "knowledge": {
     "category": "Category",
@@ -3044,7 +3056,13 @@
     "deleteAllTitle": "Delete all?",
     "screenTitle": "Notifications",
     "activities": "Activity",
-    "tooltipClearAll": "Clear all"
+    "tooltipClearAll": "Clear all",
+    "filtAll": "All",
+    "filtUnread": "Unread",
+    "filtMessage": "Messages",
+    "filtMention": "Mentions",
+    "filtInteraction": "Interactions",
+    "filtSystem": "System"
   },
   "timebank": {
     "history": "History",

@@ -851,7 +851,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   children: [
                     const ChatTypingDots(),
                     const SizedBox(width: 8),
-                    Text('schreibt…',
+                    Text('chat.typing'.tr(),
                         style: AppTypography.body(
                             size: 11, color: AppColors.mute)),
                   ],

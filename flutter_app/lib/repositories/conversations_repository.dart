@@ -15,7 +15,7 @@ class ConversationsRepository {
       final rows = await sb
           .from('chat_channels')
           .select(
-              'id, conversation_id, name, emoji, slug, description, category, is_locked, sort_order, avatar_url')
+              'id, conversation_id, name, emoji, slug, description, category, is_locked, sort_order, avatar_url, created_by')
           .order('sort_order')
           .limit(200);
       return (rows as List).whereType<Map<String, dynamic>>().toList();
@@ -60,6 +60,22 @@ class ConversationsRepository {
       return null;
     } catch (_) {
       return null;
+    }
+  }
+
+  /// Löscht einen selbst erstellten Community-Raum (Kanal). Nur der Ersteller
+  /// (chat_channels.created_by / Member-Rolle 'owner') oder ein Admin darf das
+  /// — die Berechtigung wird serverseitig in der SECURITY-DEFINER-RPC geprüft.
+  /// CASCADE entfernt Kanal, Mitglieder und alle Nachrichten.
+  static Future<bool> deleteChannel(String conversationId) async {
+    try {
+      await sb.rpc<dynamic>(
+        'delete_community_channel',
+        params: {'p_conversation': conversationId},
+      );
+      return true;
+    } catch (_) {
+      return false;
     }
   }
 

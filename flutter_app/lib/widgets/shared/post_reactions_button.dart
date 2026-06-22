@@ -48,17 +48,73 @@ final _reactionsStateProvider = FutureProvider.autoDispose
   );
 });
 
-class PostReactionsButton extends ConsumerWidget {
+/// Berechnet den neuen Zustand nach einem Toggle LOKAL (optimistisch), damit
+/// die Anzeige sofort reagiert statt erst nach dem Netzwerk-Roundtrip — das
+/// war die Ursache für „Likes werden nicht richtig gezählt" (Lag → wirkte, als
+/// würde nichts passieren).
+_ReactionsState _applyToggle(_ReactionsState s, String emoji) {
+  final byType = Map<String, int>.from(s.byType);
+  void dec(String t) {
+    final v = (byType[t] ?? 0) - 1;
+    if (v <= 0) {
+      byType.remove(t);
+    } else {
+      byType[t] = v;
+    }
+  }
+
+  if (s.mine == emoji) {
+    // Gleiche Reaction → entfernen.
+    dec(emoji);
+    return _ReactionsState(total: s.total - 1, byType: byType, mine: null);
+  }
+  if (s.mine == null) {
+    // Neue Reaction → hinzufügen.
+    byType[emoji] = (byType[emoji] ?? 0) + 1;
+    return _ReactionsState(total: s.total + 1, byType: byType, mine: emoji);
+  }
+  // Andere Reaction → ersetzen (Total bleibt gleich, 1 pro User).
+  dec(s.mine!);
+  byType[emoji] = (byType[emoji] ?? 0) + 1;
+  return _ReactionsState(total: s.total, byType: byType, mine: emoji);
+}
+
+class PostReactionsButton extends ConsumerStatefulWidget {
   const PostReactionsButton({required this.postId, super.key});
   final String postId;
 
-  Future<void> _toggle(WidgetRef ref, String emoji) async {
+  @override
+  ConsumerState<PostReactionsButton> createState() =>
+      _PostReactionsButtonState();
+}
+
+class _PostReactionsButtonState extends ConsumerState<PostReactionsButton> {
+  // Optimistischer Override — überlagert den Provider-Wert bis der Server-
+  // Refetch abgeschlossen ist.
+  _ReactionsState? _optimistic;
+
+  String get postId => widget.postId;
+
+  Future<void> _toggle(String emoji) async {
     Haptics.tap();
+    // Aktuellen Stand (Override oder Provider) als Basis nehmen.
+    final base = _optimistic ??
+        ref.read(_reactionsStateProvider(postId)).maybeWhen(
+              data: (s) => s,
+              orElse: () =>
+                  const _ReactionsState(total: 0, byType: {}, mine: null),
+            );
+    setState(() => _optimistic = _applyToggle(base, emoji));
     await PostReactionsRepository.toggle(postId, emoji);
-    ref.invalidate(_reactionsStateProvider(postId));
+    // Frisch vom Server holen, dann Override auflösen.
+    await ref.refresh(_reactionsStateProvider(postId).future).catchError(
+          (_) => _optimistic ??
+              const _ReactionsState(total: 0, byType: {}, mine: null),
+        );
+    if (mounted) setState(() => _optimistic = null);
   }
 
-  void _openPicker(BuildContext context, WidgetRef ref) {
+  void _openPicker(BuildContext context) {
     Haptics.longPress();
     showModalBottomSheet<void>(
       context: context,
@@ -77,7 +133,7 @@ class PostReactionsButton extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(28),
                   onTap: () {
                     Navigator.pop(sheetCtx);
-                    _toggle(ref, e);
+                    _toggle(e);
                   },
                   child: Container(
                     width: 48,
@@ -98,20 +154,21 @@ class PostReactionsButton extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(_reactionsStateProvider(postId)).maybeWhen(
+  Widget build(BuildContext context) {
+    final providerState = ref.watch(_reactionsStateProvider(postId)).maybeWhen(
           data: (s) => s,
           orElse: () => const _ReactionsState(
               total: 0, byType: {}, mine: null),
         );
+    final state = _optimistic ?? providerState;
     final hasMine = state.mine != null;
     // Top-2 Emojis nach Count.
     final topEmojis = state.byType.entries.toList()
       ..sort((a, b) => b.value.compareTo(a.value));
     final display = topEmojis.take(2).map((e) => e.key).toList();
     return InkWell(
-      onTap: () => _toggle(ref, state.mine ?? '❤️'),
-      onLongPress: () => _openPicker(context, ref),
+      onTap: () => _toggle(state.mine ?? '❤️'),
+      onLongPress: () => _openPicker(context),
       borderRadius: BorderRadius.circular(6),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),

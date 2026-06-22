@@ -555,7 +555,7 @@ class _MarketplaceDetailScreenState
     await Share.share(
       'marketplace.shareBody'.tr(namedArgs: {
         'title': l.title,
-        'url': 'https://www.mensaena.de/dashboard/marketplace/${l.id}',
+        'url': 'mensaena://dashboard/marketplace/${l.id}',
       }),
       subject: 'marketplace.shareSubject'
           .tr(namedArgs: {'title': l.title}),

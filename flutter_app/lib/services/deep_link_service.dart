@@ -53,14 +53,24 @@ class DeepLinkService {
 
   /// Konvertiert eine eingehende URL in eine GoRouter-Route.
   /// Returns null wenn URL nicht zu uns gehoert.
+  ///
+  /// Zwei Formate:
+  ///   mensaena://dashboard/posts/<id>      (App-Deep-Link, eigenständig)
+  ///       → host='dashboard' IST das erste Routen-Segment → /dashboard/posts/<id>
+  ///   https://www.mensaena.de/dashboard/...(Alt-Link, falls noch im Umlauf)
+  ///       → host ist die Domain, nur der Pfad zählt → /dashboard/...
   static String? toInternalRoute(Uri uri) {
-    if (uri.host.isNotEmpty &&
-        !uri.host.contains('mensaena') &&
-        uri.scheme != 'mensaena') {
+    final query = uri.query.isEmpty ? '' : '?${uri.query}';
+    if (uri.scheme == 'mensaena') {
+      // Custom-Scheme: host = erstes Pfadsegment.
+      final path = uri.path.isEmpty ? '' : uri.path;
+      final route = '/${uri.host}$path'.replaceAll('//', '/');
+      return route.isEmpty ? '/' : '$route$query';
+    }
+    if (uri.host.isNotEmpty && !uri.host.contains('mensaena')) {
       return null;
     }
     final path = uri.path.isEmpty ? '/' : uri.path;
-    final query = uri.query.isEmpty ? '' : '?${uri.query}';
     return '$path$query';
   }
 

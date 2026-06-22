@@ -16,8 +16,10 @@ import '../../repositories/conversations_repository.dart';
 import '../../repositories/profiles_repository.dart';
 import '../../services/haptics.dart';
 import '../../services/presence_service.dart';
+import '../../services/supabase_service.dart';
 import '../../widgets/effects/animated_entrance.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/app_snackbar.dart';
 import '../../widgets/shared/sized_avatar_image.dart';
 import '../../widgets/shared/error_state_card.dart';
 import '../../widgets/effects/shimmer_skeleton.dart';
@@ -363,7 +365,10 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
                     color: AppColors.amber,
                     backgroundColor: AppColors.surface,
                     onRefresh: _refresh,
-                    child: _ChannelListView(future: _channels),
+                    child: _ChannelListView(
+                      future: _channels,
+                      onChanged: () => setState(_load),
+                    ),
                   ),
                   RefreshIndicator(
                     color: AppColors.amber,
@@ -393,8 +398,9 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
 
 // ── Community: Channel-Liste gruppiert nach Kategorie ──────────────
 class _ChannelListView extends StatelessWidget {
-  const _ChannelListView({required this.future});
+  const _ChannelListView({required this.future, this.onChanged});
   final Future<List<Map<String, dynamic>>>? future;
+  final VoidCallback? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -460,7 +466,10 @@ class _ChannelListView extends StatelessWidget {
             }
             return AnimatedEntrance(
               index: i,
-              child: _ChannelTile(channel: item as Map<String, dynamic>),
+              child: _ChannelTile(
+                channel: item as Map<String, dynamic>,
+                onChanged: onChanged,
+              ),
             );
           },
         );
@@ -470,8 +479,9 @@ class _ChannelListView extends StatelessWidget {
 }
 
 class _ChannelTile extends ConsumerWidget {
-  const _ChannelTile({required this.channel});
+  const _ChannelTile({required this.channel, this.onChanged});
   final Map<String, dynamic> channel;
+  final VoidCallback? onChanged;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -480,12 +490,19 @@ class _ChannelTile extends ConsumerWidget {
     final emoji = (channel['emoji'] as String?) ?? '💬';
     final desc = channel['description'] as String?;
     final locked = channel['is_locked'] == true;
+    final me = SupabaseService.currentUser?.id;
+    // Eigene Räume (Ersteller) dürfen gelöscht werden — Server-RPC prüft die
+    // Berechtigung zusätzlich (Ersteller ODER Admin).
+    final canDelete = me != null && channel['created_by'] == me;
     final phase = ref.watch(effectiveCinemaPhaseProvider);
     final accent = CinemaAccents.hue(phase);
     return InkWell(
       onTap: convId == null
           ? null
           : () => context.push('/dashboard/messages/$convId'),
+      onLongPress: (canDelete && convId != null)
+          ? () => _confirmDelete(context, convId, name)
+          : null,
       borderRadius: BorderRadius.circular(14),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -570,6 +587,40 @@ class _ChannelTile extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _confirmDelete(
+      BuildContext context, String convId, String name) async {
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('messages.deleteChannelTitle'.tr()),
+        content: Text('messages.deleteChannelBody'.tr(namedArgs: {'name': name})),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('common.delete'.tr(),
+                style: const TextStyle(color: AppColors.herzrot)),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    final success = await ConversationsRepository.deleteChannel(convId);
+    if (!context.mounted) return;
+    if (success) {
+      Haptics.success();
+      AppSnackBar.success(context, 'messages.deleteChannelDone'.tr());
+      onChanged?.call();
+    } else {
+      Haptics.error();
+      AppSnackBar.error(context, 'messages.deleteChannelFailed'.tr());
+    }
   }
 }
 

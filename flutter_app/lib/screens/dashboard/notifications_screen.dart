@@ -27,14 +27,14 @@ class NotificationsScreen extends ConsumerStatefulWidget {
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
-  static const List<({String key, String label})> _tabs = [
-    (key: 'all', label: 'Alle'),
-    (key: 'unread', label: 'Ungelesen'),
-    (key: 'message', label: 'Nachrichten'),
-    (key: 'mention', label: 'Erwähnungen'),
-    (key: 'interaction', label: 'Interaktionen'),
-    (key: 'system', label: 'System'),
-  ];
+  List<({String key, String label})> get _tabs => [
+        (key: 'all', label: 'notifications.filtAll'.tr()),
+        (key: 'unread', label: 'notifications.filtUnread'.tr()),
+        (key: 'message', label: 'notifications.filtMessage'.tr()),
+        (key: 'mention', label: 'notifications.filtMention'.tr()),
+        (key: 'interaction', label: 'notifications.filtInteraction'.tr()),
+        (key: 'system', label: 'notifications.filtSystem'.tr()),
+      ];
 
   String _tab = 'all';
   static const _tabPrefKey = 'mensaena_notif_tab_v1';

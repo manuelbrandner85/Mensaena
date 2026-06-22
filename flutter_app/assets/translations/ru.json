@@ -60,7 +60,11 @@
     "crop": "Обрезать",
     "viewList": "Список",
     "viewMap": "Карта",
-    "viewCalendar": "Календарь"
+    "viewCalendar": "Календарь",
+    "justNow": "только что",
+    "minAgo": "{n} мин назад",
+    "hoursAgo": "{n} ч назад",
+    "daysAgo": "{n} дн назад"
   },
   "safe": {
     "critical_nearby_title": "Критический кризис рядом",
@@ -698,7 +702,10 @@
     "channelPublicHint": "Публичная — видна и доступна всем.",
     "createChannelCta": "Создать канал",
     "channelCreated": "Комната создана!",
-    "createChannelFailed": "Не удалось создать комнату."
+    "createChannelFailed": "Не удалось создать комнату.",
+    "share_location_title": "Поделиться местоположением",
+    "share_current_location": "Отправить текущее местоположение",
+    "location_message": "Местоположение"
   },
   "languages": {
     "de": "Немецкий",
@@ -2651,7 +2658,11 @@
     "searchUser": "Найти соседа …",
     "noUsersFound": "Соседи не найдены.",
     "noUsersForQuery": "Никого с таким именем.",
-    "newDmFailed": "Не удалось создать чат."
+    "newDmFailed": "Не удалось создать чат.",
+    "deleteChannelTitle": "Удалить комнату?",
+    "deleteChannelBody": "«{name}» и все сообщения в ней будут удалены навсегда.",
+    "deleteChannelDone": "Комната удалена.",
+    "deleteChannelFailed": "Не удалось удалить."
   },
   "legal": {
     "donate": "Пожертвовать",
@@ -2769,7 +2780,8 @@
     "catShop": "Фермерский магазин",
     "catMarket": "Рынок",
     "catCsa": "CSA",
-    "catOrchard": "Сад"
+    "catOrchard": "Сад",
+    "intro": "Здесь ты найдёшь поддерживаемое сообществом сельское хозяйство (CSA), продуктовые банки, фермерские магазины и точки фудшеринга поблизости — а также свои предложения обмена и самовывоза."
   },
   "knowledge": {
     "category": "Категория",
@@ -3043,7 +3055,13 @@
     "deleteAllTitle": "Удалить все?",
     "screenTitle": "Уведомления",
     "activities": "Активность",
-    "tooltipClearAll": "Очистить все"
+    "tooltipClearAll": "Очистить все",
+    "filtAll": "Все",
+    "filtUnread": "Непрочитанные",
+    "filtMessage": "Сообщения",
+    "filtMention": "Упоминания",
+    "filtInteraction": "Взаимодействия",
+    "filtSystem": "Система"
   },
   "timebank": {
     "history": "История",

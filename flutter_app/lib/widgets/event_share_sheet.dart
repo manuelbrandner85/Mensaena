@@ -49,7 +49,7 @@ class _ShareBody extends StatelessWidget {
   final String title;
   final DateTime? startsAt;
 
-  String get _url => 'https://www.mensaena.de/dashboard/events/$eventId';
+  String get _url => 'mensaena://dashboard/events/$eventId';
   String get _text =>
       '${'events.shareBody'.tr(namedArgs: {'title': title})}\n$_url';
 

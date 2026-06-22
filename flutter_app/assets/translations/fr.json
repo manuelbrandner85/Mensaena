@@ -60,7 +60,11 @@
     "crop": "Recadrer",
     "viewList": "Liste",
     "viewMap": "Carte",
-    "viewCalendar": "Calendrier"
+    "viewCalendar": "Calendrier",
+    "justNow": "à l'instant",
+    "minAgo": "il y a {n} min",
+    "hoursAgo": "il y a {n} h",
+    "daysAgo": "il y a {n} j"
   },
   "safe": {
     "critical_nearby_title": "Crise critique près de toi",
@@ -699,7 +703,10 @@
     "channelPublicHint": "Public – visible et ouvert à tous.",
     "createChannelCta": "Créer le salon",
     "channelCreated": "Salon créé !",
-    "createChannelFailed": "Impossible de créer le salon."
+    "createChannelFailed": "Impossible de créer le salon.",
+    "share_location_title": "Partager la position",
+    "share_current_location": "Envoyer la position actuelle",
+    "location_message": "Position"
   },
   "languages": {
     "de": "Allemand",
@@ -2652,7 +2659,11 @@
     "searchUser": "Rechercher un voisin …",
     "noUsersFound": "Aucun voisin trouvé.",
     "noUsersForQuery": "Personne avec ce nom.",
-    "newDmFailed": "Impossible de créer le chat."
+    "newDmFailed": "Impossible de créer le chat.",
+    "deleteChannelTitle": "Supprimer le salon ?",
+    "deleteChannelBody": "« {name} » et tous ses messages seront définitivement supprimés.",
+    "deleteChannelDone": "Salon supprimé.",
+    "deleteChannelFailed": "Échec de la suppression."
   },
   "legal": {
     "donate": "Faire un don",
@@ -2770,7 +2781,8 @@
     "catShop": "Magasin de ferme",
     "catMarket": "Marché",
     "catCsa": "AMAP",
-    "catOrchard": "Verger"
+    "catOrchard": "Verger",
+    "intro": "Ici tu trouves l'agriculture soutenue par la communauté (AMAP), des banques alimentaires, des magasins de ferme et des points de foodsharing près de chez toi — ainsi que tes propres offres d'échange et à emporter."
   },
   "knowledge": {
     "category": "Catégorie",
@@ -3044,7 +3056,13 @@
     "deleteAllTitle": "Tout supprimer ?",
     "screenTitle": "Notifications",
     "activities": "Activité",
-    "tooltipClearAll": "Tout effacer"
+    "tooltipClearAll": "Tout effacer",
+    "filtAll": "Toutes",
+    "filtUnread": "Non lues",
+    "filtMessage": "Messages",
+    "filtMention": "Mentions",
+    "filtInteraction": "Interactions",
+    "filtSystem": "Système"
   },
   "timebank": {
     "history": "Historique",

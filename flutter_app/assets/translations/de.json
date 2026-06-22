@@ -60,7 +60,11 @@
     "crop": "Zuschneiden",
     "viewList": "Liste",
     "viewMap": "Karte",
-    "viewCalendar": "Kalender"
+    "viewCalendar": "Kalender",
+    "justNow": "gerade eben",
+    "minAgo": "vor {n} Min.",
+    "hoursAgo": "vor {n} Std.",
+    "daysAgo": "vor {n} Tg."
   },
   "safe": {
     "critical_nearby_title": "Kritische Krise in deiner Nähe",
@@ -698,7 +702,10 @@
     "channelPublicHint": "Öffentlich – für alle sichtbar und beitretbar.",
     "createChannelCta": "Kanal erstellen",
     "channelCreated": "Raum erstellt!",
-    "createChannelFailed": "Konnte Raum nicht erstellen."
+    "createChannelFailed": "Konnte Raum nicht erstellen.",
+    "share_location_title": "Standort teilen",
+    "share_current_location": "Aktuellen Standort senden",
+    "location_message": "Standort"
   },
   "languages": {
     "de": "Deutsch",
@@ -2651,7 +2658,11 @@
     "searchUser": "Nachbar:in suchen …",
     "noUsersFound": "Keine Nachbar:innen gefunden.",
     "noUsersForQuery": "Niemand mit diesem Namen.",
-    "newDmFailed": "Chat konnte nicht erstellt werden."
+    "newDmFailed": "Chat konnte nicht erstellt werden.",
+    "deleteChannelTitle": "Raum löschen?",
+    "deleteChannelBody": "„{name}\" und alle Nachrichten darin werden dauerhaft gelöscht.",
+    "deleteChannelDone": "Raum gelöscht.",
+    "deleteChannelFailed": "Löschen fehlgeschlagen."
   },
   "legal": {
     "donate": "Spenden",
@@ -2769,7 +2780,8 @@
     "catShop": "Hofladen",
     "catMarket": "Markt",
     "catCsa": "Solawi",
-    "catOrchard": "Obstgarten"
+    "catOrchard": "Obstgarten",
+    "intro": "Hier findest du Solidarische Landwirtschaft (Solawi), Tafeln, Hofläden und Foodsharing-Stellen in deiner Nähe — plus eigene Tausch- und Mitnehm-Angebote."
   },
   "knowledge": {
     "category": "Kategorie",
@@ -3043,7 +3055,13 @@
     "deleteAllTitle": "Alle löschen?",
     "screenTitle": "Benachrichtigungen",
     "activities": "Aktivitäten",
-    "tooltipClearAll": "Alle löschen"
+    "tooltipClearAll": "Alle löschen",
+    "filtAll": "Alle",
+    "filtUnread": "Ungelesen",
+    "filtMessage": "Nachrichten",
+    "filtMention": "Erwähnungen",
+    "filtInteraction": "Interaktionen",
+    "filtSystem": "System"
   },
   "timebank": {
     "history": "Historie",

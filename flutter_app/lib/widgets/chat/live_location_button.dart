@@ -8,7 +8,10 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
+import '../../repositories/conversations_repository.dart';
+import '../../services/haptics.dart';
 import '../../services/live_location_service.dart';
+import '../../services/location_service.dart';
 import '../../widgets/shared/app_snackbar.dart';
 
 class LiveLocationButton extends StatefulWidget {
@@ -25,7 +28,9 @@ class _LiveLocationButtonState extends State<LiveLocationButton> {
       LiveLocationService.instance.currentConversationId == widget.conversationId;
 
   Future<void> _openSheet() async {
-    final selected = await showModalBottomSheet<Duration>(
+    // kind: 'now' = aktuellen Standort einmalig senden, 'live' = Live teilen
+    // (minutes), 'stop' = Live beenden.
+    final res = await showModalBottomSheet<({String kind, int minutes})>(
       context: context,
       backgroundColor: AppColors.sheetBackground,
       shape: const RoundedRectangleBorder(
@@ -42,14 +47,24 @@ class _LiveLocationButtonState extends State<LiveLocationButton> {
                 const Icon(LucideIcons.mapPin,
                     size: 18, color: AppColors.bronze),
                 const SizedBox(width: 8),
-                Text('chat.share_live_location'.tr(),
+                Text('chat.share_location_title'.tr(),
                     style: AppTypography.display(
                         size: 18, color: AppColors.ink)),
               ]),
-              const SizedBox(height: 4),
+              const SizedBox(height: 12),
+              // WhatsApp-Stil: zuerst „aktuellen Standort senden".
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading:
+                    const Icon(LucideIcons.navigation, color: AppColors.bronze),
+                title: Text('chat.share_current_location'.tr()),
+                onTap: () =>
+                    Navigator.pop(context, (kind: 'now', minutes: 0)),
+              ),
+              const Divider(),
               Text('chat.share_live_location_hint'.tr(),
                   style: AppTypography.caption()),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               for (final m in [15, 30, 60])
                 ListTile(
                   contentPadding: EdgeInsets.zero,
@@ -58,7 +73,7 @@ class _LiveLocationButtonState extends State<LiveLocationButton> {
                   title: Text('chat.share_duration'
                       .tr(namedArgs: {'min': '$m'})),
                   onTap: () =>
-                      Navigator.pop(context, Duration(minutes: m)),
+                      Navigator.pop(context, (kind: 'live', minutes: m)),
                 ),
               if (_activeHere) ...[
                 const Divider(),
@@ -67,7 +82,8 @@ class _LiveLocationButtonState extends State<LiveLocationButton> {
                   leading: const Icon(LucideIcons.x,
                       color: AppColors.herzrotWarm),
                   title: Text('chat.share_stop'.tr()),
-                  onTap: () => Navigator.pop(context, Duration.zero),
+                  onTap: () =>
+                      Navigator.pop(context, (kind: 'stop', minutes: 0)),
                 ),
               ],
             ],
@@ -75,19 +91,47 @@ class _LiveLocationButtonState extends State<LiveLocationButton> {
         ),
       ),
     );
-    if (selected == null) return;
-    if (selected == Duration.zero) {
+    if (res == null) return;
+    if (res.kind == 'stop') {
       await LiveLocationService.instance.stop();
-    } else {
+    } else if (res.kind == 'now') {
+      await _sendCurrentLocation();
+    } else if (res.kind == 'live') {
       final ok = await LiveLocationService.instance.start(
         conversationId: widget.conversationId,
-        duration: selected,
+        duration: Duration(minutes: res.minutes),
       );
       if (!ok && mounted) {
         AppSnackBar.info(context, 'chat.share_no_permission'.tr());
+      } else {
+        // Sichtbarer Chat-Eintrag mit der aktuellen Position als Startpunkt.
+        await _sendCurrentLocation(silentErrors: true);
       }
     }
     if (mounted) setState(() {});
+  }
+
+  /// Holt die aktuelle Position und sendet sie als Standort-Nachricht
+  /// (`[LOC:lat:lng]`), die im Chat als tippbare Karten-Vorschau erscheint.
+  Future<void> _sendCurrentLocation({bool silentErrors = false}) async {
+    final pos = await LocationService.getBestPosition();
+    if (pos == null) {
+      if (!silentErrors && mounted) {
+        AppSnackBar.info(context, 'chat.share_no_permission'.tr());
+      }
+      return;
+    }
+    final ok = await MessagesRepository.send(
+      conversationId: widget.conversationId,
+      content: '[LOC:${pos.latitude}:${pos.longitude}]',
+    );
+    if (!mounted) return;
+    if (ok) {
+      Haptics.success();
+    } else if (!silentErrors) {
+      Haptics.error();
+      AppSnackBar.error(context, 'common.error'.tr());
+    }
   }
 
   @override
