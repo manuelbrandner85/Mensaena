@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:easy_localization/easy_localization.dart';
@@ -65,14 +66,34 @@ class _SplashScreenState extends State<SplashScreen>
     // er erst nach den Background-Init-awaits in main.dart und kam oft zu
     // spät, wenn der Splash schon weg war. Fire-and-forget, fail-silent.
     AudioFeedbackService.instance.playStartupMelody();
-    _initVideo();
+    // Defer video init to post-frame so the first frame renders before
+    // the decoder starts (avoids jank / unnecessary work on first paint).
+    WidgetsBinding.instance.addPostFrameCallback((_) => _initVideo());
     _navTimer = Timer(
       const Duration(milliseconds: _totalDurationMs + 200),
       _navigate,
     );
   }
 
+  // Returns true when the device has less than 3 GB total RAM.
+  // Reads /proc/meminfo (Android/Linux only); returns false on all other
+  // platforms or if the file cannot be parsed.
+  static Future<bool> _isLowRamDevice() async {
+    try {
+      final content = await File('/proc/meminfo').readAsString();
+      final match = RegExp(r'MemTotal:\s+(\d+)\s+kB').firstMatch(content);
+      if (match == null) return false;
+      return int.parse(match.group(1)!) < 3 * 1024 * 1024; // < 3 GiB
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> _initVideo() async {
+    // Low-RAM devices fall back to the static splash_cosmos.webp — loading
+    // and decoding the mp4 on <3 GB RAM would compete with startup memory.
+    if (await _isLowRamDevice()) return;
+
     // mixWithOthers: true → der stumme Loop greift NICHT den Audio-Fokus
     // (sonst würde ExoPlayer den Startup-Sound ducken/abwürgen).
     final v = VideoPlayerController.asset(
@@ -100,6 +121,16 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   Future<void> _navigate() async {
+    // Couple ambient loop to splash duration — stop before navigating away
+    // so it does not keep ticking after the screen is no longer visible.
+    _ambientCtrl.stop();
+
+    // Dispose the video immediately rather than waiting for widget dispose —
+    // the exit-fade is complete at this point so the frame is no longer needed.
+    final video = _video;
+    _video = null;
+    if (video != null) unawaited(video.dispose());
+
     if (!mounted) return;
     if (!SupabaseService.isLoggedIn) {
       // Erster Start: immersives Dorf-Intro (= das einzige Onboarding) zeigen.
