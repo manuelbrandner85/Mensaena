@@ -47,17 +47,28 @@ class OrbitViewer extends ConsumerStatefulWidget {
 
 class _OrbitViewerState extends ConsumerState<OrbitViewer>
     with SingleTickerProviderStateMixin {
-  late double _frame = 0; // kontinuierlich, wird zum Index gerundet
+  late double _frame = 0;
   late final AnimationController _fling =
       AnimationController.unbounded(vsync: this);
   bool _preloaded = false;
   bool _hintShown = false;
+  int _lastPreloadCenter = -1;
 
   int get _count => widget.frameAssets.length;
+
+  // Dekodiert jedes Frame auf exakt display-size Pixel → weniger RAM-Druck.
+  ImageProvider _provider(int i) => ResizeImage(
+        AssetImage(widget.frameAssets[i]),
+        width: widget.size.toInt(),
+      );
 
   @override
   void dispose() {
     _fling.dispose();
+    // Alle vorab geladenen Frame-Texturen aus dem ImageCache freigeben.
+    for (var i = 0; i < _count; i++) {
+      imageCache.evict(_provider(i));
+    }
     super.dispose();
   }
 
@@ -66,15 +77,12 @@ class _OrbitViewerState extends ConsumerState<OrbitViewer>
     super.didChangeDependencies();
     if (_preloaded) return;
     _preloaded = true;
-    // Nur die volle Sequenz vorladen, wenn interaktiv gedreht wird.
     final interactive =
         ref.read(effectsProfileProvider) != EffectsProfile.none;
     if (interactive) {
-      for (final a in widget.frameAssets) {
-        precacheImage(AssetImage(a), context);
-      }
+      _preloadWindow(_refIndex);
     } else {
-      precacheImage(AssetImage(widget.frameAssets[_refIndex]), context);
+      precacheImage(_provider(_refIndex), context);
     }
   }
 
@@ -87,6 +95,17 @@ class _OrbitViewerState extends ConsumerState<OrbitViewer>
     return i < 0 ? i + _count : i;
   }
 
+  // Laedt nur ±2 Frames um center lazy vor; ist ein No-op wenn center gleich
+  // dem letzten Preload-Mittelpunkt ist.
+  void _preloadWindow(int center) {
+    if (center == _lastPreloadCenter || !mounted) return;
+    _lastPreloadCenter = center;
+    for (var delta = -2; delta <= 2; delta++) {
+      final i = ((center + delta) % _count + _count) % _count;
+      precacheImage(_provider(i), context);
+    }
+  }
+
   void _onDragUpdate(DragUpdateDetails d, double dragUnit) {
     _fling.stop();
     setState(() {
@@ -94,6 +113,7 @@ class _OrbitViewerState extends ConsumerState<OrbitViewer>
       _frame += d.primaryDelta! * dragUnit;
       if (!_hintShown) _hintShown = true;
     });
+    _preloadWindow(_index);
   }
 
   void _onDragEnd(DragEndDetails d, double dragUnit, bool momentum) {
@@ -114,6 +134,7 @@ class _OrbitViewerState extends ConsumerState<OrbitViewer>
 
   void _onFling() {
     setState(() => _frame = _fling.value);
+    _preloadWindow(_index);
     if (!_fling.isAnimating) _fling.removeListener(_onFling);
   }
 
@@ -158,8 +179,8 @@ class _OrbitViewerState extends ConsumerState<OrbitViewer>
     return SizedBox(
       width: widget.size,
       height: widget.size,
-      child: Image.asset(
-        widget.frameAssets[i],
+      child: Image(
+        image: _provider(i),
         fit: BoxFit.contain,
         gaplessPlayback: true, // kein Flackern beim Frame-Wechsel
         errorBuilder: (_, __, ___) => const SizedBox.shrink(),
