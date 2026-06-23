@@ -670,10 +670,22 @@ class _CallScreenState extends ConsumerState<CallScreen> {
     final lp = _room?.localParticipant;
     if (lp == null) return;
     final next = !_screenShareEnabled;
+    final tracksBefore = lp.videoTrackPublications.length;
     try {
       await lp.setScreenShareEnabled(next);
       if (!mounted) return;
       setState(() => _screenShareEnabled = next);
+      // Diagnose: setScreenShareEnabled wirft NICHT (kein Exception-Log in
+      // error_logs), aber andere sehen den Bildschirm nicht. Diese Zeile zeigt,
+      // ob das Enable überhaupt einen Screen-Share-Track publiziert hat
+      // (Track-Zahl vorher→nachher). Bleibt sie gleich → Publish scheiterte
+      // still; steigt sie → der Track existiert und das Problem ist das
+      // Hintergrund-Killing (fehlender mediaProjection-Foreground-Service).
+      unawaited(ErrorLogsRepository.log(
+        errorType: 'screen_share',
+        message: 'toggle enabled=$next tracksBefore=$tracksBefore '
+            'after=${lp.videoTrackPublications.length}',
+      ));
     } catch (e, st) {
       // Diagnose: echte Ursache erfassen (FGS-Permission/MediaProjection).
       unawaited(ErrorLogsRepository.log(
