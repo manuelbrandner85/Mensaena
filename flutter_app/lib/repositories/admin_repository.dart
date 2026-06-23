@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart'
     show CountOption, PostgrestResponse;
 
 import '../services/supabase_service.dart';
+import 'extra_repositories.dart';
 
 /// SKILL: supabase + mensaena-features
 /// Admin-Repository — Counts + generische Tabellen-Liste.
@@ -643,7 +644,10 @@ class AdminRepository {
       await sb.rpc<dynamic>('admin_delete_user', params: {'p_user_id': userId});
       unawaited(_logAdminAction('delete_user', targetId: userId));
       return true;
-    } catch (_) {
+    } catch (e, st) {
+      // Fehler nicht mehr still verschlucken — sonst „passiert nichts" ohne Spur.
+      unawaited(ErrorLogsRepository.log(
+          errorType: 'admin_delete_failed', message: '$e', stack: st.toString()));
       return false;
     }
   }
@@ -681,13 +685,17 @@ class AdminRepository {
       await sb.from('profiles').update({
         'is_banned': true,
         'banned_until': until,
+        'banned_at': DateTime.now().toUtc().toIso8601String(),
+        'banned_by': SupabaseService.currentUser?.id,
         'ban_reason': reason,
       }).eq('id', userId);
       unawaited(_logAdminAction('ban',
           targetId: userId,
           details: {'reason': reason, 'days': days, 'until': until}));
       return true;
-    } catch (_) {
+    } catch (e, st) {
+      unawaited(ErrorLogsRepository.log(
+          errorType: 'admin_ban_failed', message: '$e', stack: st.toString()));
       return false;
     }
   }
@@ -698,11 +706,15 @@ class AdminRepository {
       await sb.from('profiles').update({
         'is_banned': false,
         'banned_until': null,
+        'banned_at': null,
+        'banned_by': null,
         'ban_reason': null,
       }).eq('id', userId);
       unawaited(_logAdminAction('unban', targetId: userId));
       return true;
-    } catch (_) {
+    } catch (e, st) {
+      unawaited(ErrorLogsRepository.log(
+          errorType: 'admin_unban_failed', message: '$e', stack: st.toString()));
       return false;
     }
   }
