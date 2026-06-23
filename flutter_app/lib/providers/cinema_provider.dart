@@ -10,6 +10,8 @@
 /// Storage-Update kommt smooth nach dem ersten Paint.
 library;
 
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -368,3 +370,73 @@ final effectiveCinemaPhaseProvider = Provider<CinemaPhase?>((ref) {
           CinemaTheme.resolveForTime(DateTime.now());
   }
 });
+
+/// B: Echte Sonnen-/Mond-Position als [Alignment], kontinuierlich aus den
+/// lokalen Sonnenzeiten berechnet — Aufgang Ost (links), Zenit oben-mittig,
+/// Untergang West (rechts). Nachts derselbe Bogen für den Mond. Behebt die
+/// früher fixe „Sonne mittig in der Stadt bei Sonnenuntergang": die Position
+/// folgt jetzt der echten Uhrzeit statt einem statischen Phasen-Punkt.
+///
+/// null = keine Standortdaten / nur User-Override-Phase aktiv → SkyBody nutzt
+/// die statische Phasen-Position als Fallback (z. B. bei forceNight/-Day/-Dusk).
+final cinemaSkyBodyAlignmentProvider = StreamProvider<Alignment?>((ref) async* {
+  // Nur im Auto-Modus folgt der Himmelskörper der echten Zeit. Bei einem
+  // erzwungenen Phasen-Override (Nacht/Tag/Dusk) bleibt die kuratierte
+  // statische Position der Phase erhalten.
+  if (ref.watch(cinemaModeProvider) != CinemaMode.auto) {
+    yield null;
+    return;
+  }
+
+  Future<Alignment?> resolve() async {
+    try {
+      final p = await ProfilesRepository.getMine();
+      final lat = p?.latitude ?? p?.homeLat;
+      final lng = p?.longitude ?? p?.homeLng;
+      if (lat == null || lng == null) return null;
+      final sun = await SunriseSunsetService.forLocation(lat: lat, lng: lng);
+      if (sun == null) return null;
+      return _skyArcAlignment(DateTime.now(), sun);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  yield await resolve();
+  // Alle 2 Min nachführen — die Position wandert nur minimal, SkyBody glättet
+  // den Schritt per AnimatedAlign, also reicht ein grobes Intervall (Akku).
+  final timer = Stream<void>.periodic(const Duration(minutes: 2));
+  await for (final _ in timer) {
+    yield await resolve();
+  }
+});
+
+/// Bildet die aktuelle Uhrzeit auf einen Himmels-Bogen ab.
+///   * Tag (sunrise→sunset): Sonne wandert.
+///   * Nacht (sunset→nächster sunrise): Mond wandert auf demselben Bogen.
+/// x: linear Ost(−1.05)→West(+1.05). y: angehobener Sinus-Bogen — Horizont
+/// (~0.92 unten) an den Rändern, Zenit (~−0.88 oben) in der Mitte.
+Alignment _skyArcAlignment(DateTime now, SunTimes sun) {
+  final isDay = now.isAfter(sun.sunrise) && now.isBefore(sun.sunset);
+  final DateTime start;
+  final DateTime end;
+  if (isDay) {
+    start = sun.sunrise;
+    end = sun.sunset;
+  } else if (now.isBefore(sun.sunrise)) {
+    // Frühe Morgenstunden → der Untergang war „gestern".
+    start = sun.sunset.subtract(const Duration(days: 1));
+    end = sun.sunrise;
+  } else {
+    // Nach Sonnenuntergang → bis zum Aufgang „morgen".
+    start = sun.sunset;
+    end = sun.sunrise.add(const Duration(days: 1));
+  }
+  final total = end.difference(start).inSeconds;
+  if (total <= 0) return const Alignment(0, -0.85);
+  final t = (now.difference(start).inSeconds / total).clamp(0.0, 1.0);
+  final x = -1.05 + t * 2.10;
+  final lift = math.sin(t * math.pi); // 0 an Rändern, 1 in der Mitte
+  final y = 0.92 - lift * 1.80;
+  return Alignment(x.clamp(-1.1, 1.1), y.clamp(-1.0, 1.0));
+}

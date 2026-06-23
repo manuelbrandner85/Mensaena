@@ -103,6 +103,9 @@ class CinemaOverlay extends ConsumerWidget {
     final seasonalTint = seasonalBase == null
         ? null
         : Color.lerp(Colors.transparent, seasonalBase, intensity);
+    // B: Echte Sonnen-/Mond-Position (kontinuierlich aus den Sonnenzeiten).
+    // null → SkyBody nutzt die statische Phasen-Position (Fallback/Override).
+    final skyAlign = ref.watch(cinemaSkyBodyAlignmentProvider).value;
 
     return KeyedSubtree(
       key: const ValueKey('cinema_overlay_on'),
@@ -162,14 +165,16 @@ class CinemaOverlay extends ConsumerWidget {
             key: const ValueKey('sky_persistent'),
             spec: spec.skyBody,
             intensity: intensity,
+            alignmentOverride: skyAlign,
           ),
         ),
 
-        // 5. God-Rays vom Sky-Body — nur bei full intensity.
+        // 5. God-Rays vom Sky-Body — nur bei full intensity. Strahlt aus der
+        // echten Sonnenposition (skyAlign) statt dem statischen Phasen-Punkt.
         if (spec.hasGodRays && intensity >= 0.6)
           RepaintBoundary(
             child: GodRays(
-              source: spec.skyBody.alignment,
+              source: skyAlign ?? spec.skyBody.alignment,
               color: spec.skyBody.glow,
               intensity: intensity * 0.85,
             ),

@@ -16,10 +16,21 @@ import 'package:flutter/material.dart';
 import '../../config/theme/cinema_theme.dart';
 
 class SkyBody extends StatefulWidget {
-  const SkyBody({required this.spec, required this.intensity, super.key});
+  const SkyBody({
+    required this.spec,
+    required this.intensity,
+    this.alignmentOverride,
+    super.key,
+  });
 
   final SkyBodySpec spec;
   final double intensity; // 0.0 – 1.0
+
+  /// B: Echte, kontinuierlich berechnete Sonnen-/Mond-Position. Wenn gesetzt,
+  /// gewinnt sie über [SkyBodySpec.alignment] — der Himmelskörper folgt der
+  /// realen Uhrzeit (Aufgang→Zenit→Untergang) statt an einem festen Punkt der
+  /// Phase zu stehen. null → statische Phasen-Position (Fallback / Override).
+  final Alignment? alignmentOverride;
 
   @override
   State<SkyBody> createState() => _SkyBodyState();
@@ -95,6 +106,18 @@ class _SkyBodyState extends State<SkyBody>
         animation: Listenable.merge([_breath, _travel]),
         builder: (_, __) {
           final breath = 0.95 + _breath.value * 0.10;
+          final override = widget.alignmentOverride;
+          // B: Echte Sonnenposition gewinnt — sie IST bereits der Bogen
+          // (über die Zeit gesampelt), daher kein Phasen-Bogen nötig. Die
+          // 2-Min-Schritte werden via AnimatedAlign glatt nachgeführt.
+          if (override != null) {
+            return AnimatedAlign(
+              alignment: override,
+              duration: const Duration(seconds: 8),
+              curve: Curves.linear,
+              child: _visual(widget.spec, breath, 1.0),
+            );
+          }
           final from = _fromSpec;
           if (from == null) {
             // Ruhezustand: nur die aktuelle Spec an ihrer Position.
