@@ -44,7 +44,12 @@ class DashboardSection {
   final List<String> widgetIds;
 }
 
-/// Widget-IDs je Sektion (matched die Strings im dashboard_widget_config).
+/// Widget-IDs je Sektion. MUSS exakt den IDs in
+/// DashboardWidgetConfig.all entsprechen — jede dort definierte ID gehört
+/// genau einer Sektion an (außer den pinned-Chrome-Widgets hero/onboarding/
+/// safety/stats/quick_actions, die im Dashboard-Kopf ohne Sektion rendern).
+/// Stimmt eine ID nicht überein, liefert sectionForWidget() null → das Widget
+/// fällt aus jeder Sektion und rendert „lose" ohne Banner (Bug-Quelle).
 const _sections = <DashboardSection>[
   DashboardSection(
     id: DashboardSectionId.myDay,
@@ -54,9 +59,9 @@ const _sections = <DashboardSection>[
     widgetIds: [
       'hero',
       'sky',
-      'mood_chart',
+      'mood',
       'affirmation',
-      'daily_quote',
+      'quote',
       'health',
     ],
   ),
@@ -68,12 +73,13 @@ const _sections = <DashboardSection>[
     widgetIds: [
       'activity_feed',
       'community_pulse',
-      'nearby_neighbors',
+      'nearby_posts',
       'smart_match',
-      'thanks_received',
+      'thanks',
+      'trust_score',
       'unread_messages',
+      'rating_prompt',
       'success_story',
-      'friend_suggestions',
     ],
   ),
   DashboardSection(
@@ -87,7 +93,7 @@ const _sections = <DashboardSection>[
       'streak',
       'helpStreak',
       'personalBest',
-      'daily_challenges',
+      'dailyChallenges',
       'weekly_challenge',
       'holiday_badge',
     ],
@@ -101,9 +107,7 @@ const _sections = <DashboardSection>[
       'mini_map',
       'nasa_apod',
       'alerts_badge',
-      'recent_routes',
-      'activity_heatmap',
-      'water_level',
+      'heatmap',
       'weather',
       'traffic',
       'safety',
@@ -119,10 +123,11 @@ const _sections = <DashboardSection>[
     widgetIds: [
       'on_this_day',
       'gratitude',
-      'quick_note',
+      'quickNote',
       'weekly_summary',
+      'weekly_digest',
       'recap',
-      'digest',
+      'books',
       'bot_tip',
     ],
   ),
@@ -132,8 +137,7 @@ const _sections = <DashboardSection>[
     icon: LucideIcons.calendar,
     color: Color(0xFF2980B9),
     widgetIds: [
-      'today_events',
-      'become_mentor_cta',
+      'todayEvents',
     ],
   ),
 ];

@@ -366,9 +366,18 @@ class _DashboardHomeScreenState
     // collapse-bar. User-Wunsch (2026-05): die Hero-Begrüßungs-Karte
     // (Guten Tag / Avatar / Bearbeiten / Vollprofil) MUSS fest ganz oben
     // sein — kein User-Reorder kann sie verschieben.
-    const pinnedTop = {'hero', 'onboarding', 'safety', 'stats'};
+    // quick_actions gehört zum Dashboard-Kopf (Schnellaktionen + Recent-
+    // Routes) — ohne Sektion sortierte es vorher ans ENDE (Priorität 999).
+    // Pinnen hält die Kern-Navigation oben (Struktur-Fix „schief angeordnet").
+    const pinnedTop = {'hero', 'onboarding', 'safety', 'stats', 'quick_actions'};
     // Feste Reihenfolge der Pinned. Hero IMMER #0.
-    const pinnedFixedOrder = ['hero', 'onboarding', 'safety', 'stats'];
+    const pinnedFixedOrder = [
+      'hero',
+      'onboarding',
+      'safety',
+      'stats',
+      'quick_actions',
+    ];
     int pinnedRank(String id) {
       final idx = pinnedFixedOrder.indexOf(id);
       return idx < 0 ? 999 : idx;
