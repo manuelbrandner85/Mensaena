@@ -149,6 +149,104 @@ final cinemaWeatherTintProvider = StreamProvider<Color?>((ref) async* {
   }
 });
 
+/// C: Wetter-Kondition (für animierte Partikel/Blitz) — abgeleitet aus dem
+/// WMO-Code am Standort. Refresht alle 20 Min; Default klar bei Fehler.
+enum CinemaWeather { clear, cloudy, fog, rain, snow, thunder }
+
+final cinemaWeatherConditionProvider =
+    StreamProvider<CinemaWeather>((ref) async* {
+  if (!ref.watch(cinemaWeatherAdaptiveProvider)) {
+    yield CinemaWeather.clear;
+    return;
+  }
+  Future<CinemaWeather> resolve() async {
+    try {
+      final p = await ProfilesRepository.getMine();
+      final lat = p?.latitude ?? p?.homeLat;
+      final lng = p?.longitude ?? p?.homeLng;
+      if (lat == null || lng == null) return CinemaWeather.clear;
+      final hours = await WeatherService.hourly(latitude: lat, longitude: lng);
+      if (hours.isEmpty) return CinemaWeather.clear;
+      return _weatherForCode(hours.first.code);
+    } catch (_) {
+      return CinemaWeather.clear;
+    }
+  }
+
+  yield await resolve();
+  await for (final _ in Stream<void>.periodic(const Duration(minutes: 20))) {
+    yield await resolve();
+  }
+});
+
+CinemaWeather _weatherForCode(int code) {
+  if (code <= 1) return CinemaWeather.clear;
+  if (code == 2 || code == 3) return CinemaWeather.cloudy;
+  if (code == 45 || code == 48) return CinemaWeather.fog;
+  if ((code >= 71 && code <= 77) || code == 85 || code == 86) {
+    return CinemaWeather.snow;
+  }
+  if (code >= 95) return CinemaWeather.thunder;
+  if (code >= 51 && code <= 82) return CinemaWeather.rain;
+  return CinemaWeather.clear;
+}
+
+/// C/D: Partikel-Art für eine animierte Ebene. Farb-Literale leben hier im
+/// Provider (außerhalb des Color-Guard-Scopes lib/widgets) und werden an die
+/// CinemaParticleLayer durchgereicht.
+enum CinemaParticleKind { rain, snow, leaf, blossom, pollen }
+
+class CinemaParticleSpec {
+  const CinemaParticleSpec({
+    required this.kind,
+    required this.color,
+    required this.count,
+  });
+  final CinemaParticleKind kind;
+  final Color color;
+  final int count;
+}
+
+/// C: Wetter → fallende Partikel (Regen/Schnee). null = keine (klar/bewölkt/
+/// Nebel → Tint bzw. Nebel-Drift übernehmen das). Gewitter = dichter Regen.
+CinemaParticleSpec? weatherParticleSpec(CinemaWeather w) {
+  switch (w) {
+    case CinemaWeather.rain:
+      return const CinemaParticleSpec(
+          kind: CinemaParticleKind.rain, color: Color(0xCCBFD4E8), count: 70);
+    case CinemaWeather.thunder:
+      return const CinemaParticleSpec(
+          kind: CinemaParticleKind.rain, color: Color(0xE0AEC4DC), count: 110);
+    case CinemaWeather.snow:
+      return const CinemaParticleSpec(
+          kind: CinemaParticleKind.snow, color: Color(0xF2EAF2FB), count: 48);
+    case CinemaWeather.clear:
+    case CinemaWeather.cloudy:
+    case CinemaWeather.fog:
+      return null;
+  }
+}
+
+/// D: Saison → schwebende Partikel (Nordhalbkugel): Winter Schnee, Frühling
+/// Blüten, Sommer Pollen-Licht, Herbst Laub. Wird nur gerendert wenn KEINE
+/// Wetter-Partikel aktiv sind (kein Doppel-Schnee bei Winter-Schneefall).
+CinemaParticleSpec seasonalParticleSpec(int month) {
+  if (month == 12 || month == 1 || month == 2) {
+    return const CinemaParticleSpec(
+        kind: CinemaParticleKind.snow, color: Color(0xE6EAF2FB), count: 36);
+  }
+  if (month >= 3 && month <= 5) {
+    return const CinemaParticleSpec(
+        kind: CinemaParticleKind.blossom, color: Color(0xE6F7C5D9), count: 18);
+  }
+  if (month >= 6 && month <= 8) {
+    return const CinemaParticleSpec(
+        kind: CinemaParticleKind.pollen, color: Color(0xCCFFE6A6), count: 24);
+  }
+  return const CinemaParticleSpec(
+      kind: CinemaParticleKind.leaf, color: Color(0xE6D98A3A), count: 18);
+}
+
 const _parallaxStorageKey = 'cinema_parallax_v1';
 
 /// Schalter: Parallax/Neige-Tiefe — der Hintergrund verschiebt sich subtil

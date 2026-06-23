@@ -33,6 +33,7 @@ import '../../services/device_tier_service.dart';
 import 'atmospheric_layers.dart';
 import 'chromatic_aberration.dart';
 import 'cinema_parallax.dart';
+import 'cinema_weather_layers.dart';
 import 'film_grain.dart';
 import 'lens_flare.dart';
 import 'light_leaks.dart';
@@ -106,6 +107,20 @@ class CinemaOverlay extends ConsumerWidget {
     // B: Echte Sonnen-/Mond-Position (kontinuierlich aus den Sonnenzeiten).
     // null → SkyBody nutzt die statische Phasen-Position (Fallback/Override).
     final skyAlign = ref.watch(cinemaSkyBodyAlignmentProvider).value;
+    // C: Wetter-Kondition → animierte Partikel/Nebel/Blitz. D: Saison-Partikel.
+    // Teuer (eigener AnimationController) → nur bei vollen Effekten (>= 0.6).
+    final heavyOn = intensity >= 0.6;
+    final weather = heavyOn
+        ? (ref.watch(cinemaWeatherConditionProvider).value ??
+            CinemaWeather.clear)
+        : CinemaWeather.clear;
+    final weatherParticles = heavyOn ? weatherParticleSpec(weather) : null;
+    // Saison-Partikel nur, wenn KEIN Wetter-Niederschlag aktiv ist (kein
+    // Doppel-Schnee) und der Saison-Schalter an ist.
+    final seasonalParticles =
+        (heavyOn && weatherParticles == null && ref.watch(cinemaSeasonalProvider))
+            ? seasonalParticleSpec(DateTime.now().month)
+            : null;
 
     return KeyedSubtree(
       key: const ValueKey('cinema_overlay_on'),
@@ -214,6 +229,34 @@ class CinemaOverlay extends ConsumerWidget {
               intensity: intensity,
             ),
           ),
+
+        // 9b. C — Nebel-Drift (Wetter = Nebel): langsam ziehende Schwaden.
+        if (weather == CinemaWeather.fog && weatherTint != null)
+          RepaintBoundary(
+            child: FogDriftLayer(color: weatherTint, intensity: intensity),
+          ),
+
+        // 9c. C — Wetter-Partikel (Regen-Schlieren / Schnee-Flocken).
+        if (weatherParticles != null)
+          RepaintBoundary(
+            child: CinemaParticleLayer(
+              spec: weatherParticles,
+              intensity: intensity,
+            ),
+          ),
+
+        // 9d. D — Saison-Partikel (Laub/Blüten/Pollen/Schnee), nur ohne Wetter.
+        if (seasonalParticles != null)
+          RepaintBoundary(
+            child: CinemaParticleLayer(
+              spec: seasonalParticles,
+              intensity: intensity,
+            ),
+          ),
+
+        // 9e. C — Gewitter-Blitz (gelegentlicher Doppelschlag).
+        if (weather == CinemaWeather.thunder)
+          RepaintBoundary(child: LightningFlash(intensity: intensity)),
 
         // ═══════════ CONTENT (nie überlagert) ═══════════
         child,
