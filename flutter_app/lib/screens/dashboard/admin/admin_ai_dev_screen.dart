@@ -1596,65 +1596,10 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     }
   }
 
-  // Live-Region: StatusBar + TabBar + TabBarView. Hängt am _pollRev-Notifier,
-  // damit stilles Polling NUR diesen Teilbaum neu baut — Header und InputBar
-  // bleiben unangetastet.
-  Widget _liveRegion() {
-    final visible = _visibleSuggestions;
-    return Expanded(
-      child: Column(
-        children: [
-          _StatusBar(
-            activeTasks: _activeTaskCount,
-            openSuggestions: visible.length,
-            openAlerts: _healthAlerts.length,
-            lastDelivered: _changelog.isNotEmpty
-                ? (_changelog.first['title'] as String?)
-                : null,
-          ),
-          TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            labelColor: AppColors.teal,
-            unselectedLabelColor: AppColors.lightMute,
-            indicatorColor: AppColors.teal,
-            labelStyle: AppTypography.body(size: 12, weight: FontWeight.w700),
-            tabs: [
-              Tab(text: 'adminDev.tabs.overview'.tr()),
-              Tab(
-                text: 'adminDev.tabs.tasks'.tr() +
-                    (_tasks.isNotEmpty ? ' (${_tasks.length})' : ''),
-              ),
-              Tab(
-                text: 'adminDev.tabs.suggestions'.tr() +
-                    (visible.isNotEmpty ? ' (${visible.length})' : ''),
-              ),
-              Tab(text: 'adminDev.tabs.roadmap'.tr()),
-              Tab(text: 'adminDev.tabs.settings'.tr()),
-            ],
-          ),
-          Expanded(
-            child: _loading
-                ? const Center(child: CircularProgressIndicator())
-                : TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _overviewTab(),
-                      _tasksTab(),
-                      _suggestionsTab(visible),
-                      _roadmapTab(),
-                      _settingsTab(),
-                    ],
-                  ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    // Computed once per setState-rebuild; used by TabBar badge + suggestionsTab.
+    final visible = _visibleSuggestions;
     return DashboardScaffold(
       title: 'adminDev.title'.tr(),
       currentRoute: '/dashboard/admin/dev-agent',
@@ -1662,9 +1607,61 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
         child: Column(
           children: [
             _GodmodeHeader(),
+            // (b) Only _StatusBar listens to _pollRev; stilles Polling baut
+            // NUR diesen schmalen Widget neu — TabBar + TabBarView bleiben
+            // unangetastet. _visibleSuggestions wird direkt im Builder
+            // ausgewertet, damit der Zähler auch bei silent-Polls aktuell ist.
             ValueListenableBuilder<int>(
               valueListenable: _pollRev,
-              builder: (context, _, __) => _liveRegion(),
+              builder: (context, _, __) => _StatusBar(
+                activeTasks: _activeTaskCount,
+                openSuggestions: _visibleSuggestions.length,
+                openAlerts: _healthAlerts.length,
+                lastDelivered: _changelog.isNotEmpty
+                    ? (_changelog.first['title'] as String?)
+                    : null,
+              ),
+            ),
+            // TabBar rebuildet nur bei setState (Datenänderung), nicht bei
+            // jedem Poll-Tick.
+            TabBar(
+              controller: _tabController,
+              isScrollable: true,
+              tabAlignment: TabAlignment.start,
+              labelColor: AppColors.teal,
+              unselectedLabelColor: AppColors.lightMute,
+              indicatorColor: AppColors.teal,
+              labelStyle: AppTypography.body(size: 12, weight: FontWeight.w700),
+              tabs: [
+                Tab(text: 'adminDev.tabs.overview'.tr()),
+                Tab(
+                  text: 'adminDev.tabs.tasks'.tr() +
+                      (_tasks.isNotEmpty ? ' (${_tasks.length})' : ''),
+                ),
+                Tab(
+                  text: 'adminDev.tabs.suggestions'.tr() +
+                      (visible.isNotEmpty ? ' (${visible.length})' : ''),
+                ),
+                Tab(text: 'adminDev.tabs.roadmap'.tr()),
+                Tab(text: 'adminDev.tabs.settings'.tr()),
+              ],
+            ),
+            // (a) Builder-Wrapper: TabBarView baut nur den sichtbaren Tab
+            // (+ direkten Nachbarn) — alle anderen _xTab()-Methoden werden
+            // NICHT aufgerufen bis der jeweilige Tab aktiv wird.
+            Expanded(
+              child: _loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : TabBarView(
+                      controller: _tabController,
+                      children: [
+                        Builder(builder: (_) => _overviewTab()),
+                        Builder(builder: (_) => _tasksTab()),
+                        Builder(builder: (_) => _suggestionsTab(visible)),
+                        Builder(builder: (_) => _roadmapTab()),
+                        Builder(builder: (_) => _settingsTab()),
+                      ],
+                    ),
             ),
             if (_selectionMode && _selected.isNotEmpty)
               _BatchBar(
@@ -2656,6 +2653,9 @@ class _LiveScanCard extends StatefulWidget {
 class _LiveScanCardState extends State<_LiveScanCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ac;
+  // (c) Einmalig in initState gecacht — nie neu alloziert während build().
+  late final Animation<double> _fadePulse; // Scan-Icon: 0.35 → 1.0
+  late final Animation<double> _fadeDot; // Fortschritts-Dot: 0.3 → 1.0
   Timer? _tick; // sekündlicher Tick für die Laufzeit-Anzeige
 
   @override
@@ -2665,6 +2665,8 @@ class _LiveScanCardState extends State<_LiveScanCard>
       vsync: this,
       duration: const Duration(milliseconds: 1100),
     );
+    _fadePulse = Tween<double>(begin: 0.35, end: 1.0).animate(_ac);
+    _fadeDot = Tween<double>(begin: 0.3, end: 1.0).animate(_ac);
     // Pulse-Animation + Sekundentimer NUR bei aktivem Scan — sonst läuft der
     // Ticker (und damit ein Frame-Callback pro Vsync) dauerhaft im Leerlauf.
     _syncScanState();
@@ -2737,8 +2739,7 @@ class _LiveScanCardState extends State<_LiveScanCard>
             children: [
               scanning
                   ? FadeTransition(
-                      opacity:
-                          Tween(begin: 0.35, end: 1.0).animate(_ac),
+                      opacity: _fadePulse,
                       child: const Icon(LucideIcons.scanLine,
                           size: 20, color: AppColors.teal),
                     )
@@ -2805,7 +2806,7 @@ class _LiveScanCardState extends State<_LiveScanCard>
               child: Row(
                 children: [
                   FadeTransition(
-                    opacity: Tween(begin: 0.3, end: 1.0).animate(_ac),
+                    opacity: _fadeDot,
                     child: Container(
                       width: 8,
                       height: 8,
