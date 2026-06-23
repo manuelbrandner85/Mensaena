@@ -88,8 +88,10 @@ class _CinemaParallaxState extends ConsumerState<CinemaParallax> {
 
   @override
   Widget build(BuildContext context) {
+    // Parallax ist leicht (günstiger Transform) → läuft auf jedem Gerät,
+    // sobald der Schalter an ist; nur reduceMotion (isOff) schaltet ab.
     final active = ref.watch(cinemaParallaxProvider) &&
-        ref.watch(effectsProfileProvider).isFull;
+        !ref.watch(effectsProfileProvider).isOff;
     // Subscription nur bei Zustandswechsel an/abmelden (nicht jeden Build).
     if (active != _subActive) {
       _subActive = active;

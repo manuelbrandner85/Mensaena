@@ -26,6 +26,7 @@ class CinematicVideoBackdrop extends ConsumerStatefulWidget {
     required this.stillAsset,
     this.topScrim = 0.35,
     this.bottomScrim = 0.85,
+    this.alwaysPlay = false,
     super.key,
   });
 
@@ -33,6 +34,12 @@ class CinematicVideoBackdrop extends ConsumerStatefulWidget {
   final String stillAsset;
   final double topScrim;
   final double bottomScrim;
+
+  /// Wenn true, spielt das Video unabhängig vom EffectsProfile (z. B. wenn der
+  /// User den Video-Hintergrund explizit aktiviert hat) — läuft GPU-dekodiert
+  /// auch auf schwächeren Geräten flüssig. Nur Decoder-/Asset-Fehler oder
+  /// reduceMotion fallen dann noch aufs Standbild zurück.
+  final bool alwaysPlay;
 
   @override
   ConsumerState<CinematicVideoBackdrop> createState() =>
@@ -84,8 +91,12 @@ class _CinematicVideoBackdropState
     );
 
     final profile = ref.watch(effectsProfileProvider);
-    if (!profile.isFull || _failed) {
-      // Downgrade (z. B. FrameWatchdog) → Video pausieren, Bild zeigen.
+    // alwaysPlay (User hat Video-Hintergrund aktiv): unabhängig vom Profil
+    // abspielen, nur reduceMotion (profile.isOff) bleibt beim Standbild.
+    // Sonst (Landing): wie gehabt nur bei full.
+    final allowVideo = widget.alwaysPlay ? !profile.isOff : profile.isFull;
+    if (!allowVideo || _failed) {
+      // Downgrade / aus → Video pausieren, Bild zeigen.
       _ctrl?.pause();
       return still;
     }

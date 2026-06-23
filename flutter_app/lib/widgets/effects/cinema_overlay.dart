@@ -62,6 +62,12 @@ class CinemaOverlay extends ConsumerWidget {
     final forceFull = ref.watch(forceFullEffectsProvider);
     final liteMode = ref.watch(liteModeActiveProvider) && !forceFull;
     final baseIntensity = profile.intensityFactor;
+    // Video + Parallax sind leicht (GPU-Video / günstiger Transform) und sollen
+    // auf JEDEM Gerät laufen, sobald ihr Schalter an ist — daher unabhängig
+    // von isFull/Lite. Die teuren Atmosphären-Ebenen bleiben über das
+    // intensity>=0.6-Gate trotzdem aus.
+    final videoOn = ref.watch(cinemaVideoBackdropProvider);
+    final parallaxOn = ref.watch(cinemaParallaxProvider);
 
     // CRASH-FIX: Off-Mode (phase null oder intensity ~0) und On-Mode
     // ergeben strukturell SEHR unterschiedliche Widget-Trees (SizedBox vs
@@ -69,7 +75,12 @@ class CinemaOverlay extends ConsumerWidget {
     // kann die Disposal-Reihenfolge der alten Controllers mit dem Mount
     // der neuen kollidieren → Crash bei Navigation. KeyedSubtree
     // erzwingt sauberen Unmount der einen Variante vor Mount der anderen.
-    if (phase == null || profile.isOff || liteMode) {
+    // Auf Lite weiterhin abschalten — AUSSER Video/Parallax ist aktiv (die
+    // sind leicht und vom User explizit gewünscht). reduceMotion/cinema-off
+    // (profile.isOff) sowie phase==null bleiben hart aus.
+    if (phase == null ||
+        profile.isOff ||
+        (liteMode && !videoOn && !parallaxOn)) {
       return KeyedSubtree(
         key: const ValueKey('cinema_overlay_off'),
         child: child,
@@ -98,11 +109,9 @@ class CinemaOverlay extends ConsumerWidget {
     final seasonalTint = seasonalBase == null
         ? null
         : Color.lerp(Colors.transparent, seasonalBase, intensity);
-    // Video-Hintergrund nur bei vollen Effekten (Crash-Schutz hat profile
-    // ggf. schon auf reduced gedrosselt → dann Mesh-Gradient).
-    final videoBackdrop =
-        ref.watch(cinemaVideoBackdropProvider) && profile.isFull;
-    final phaseVideo = videoBackdrop ? _videoAssetsForPhase(phase) : null;
+    // Video-Hintergrund sobald der Schalter an ist (läuft auf jedem Gerät,
+    // GPU-dekodiert). alwaysPlay umgeht die isFull-Sperre im Widget.
+    final phaseVideo = videoOn ? _videoAssetsForPhase(phase) : null;
 
     return KeyedSubtree(
       key: const ValueKey('cinema_overlay_on'),
@@ -122,6 +131,7 @@ class CinemaOverlay extends ConsumerWidget {
                     key: ValueKey('video_${phase.name}'),
                     videoAsset: phaseVideo.video,
                     stillAsset: phaseVideo.still,
+                    alwaysPlay: true,
                     topScrim: 0.25,
                     bottomScrim: 0.7,
                   ),
