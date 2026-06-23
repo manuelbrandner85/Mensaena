@@ -49,6 +49,11 @@ class LinkPreviewService {
     return u;
   }
 
+  /// Gibt den In-Memory-Cache komplett frei (RAM-Reset). Aufruf vom
+  /// MemoryWatchdog bei Speicherdruck — laufende Fetches (`_inflight`)
+  /// laufen unangetastet weiter und cachen ihr Ergebnis neu.
+  void clearCache() => _cache.clear();
+
   /// Preview für [url] holen. Synchroner Cache-Hit liefert sofort, sonst
   /// läuft der Fetch im Hintergrund und bei Fertigstellung pusht der Caller
   /// via Rebuild.
