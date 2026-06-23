@@ -227,6 +227,7 @@ class WeatherService {
     _forecastCache.clear();
     _hourlyCache.clear();
     _aqCache.clear();
+    _currentCache.clear();
   }
 }
 

@@ -26,7 +26,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
 import '../repositories/extra_repositories.dart';
+import 'link_preview_service.dart';
+import 'notification_service.dart';
 import 'query_cache_service.dart';
+import 'water_level_service.dart';
+import 'weather_service.dart';
 
 class MemoryWatchdogService {
   MemoryWatchdogService._();
@@ -122,6 +126,9 @@ class MemoryWatchdogService {
       // referenziert sind, weil das Bild kürzlich sichtbar war — nicht die
       // gerade aktiv gemalten. evict des LRU-Tails passiert dadurch zügiger.
       cache.clearLiveImages();
+      // Zusätzlich zu den Bildern auch die Daten-Caches leeren — sie wachsen
+      // über die Session und geben hier proaktiv RAM zurück.
+      evictAllDataCaches();
       if (kDebugMode) {
         debugPrint(
           '[MemoryWatchdog] Soft-Evict bei ${(ratio * 100).toStringAsFixed(0)}% '
@@ -139,6 +146,20 @@ class MemoryWatchdogService {
         pendingCount: cache.pendingImageCount,
       );
     }
+  }
+
+  /// Zentraler "evict all"-Hook: leert ALLE In-Memory-Daten-Caches der App
+  /// (Query-Cache + die fachlichen Service-Caches), unabhängig vom
+  /// Flutter-ImageCache. Wird bei OS-MemoryPressure und beim Soft-Check
+  /// (80 %) gerufen, damit nicht nur Bilder, sondern auch JSON-/Meta-Daten
+  /// RAM zurückgeben, bevor Android die App killt. Jede einzelne
+  /// clearCache()-Methode ist idempotent und billig (Map.clear()).
+  void evictAllDataCaches() {
+    QueryCache.invalidateAll();
+    WeatherService.clearCache();
+    WaterLevelService.clearCache();
+    LinkPreviewService.instance.clearCache();
+    NotificationService.instance.clearCache();
   }
 
   void _maybeReport({
@@ -167,8 +188,9 @@ class MemoryWatchdogService {
   void onMemoryPressure() {
     // Akuter RAM-Mangel = stärkstes Vor-Crash-Signal → Effekte sofort deckeln.
     _setCap(true);
-    // Query-Cache komplett leeren: RAM freigeben, bevor Android die App killt.
-    QueryCache.invalidateAll();
+    // Alle Daten-Caches komplett leeren: RAM freigeben, bevor Android die App
+    // killt (Query-Cache + Wetter/Pegel/Link-Preview/Notification-Caches).
+    evictAllDataCaches();
     final cache = PaintingBinding.instance.imageCache;
     final ratioBefore = cache.maximumSizeBytes > 0
         ? cache.currentSizeBytes / cache.maximumSizeBytes
@@ -203,7 +225,7 @@ class MemoryWatchdogService {
     final freedMb = cache.currentSizeBytes / 1024 / 1024;
     cache.clear();
     cache.clearLiveImages();
-    QueryCache.invalidateAll();
+    evictAllDataCaches();
     return freedMb;
   }
 }
