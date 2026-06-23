@@ -9,6 +9,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../repositories/ai_features_repository.dart';
 import '../../../repositories/board_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../services/haptics.dart';
@@ -40,6 +41,7 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
   double? _lat;
   double? _lng;
   bool _locating = false;
+  bool _aiImproving = false;
   bool _submitting = false;
   String? _error;
 
@@ -124,6 +126,54 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
       // still — Standort bleibt optional.
     } finally {
       if (mounted) setState(() => _locating = false);
+    }
+  }
+
+  /// KI-Texthilfe: Stichworte → klarer Pinnwand-Text (übernehmen/verwerfen).
+  /// Nutzt die vorhandene ai-improve-post-Edge-Function (fail-safe, wirft nie).
+  Future<void> _improveWithAi() async {
+    final raw = _content.text.trim();
+    if (raw.isEmpty) {
+      AppSnackBar.info(context, 'assistant.improve_empty'.tr());
+      return;
+    }
+    setState(() => _aiImproving = true);
+    String? improved;
+    try {
+      improved = await AiFeaturesRepository()
+          .improvePost(raw, context.locale.languageCode);
+    } catch (_) {/* unten als Fehler behandelt */}
+    if (!mounted) return;
+    setState(() => _aiImproving = false);
+    if (improved == null || improved.trim().isEmpty) {
+      AppSnackBar.error(context, 'assistant.error'.tr());
+      return;
+    }
+    final suggestion = improved;
+    final accepted = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Text('assistant.improve_title'.tr(),
+            style: AppTypography.display(size: 16, color: AppColors.ink)),
+        content: SingleChildScrollView(
+          child: Text(suggestion,
+              style: AppTypography.body(size: 14, color: AppColors.ink)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text('common.cancel'.tr()),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text('assistant.improve_apply'.tr()),
+          ),
+        ],
+      ),
+    );
+    if (accepted == true && mounted) {
+      setState(() => _content.text = suggestion);
     }
   }
 
@@ -356,6 +406,25 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
                   decoration: InputDecoration(
                     labelText: 'create.pinNote'.tr(),
                     alignLabelWithHint: true,
+                  ),
+                ),
+                // KI-Texthilfe: Stichworte → klarer Text (übernehmen/verwerfen).
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton.icon(
+                    onPressed: _aiImproving ? null : _improveWithAi,
+                    icon: _aiImproving
+                        ? const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: AppColors.bronze),
+                          )
+                        : const Icon(Icons.auto_awesome,
+                            size: 16, color: AppColors.bronze),
+                    label: Text('assistant.improve_button'.tr(),
+                        style: AppTypography.label(
+                            size: 12, color: AppColors.bronze)),
                   ),
                 ),
                 const SizedBox(height: 12),
