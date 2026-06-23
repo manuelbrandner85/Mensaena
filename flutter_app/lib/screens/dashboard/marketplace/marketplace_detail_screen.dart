@@ -97,6 +97,8 @@ class _MarketplaceDetailScreenState
                 ? l.userId
                 : (l.sellerId ?? '');
             final isOwner = me != null && me == ownerId;
+            // Eigenes Inserat zeigt keinen "Nachricht senden"-CTA.
+            final canMessage = me != null && me != ownerId;
             final isClaimed = l.status == 'claimed' || l.status == 'sold';
 
             return ListView(
@@ -377,6 +379,25 @@ class _MarketplaceDetailScreenState
                   }),
                   style: AppTypography.caption(),
                 ),
+                // Prominenter CTA: Direkt-DM mit dem/der Anbieter:in.
+                // Nur bei fremden Inseraten (eigene → kein Selbst-Chat).
+                if (canMessage) ...[
+                  const SizedBox(height: 18),
+                  FilledButton.icon(
+                    onPressed: () => _sendMessage(context, l),
+                    icon: const Icon(LucideIcons.send, size: 16),
+                    label: Text('marketplace.sendMessage'.tr()),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: AppColors.amber,
+                      foregroundColor: AppColors.voidColor,
+                      minimumSize: const Size.fromHeight(52),
+                      textStyle: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             );
           },
@@ -489,6 +510,30 @@ class _MarketplaceDetailScreenState
         return;
       }
       context.go('/dashboard/chat?conv=$convId');
+    } catch (_) {
+      if (!context.mounted) return;
+      AppSnackBar.error(context, 'marketplace.contactFailed'.tr());
+    } finally {
+      _contactInFlight.remove(l.id);
+    }
+  }
+
+  /// Prominenter Bottom-CTA: legt (oder findet) die DM mit dem/der
+  /// Anbieter:in an und öffnet direkt die Chat-Ansicht. Teilt sich den
+  /// In-Flight-Guard mit `_contactSeller`, damit kein Doppel-DM entsteht.
+  Future<void> _sendMessage(
+      BuildContext context, MarketplaceListing l) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null || uid == l.userId) return;
+    if (!_contactInFlight.add(l.id)) return; // schon in Arbeit
+    try {
+      final convId = await ConversationsRepository.getOrCreateDm(l.userId);
+      if (!context.mounted) return;
+      if (convId == null) {
+        AppSnackBar.error(context, 'marketplace.contactFailed'.tr());
+        return;
+      }
+      context.push('/dashboard/messages/$convId');
     } catch (_) {
       if (!context.mounted) return;
       AppSnackBar.error(context, 'marketplace.contactFailed'.tr());

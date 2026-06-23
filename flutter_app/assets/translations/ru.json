@@ -2175,6 +2175,7 @@
     "listingNotFound": "Объявление не найдено.",
     "condition": "Состояние: {state}",
     "contact": "Связаться",
+    "sendMessage": "Отправить сообщение",
     "reserve_request": "Забронировать",
     "reserve_hint": "Отправь продавцу запрос на бронь.",
     "reserve_message": "Сообщение (необязательно)",

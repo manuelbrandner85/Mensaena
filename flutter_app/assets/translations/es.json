@@ -2176,6 +2176,7 @@
     "listingNotFound": "Anuncio no encontrado.",
     "condition": "Estado: {state}",
     "contact": "Contactar",
+    "sendMessage": "Enviar mensaje",
     "reserve_request": "Reservar",
     "reserve_hint": "Envía al vendedor una solicitud de reserva.",
     "reserve_message": "Mensaje (opcional)",

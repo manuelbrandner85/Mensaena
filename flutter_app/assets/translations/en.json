@@ -2173,6 +2173,7 @@
     "autoExpireNone": "No automatic expiry",
     "autoExpireOn": "Expires on {date}",
     "listing": "Listing",
+    "sendMessage": "Send message",
     "reserve_request": "Reserve",
     "reserve_hint": "Send the seller a reservation request.",
     "reserve_message": "Message (optional)",
