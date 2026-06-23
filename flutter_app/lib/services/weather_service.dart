@@ -71,7 +71,7 @@ class WeatherService {
     required double latitude,
     required double longitude,
     int days = 5,
-    String timezone = 'Europe/Berlin',
+    String timezone = 'auto',
   }) async {
     final key = _key(latitude, longitude);
     final cached = _forecastCache[key];
@@ -107,7 +107,10 @@ class WeatherService {
       final out = <WeatherDay>[];
       for (var i = 0; i < dates.length; i++) {
         out.add(WeatherDay(
-          date: DateTime.parse(dates[i]).toUtc(),
+          // timezone=auto → date-only-Strings sind Standort-Lokaldatum; als
+          // naive Lokalzeit parsen (KEIN .toUtc(), sonst verschiebt Mitternacht
+          // bei UTC+x den Wochentag/„Heute" um einen Tag nach hinten).
+          date: DateTime.parse(dates[i]),
           tempMin: tmin[i],
           tempMax: tmax[i],
           code: codes[i],
@@ -125,7 +128,7 @@ class WeatherService {
   static Future<List<WeatherHourly>> hourly({
     required double latitude,
     required double longitude,
-    String timezone = 'Europe/Berlin',
+    String timezone = 'auto',
   }) async {
     final key = _key(latitude, longitude);
     final cached = _hourlyCache[key];
