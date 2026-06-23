@@ -290,15 +290,18 @@ class _EventsScreenState extends ConsumerState<EventsScreen> {
                             subtitle: _hasFilters
                                 ? 'modules.tryOtherFilters'.tr()
                                 : 'events.emptyHint'.tr(),
+                            // Leer + ungefiltert: direkter Create-CTA
+                            // („nächste sinnvolle Aktion" statt Sackgasse).
                             actionLabel: _hasFilters
                                 ? 'posts.resetFilter'.tr()
-                                : null,
+                                : 'events.create'.tr(),
                             onAction: _hasFilters
                                 ? () => setState(() {
                                       _category = null;
                                       _search = '';
                                     })
-                                : null,
+                                : () =>
+                                    context.push('/dashboard/events/create'),
                           ),
                         ],
                       );

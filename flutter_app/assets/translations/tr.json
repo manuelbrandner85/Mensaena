@@ -2626,6 +2626,8 @@
     "createSubtitle": "Mahalleni bir araya getir"
   },
   "board": {
+    "empty": "Pano boş.",
+    "emptyHint": "Mahallenle bir şeyler paylaşan ilk kişi ol.",
     "title": "Not",
     "notFound": "Not bulunamadı.",
     "deletePinTitle": "Pin silinsin mi?",

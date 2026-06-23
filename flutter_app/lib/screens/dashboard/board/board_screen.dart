@@ -159,20 +159,23 @@ class _BoardScreenState extends ConsumerState<BoardScreen> {
                           const SizedBox(height: 40),
                           EmptyStateCard(
                             icon: LucideIcons.stickyNote,
+                            // i18n statt hartkodiertem Deutsch (CLAUDE.md) +
+                            // Create-CTA wenn leer (statt Sackgasse).
                             title: hasFilters
-                                ? 'Keine Treffer.'
-                                : 'Pinnwand ist leer.',
+                                ? 'search.noResultsShort'.tr()
+                                : 'board.empty'.tr(),
                             description: hasFilters
-                                ? 'Andere Filter probieren.'
-                                : 'Sei der/die Erste:r — Plus-Button.',
-                            actionLabel:
-                                hasFilters ? 'Filter zurücksetzen' : null,
+                                ? 'modules.tryOtherFilters'.tr()
+                                : 'board.emptyHint'.tr(),
+                            actionLabel: hasFilters
+                                ? 'posts.resetFilter'.tr()
+                                : 'board.pin'.tr(),
                             onAction: hasFilters
                                 ? () => setState(() {
                                       _search = '';
                                       _category = 'all';
                                     })
-                                : null,
+                                : () => context.go('/dashboard/board/create'),
                           ),
                         ],
                       );

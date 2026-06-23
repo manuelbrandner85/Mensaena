@@ -2627,6 +2627,8 @@
     "createSubtitle": "Rassemble ton voisinage"
   },
   "board": {
+    "empty": "Le tableau est vide.",
+    "emptyHint": "Sois le premier à partager quelque chose avec ton quartier.",
     "title": "Note",
     "notFound": "Note introuvable.",
     "deletePinTitle": "Supprimer le pin ?",

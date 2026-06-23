@@ -390,9 +390,11 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                             subtitle: _hasFilters
                                 ? 'marketplace.noMatchesHint'.tr()
                                 : 'marketplace.beFirstHint'.tr(),
+                            // Leer + ungefiltert: direkter Create-CTA
+                            // („nächste sinnvolle Aktion" statt Sackgasse).
                             actionLabel: _hasFilters
                                 ? 'marketplace.resetFilters'.tr()
-                                : null,
+                                : 'marketplace.advertise'.tr(),
                             onAction: _hasFilters
                                 ? () => setState(() {
                                       _type = 'all';
@@ -402,7 +404,8 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                                       _maxPrice = null;
                                       _maxDistanceKm = null;
                                     })
-                                : null,
+                                : () => context
+                                    .push('/dashboard/marketplace/create'),
                           ),
                         ],
                       );

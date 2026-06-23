@@ -2626,6 +2626,8 @@
     "createSubtitle": "Bringe deine Nachbarschaft zusammen"
   },
   "board": {
+    "empty": "Pinnwand ist leer.",
+    "emptyHint": "Sei der/die Erste:r und teile etwas mit deiner Nachbarschaft.",
     "title": "Notiz",
     "notFound": "Notiz nicht gefunden.",
     "deletePinTitle": "Pin löschen?",

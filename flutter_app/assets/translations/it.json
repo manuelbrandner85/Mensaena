@@ -2627,6 +2627,8 @@
     "createSubtitle": "Unisci il tuo vicinato"
   },
   "board": {
+    "empty": "La bacheca è vuota.",
+    "emptyHint": "Sii il primo a condividere qualcosa con il tuo vicinato.",
     "title": "Nota",
     "notFound": "Nota non trovata.",
     "deletePinTitle": "Eliminare il pin?",

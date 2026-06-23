@@ -2627,6 +2627,8 @@
     "createSubtitle": "Reúne a tu vecindario"
   },
   "board": {
+    "empty": "El tablón está vacío.",
+    "emptyHint": "Sé el primero en compartir algo con tu vecindario.",
     "title": "Nota",
     "notFound": "Nota no encontrada.",
     "deletePinTitle": "¿Eliminar el pin?",

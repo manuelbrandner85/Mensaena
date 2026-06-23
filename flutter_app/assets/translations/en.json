@@ -2627,6 +2627,8 @@
     "createSubtitle": "Bring your neighbourhood together"
   },
   "board": {
+    "empty": "The board is empty.",
+    "emptyHint": "Be the first to share something with your neighborhood.",
     "title": "Note",
     "notFound": "Note not found.",
     "deletePinTitle": "Delete pin?",
