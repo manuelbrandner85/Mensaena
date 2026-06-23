@@ -20,6 +20,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../../config/theme/app_colors.dart';
+import '../../../config/theme/app_spacing.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/post.dart';
 import '../../../models/profile.dart';
@@ -347,8 +348,9 @@ class _DashboardHomeScreenState
     // Set damit wir mehrfach-gerenderte IDs uebersrpringen (V14 grouping).
     final consumed = <String>{};
 
-    // Ruhigeres Layout: etwas mehr Weißraum zwischen den Widgets (16 → 18).
-    void addSpacing([double h = 18]) =>
+    // Ruhigeres Layout: Standard-Abstand zwischen Widgets = AppSpacing.lg (20),
+    // auf dem 4dp-Raster statt dem krummen 18 → konsistenter Vertikal-Rhythmus.
+    void addSpacing([double h = AppSpacing.lg]) =>
         out.add(SizedBox(height: h));
 
     // Phase 10 A/B/C: Sektion-Banner zwischen Widget-Gruppen.
@@ -1180,7 +1182,10 @@ class _SectionBanner extends StatelessWidget {
     // Versal-Label + Haarlinie, die über die Restbreite ausläuft. Ruhiger,
     // hochwertiger, konsistent mit den Modul-Screens (§-Editorial-Stil).
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 24, 14, 8),
+      // Horizontal 4 statt 14: der Banner sitzt im 16px-ListView-Padding;
+      // der Akzent-Punkt richtet sich so an der linken Karten-Kante darunter
+      // aus (vorher 16+14=30px → Label wirkte gegenüber den Karten eingerückt).
+      padding: const EdgeInsets.fromLTRB(4, 24, 4, 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
