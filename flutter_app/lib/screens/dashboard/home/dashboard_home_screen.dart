@@ -951,11 +951,11 @@ class _NearbyFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (loading) {
-      return Column(
-        children: List.generate(
-          3,
-          (i) => PostCardSkeleton(showImage: i.isEven),
-        ),
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: 3,
+        itemBuilder: (_, i) => PostCardSkeleton(showImage: i.isEven),
       );
     }
     if (posts.isEmpty) {
@@ -1025,8 +1025,11 @@ class _NearbyFeed extends StatelessWidget {
         ),
       );
     }
-    return Column(
-      children: posts.map((p) => PostCard(post: p)).toList(),
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: posts.length,
+      itemBuilder: (_, i) => PostCard(post: posts[i]),
     );
   }
 }
@@ -1111,15 +1114,17 @@ class _DashboardScrollBody extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (!isEditMode) {
-      return ListView(
+      final items = <Widget>[
+        const DashboardDorfHeader(),
+        const ProfileCompletionCard(),
+        const DashboardOnboardingTooltip(),
+        ...buildChildren(cfg, data, loading),
+      ];
+      return ListView.builder(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         physics: const AlwaysScrollableScrollPhysics(),
-        children: [
-          const DashboardDorfHeader(),
-          const ProfileCompletionCard(),
-          const DashboardOnboardingTooltip(),
-          ...buildChildren(cfg, data, loading),
-        ],
+        itemCount: items.length,
+        itemBuilder: (_, i) => items[i],
       );
     }
     final ids = cfg.activeWidgetIds;
