@@ -13,8 +13,10 @@ import 'package:flutter/services.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/emergency_numbers_config.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 class CrisisFirstAidScreen extends StatelessWidget {
@@ -108,6 +110,10 @@ class CrisisFirstAidScreen extends StatelessWidget {
 class _EmergencyCallCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final country = LocaleCountryService.forContext(context);
+    final cfg = getCountryConfig(country);
+    final number = cfg?.emergency ?? kEuEmergencyNumber;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -140,13 +146,14 @@ class _EmergencyCallCard extends StatelessWidget {
                 foregroundColor: Colors.white),
             onPressed: () async {
               HapticFeedback.heavyImpact();
-              final uri = Uri.parse('tel:112');
+              final uri = Uri.parse(
+                  'tel:${number.replaceAll(RegExp(r'[^0-9+]'), '')}');
               try {
                 await launchUrl(uri);
               } catch (_) {/* still */}
             },
-            child: const Text('112',
-                style: TextStyle(
+            child: Text(number,
+                style: const TextStyle(
                     fontWeight: FontWeight.w800, letterSpacing: 1)),
           ),
         ],

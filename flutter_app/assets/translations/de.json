@@ -4525,7 +4525,11 @@
     "thanks": "Meldung eingereicht. Danke!"
   },
   "mentalSupport": {
-    "launchFailed": "Der Anruf konnte nicht gestartet werden."
+    "launchFailed": "Der Anruf konnte nicht gestartet werden.",
+    "bannerTitle": "Du bist nicht allein.",
+    "bannerDesc": "Krisenhotlines sind kostenlos, anonym und erreichbar — rund um die Uhr. Tippe eine Nummer zum Anrufen.",
+    "emergencyFooterTitle": "Im akuten Notfall: {number}",
+    "emergencyFooterDesc": "Bei Lebensgefahr — Polizei, Feuerwehr, Rettung."
   },
   "postCard": {
     "savedToast": "✓ Beitrag gespeichert.",

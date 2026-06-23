@@ -4526,7 +4526,11 @@
     "thanks": "Report submitted. Thank you!"
   },
   "mentalSupport": {
-    "launchFailed": "Could not start the call."
+    "launchFailed": "Could not start the call.",
+    "bannerTitle": "You are not alone.",
+    "bannerDesc": "Crisis hotlines are free, anonymous and available around the clock. Tap a number to call.",
+    "emergencyFooterTitle": "In an emergency: {number}",
+    "emergencyFooterDesc": "Life-threatening emergency — police, fire, ambulance."
   },
   "postCard": {
     "savedToast": "✓ Post saved.",

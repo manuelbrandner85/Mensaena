@@ -4529,7 +4529,11 @@
     "thanks": "Segnalazione inviata. Grazie!"
   },
   "mentalSupport": {
-    "launchFailed": "Impossibile avviare la chiamata."
+    "launchFailed": "Impossibile avviare la chiamata.",
+    "bannerTitle": "Non sei solo.",
+    "bannerDesc": "Le linee di crisi sono gratuite, anonime e disponibili 24 ore su 24. Tocca un numero per chiamare.",
+    "emergencyFooterTitle": "In caso di emergenza: {number}",
+    "emergencyFooterDesc": "Pericolo di vita — polizia, pompieri, ambulanza."
   },
   "postCard": {
     "savedToast": "✓ Post salvato.",
