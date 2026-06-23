@@ -694,7 +694,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     );
                   }
                   WidgetsBinding.instance.addPostFrameCallback((_) {
-                    if (_scrollCtrl.hasClients) {
+                    // hasContentDimensions zusätzlich prüfen: hasClients allein
+                    // garantiert nicht, dass maxScrollExtent schon gesetzt ist
+                    // (sonst Null-Check-Crash beim ersten Frame der Liste).
+                    if (_scrollCtrl.hasClients &&
+                        _scrollCtrl.position.hasContentDimensions) {
                       _scrollCtrl.animateTo(
                         _scrollCtrl.position.maxScrollExtent,
                         duration: const Duration(milliseconds: 250),

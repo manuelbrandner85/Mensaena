@@ -18,8 +18,16 @@ class DetoxReminderDialog extends StatelessWidget {
   final int minutes;
 
   static Future<void> show(BuildContext context, int minutes) {
+    // Crash-Schutz (häufigster Null-Check-Absturz lt. error_logs): wird show()
+    // mit einem Context ohne Navigator-Ancestor aufgerufen (z. B. der
+    // UpdateGate-Context, der über dem Router-Navigator liegt), stürzt
+    // showDialog → Navigator.of an einem Null-Check ab. Dann den nicht-
+    // kritischen Reminder still überspringen statt zu crashen.
+    final navigator = Navigator.maybeOf(context, rootNavigator: true);
+    if (navigator == null) return Future<void>.value();
     return showDialog<void>(
       context: context,
+      useRootNavigator: true,
       barrierDismissible: false,
       builder: (_) => DetoxReminderDialog(minutes: minutes),
     );

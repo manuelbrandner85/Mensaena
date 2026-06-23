@@ -79,6 +79,10 @@ class _ChargeStationsScreenState
   }
 
   Future<void> _load() async {
+    // _load() wird nach async-Gaps aus _initAndLoad gerufen — Widget kann
+    // zwischenzeitlich disposed sein → setState ohne mounted-Check crasht
+    // ("Null check operator used on a null value", lt. error_logs).
+    if (!mounted) return;
     setState(() => _loading = true);
     final list = await ChargeStationsService.nearby(
       lat: _center.latitude,
