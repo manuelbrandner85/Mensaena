@@ -28,6 +28,7 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../providers/active_stream_provider.dart';
+import '../../../providers/effects_gate_provider.dart';
 import '../../../services/call_busy_state.dart';
 import '../../../services/dm_call_service.dart';
 import '../../../services/live_audio_service.dart';
@@ -702,6 +703,16 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     // ist dezent, volle Bühne strahlt. Bezugspunkt ~8 Personen für volle
     // Sättigung — danach bleibt's konstant.
     final crowdGlow = (_participantCount.clamp(1, 8) / 8.0);
+    // Cinema-Effekte (Haze/LightLeaks/FilmGrain) laufen NUR im verbundenen
+    // Zustand. Bei connecting/failed/ended werden sie gar nicht erst gebaut →
+    // ihre AnimationController werden disposed und stoppen (kein Dauer-Repaint
+    // hinter Spinner/Fehler-Screen, keine Pulse-/Grain-Loops im Leerlauf).
+    // Zusätzlich vom EffectsGate gedeckelt: Lite-Gerät/A11y/Crash-Schutz →
+    // off (gar nicht) oder reduced (halbe Intensität, keine Pulse).
+    final profile = ref.watch(effectsProfileProvider);
+    final showEffects = _state == _RoomState.connected && !profile.isOff;
+    final fx = profile.intensityFactor; // 1.0 full · 0.5 reduced
+    final pulseLeaks = profile.isFull; // pulsierende Leaks nur bei voller Stufe
     return Scaffold(
       backgroundColor: AppColors.voidColor,
       body: SafeArea(
@@ -721,37 +732,43 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
                 ),
               ),
             ),
-            // Cinema-Atmosphäre — AtmosphericHaze + 2 LightLeaks + Grain + Vignette.
-            const Positioned.fill(
-              child: AtmosphericHaze(
-                topColor: AppColors.bronze,
-                bottomColor: AppColors.tealDeep,
-                intensity: 0.35,
+            // Cinema-Atmosphäre — AtmosphericHaze + 2 LightLeaks (nur connected
+            // + gedeckelt durch EffectsGate). Vignette bleibt statisch immer an.
+            if (showEffects) ...[
+              Positioned.fill(
+                child: AtmosphericHaze(
+                  topColor: AppColors.bronze,
+                  bottomColor: AppColors.tealDeep,
+                  intensity: 0.35 * fx,
+                ),
               ),
-            ),
-            Positioned.fill(
-              child: LightLeaksOverlay(
-                intensity: 0.30 + crowdGlow * 0.20,
-                spots: const <LightLeakSpot>[
-                  LightLeakSpot(
-                    alignment: Alignment(-0.9, -0.85),
-                    color: AppColors.bronze,
-                    radius: 220,
-                    opacity: 0.28,
-                    pulse: true,
-                  ),
-                  LightLeakSpot(
-                    alignment: Alignment(0.95, 0.7),
-                    color: AppColors.herzrotWarm,
-                    radius: 240,
-                    opacity: 0.18,
-                    pulse: true,
-                  ),
-                ],
+              Positioned.fill(
+                child: LightLeaksOverlay(
+                  intensity: (0.30 + crowdGlow * 0.20) * fx,
+                  spots: <LightLeakSpot>[
+                    LightLeakSpot(
+                      alignment: const Alignment(-0.9, -0.85),
+                      color: AppColors.bronze,
+                      radius: 220,
+                      opacity: 0.28,
+                      pulse: pulseLeaks,
+                    ),
+                    LightLeakSpot(
+                      alignment: const Alignment(0.95, 0.7),
+                      color: AppColors.herzrotWarm,
+                      radius: 240,
+                      opacity: 0.18,
+                      pulse: pulseLeaks,
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
             const Positioned.fill(child: VignetteOverlay(intensity: 0.42)),
-            const Positioned.fill(child: FilmGrainOverlay(opacity: 0.025)),
+            // Film-Grain ebenfalls nur connected — opacity 0 stoppt sonst den
+            // Grain-Controller (siehe FilmGrainOverlay.didUpdateWidget).
+            if (showEffects)
+              Positioned.fill(child: FilmGrainOverlay(opacity: 0.025 * fx)),
             Column(
               children: [
                 _ElegantHeader(
