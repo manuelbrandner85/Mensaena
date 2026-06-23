@@ -14,6 +14,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/extra_repositories.dart';
 import '../../../repositories/marketplace_repository.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
@@ -74,7 +75,33 @@ class _MarketplaceCreateScreenState
               lost.take(_maxImages - _images.length).map((x) => File(x.path)),
             ));
       }
+      await _prefillLocationFromProfile();
     });
+  }
+
+  /// Smart-Default: Standort aus dem Profil-Heimatort vorbelegen (editierbar,
+  /// KEIN GPS-Prompt). Die meisten Inserate sind in Wohnortnähe → ein Pin per
+  /// Default statt leerem Feld; der GPS-Button/Picker überschreibt jederzeit.
+  Future<void> _prefillLocationFromProfile() async {
+    if (_lat != null || _lng != null) return;
+    try {
+      final p = await ref.read(myProfileProvider.future);
+      final hLat = p?.homeLat ?? p?.latitude;
+      final hLng = p?.homeLng ?? p?.longitude;
+      if (hLat == null || hLng == null || !mounted) return;
+      setState(() {
+        _lat = hLat;
+        _lng = hLng;
+        if (_location.text.trim().isEmpty) {
+          final city = p?.homeCity?.trim();
+          _location.text = (city != null && city.isNotEmpty)
+              ? city
+              : '${hLat.toStringAsFixed(3)}, ${hLng.toStringAsFixed(3)}';
+        }
+      });
+    } catch (_) {
+      // Standort bleibt optional — kein Default ist auch ok.
+    }
   }
 
   static const List<({String value, String i18n, String emoji})> _types = [

@@ -10,6 +10,7 @@ import 'package:lucide_icons/lucide_icons.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../repositories/board_repository.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/haptics.dart';
 import '../../../services/image_upload_service.dart';
 import '../../../services/location_service.dart';
@@ -52,6 +53,32 @@ class _BoardCreateScreenState extends ConsumerState<BoardCreateScreen> {
     (value: 'verloren', i18n: 'board.catVerloren', emoji: '😢'),
     (value: 'fundbuero', i18n: 'board.catFundbuero', emoji: '🔑'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Smart-Default: Standort aus dem Profil-Heimatort vorbelegen (kein
+    // GPS-Prompt, editierbar über GPS-Button/Picker). Pinnwand-Notizen
+    // betreffen meist die eigene Nachbarschaft → sinnvoller Default-Pin.
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _prefillLocationFromProfile());
+  }
+
+  Future<void> _prefillLocationFromProfile() async {
+    if (_lat != null || _lng != null) return;
+    try {
+      final p = await ref.read(myProfileProvider.future);
+      final hLat = p?.homeLat ?? p?.latitude;
+      final hLng = p?.homeLng ?? p?.longitude;
+      if (hLat == null || hLng == null || !mounted) return;
+      setState(() {
+        _lat = hLat;
+        _lng = hLng;
+      });
+    } catch (_) {
+      // Standort bleibt optional.
+    }
+  }
 
   @override
   void dispose() {
