@@ -26,6 +26,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
 import '../repositories/extra_repositories.dart';
+import 'query_cache_service.dart';
 
 class MemoryWatchdogService {
   MemoryWatchdogService._();
@@ -103,6 +104,8 @@ class MemoryWatchdogService {
   /// leeren, wenn er über der weichen Schwelle liegt. Sichtbare Bilder
   /// bleiben → kein Flackern in der UI.
   void _softCheck() {
+    // Abgelaufene Query-Cache-Einträge bei jedem Zyklus aufräumen.
+    QueryCache.sweepExpired();
     final cache = PaintingBinding.instance.imageCache;
     final maxBytes = cache.maximumSizeBytes;
     if (maxBytes <= 0) return;
@@ -164,6 +167,8 @@ class MemoryWatchdogService {
   void onMemoryPressure() {
     // Akuter RAM-Mangel = stärkstes Vor-Crash-Signal → Effekte sofort deckeln.
     _setCap(true);
+    // Query-Cache komplett leeren: RAM freigeben, bevor Android die App killt.
+    QueryCache.invalidateAll();
     final cache = PaintingBinding.instance.imageCache;
     final ratioBefore = cache.maximumSizeBytes > 0
         ? cache.currentSizeBytes / cache.maximumSizeBytes
@@ -198,6 +203,7 @@ class MemoryWatchdogService {
     final freedMb = cache.currentSizeBytes / 1024 / 1024;
     cache.clear();
     cache.clearLiveImages();
+    QueryCache.invalidateAll();
     return freedMb;
   }
 }
