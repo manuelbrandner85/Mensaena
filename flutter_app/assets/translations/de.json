@@ -2175,6 +2175,7 @@
     "listingNotFound": "Inserat nicht gefunden.",
     "condition": "Zustand: {state}",
     "contact": "Kontakt",
+    "sendMessage": "Nachricht senden",
     "reserve_request": "Reservieren",
     "reserve_hint": "Sende dem/der Anbieter:in eine Reservierungs-Anfrage.",
     "reserve_message": "Nachricht (optional)",

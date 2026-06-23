@@ -2175,6 +2175,7 @@
     "listingNotFound": "İlan bulunamadı.",
     "condition": "Durum: {state}",
     "contact": "İletişim",
+    "sendMessage": "Mesaj gönder",
     "reserve_request": "Rezerve et",
     "reserve_hint": "Satıcıya bir rezervasyon isteği gönder.",
     "reserve_message": "Mesaj (isteğe bağlı)",
