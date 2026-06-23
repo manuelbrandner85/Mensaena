@@ -4528,7 +4528,11 @@
     "thanks": "Bildirim gönderildi. Teşekkürler!"
   },
   "mentalSupport": {
-    "launchFailed": "Arama başlatılamadı."
+    "launchFailed": "Arama başlatılamadı.",
+    "bannerTitle": "Yalnız değilsin.",
+    "bannerDesc": "Kriz hatları ücretsiz, anonim ve 7/24 ulaşılabilir. Aramak için bir numaraya dokun.",
+    "emergencyFooterTitle": "Acil durumda: {number}",
+    "emergencyFooterDesc": "Hayati tehlike — polis, itfaiye, ambulans."
   },
   "postCard": {
     "savedToast": "✓ Gönderi kaydedildi.",

@@ -4,8 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../config/emergency_numbers_config.dart';
 import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
+import '../../../services/locale_country_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 /// SKILL: mensaena-features
@@ -232,7 +234,7 @@ class _Banner extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Du bist nicht allein.',
+                  'mentalSupport.bannerTitle'.tr(),
                   style: AppTypography.body(
                     size: 14,
                     color: AppColors.ink,
@@ -241,8 +243,7 @@ class _Banner extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Krisenhotlines sind kostenlos, anonym und erreichbar — '
-                  'rund um die Uhr. Tippe eine Nummer zum Anrufen.',
+                  'mentalSupport.bannerDesc'.tr(),
                   style: AppTypography.body(
                     size: 12,
                     color: AppColors.inkSoft,
@@ -428,6 +429,11 @@ Future<void> safeLaunchHotline(
 class _EmergencyFooter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final country = LocaleCountryService.forContext(context);
+    final cfg = getCountryConfig(country);
+    final number = cfg?.emergency ?? kEuEmergencyNumber;
+    final dialNumber = number.replaceAll(RegExp(r'[^0-9+]'), '');
+
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -445,7 +451,8 @@ class _EmergencyFooter extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Im akuten Notfall: 112 (EU-weit)',
+                  'mentalSupport.emergencyFooterTitle'
+                      .tr(namedArgs: {'number': number}),
                   style: AppTypography.body(
                     size: 13,
                     color: AppColors.herzrotWarm,
@@ -454,15 +461,15 @@ class _EmergencyFooter extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'Bei Lebensgefahr — Polizei, Feuerwehr, Rettung.',
+                  'mentalSupport.emergencyFooterDesc'.tr(),
                   style: AppTypography.caption(),
                 ),
               ],
             ),
           ),
           GestureDetector(
-            onTap: () =>
-                safeLaunchHotline(context, 'tel:112', LaunchMode.platformDefault),
+            onTap: () => safeLaunchHotline(
+                context, 'tel:$dialNumber', LaunchMode.platformDefault),
             child: Container(
               padding: const EdgeInsets.symmetric(
                   horizontal: 14, vertical: 8),
@@ -471,7 +478,7 @@ class _EmergencyFooter extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '112',
+                number,
                 style: AppTypography.mono(
                   size: 14,
                   color: AppColors.ink,

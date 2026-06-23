@@ -4529,7 +4529,11 @@
     "thanks": "Denuncia enviada. ¡Gracias!"
   },
   "mentalSupport": {
-    "launchFailed": "No se pudo iniciar la llamada."
+    "launchFailed": "No se pudo iniciar la llamada.",
+    "bannerTitle": "No estás solo.",
+    "bannerDesc": "Las líneas de crisis son gratuitas, anónimas y disponibles las 24 horas. Toca un número para llamar.",
+    "emergencyFooterTitle": "En caso de emergencia: {number}",
+    "emergencyFooterDesc": "Peligro de vida — policía, bomberos, ambulancia."
   },
   "postCard": {
     "savedToast": "✓ Publicación guardada.",

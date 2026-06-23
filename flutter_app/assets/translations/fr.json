@@ -4529,7 +4529,11 @@
     "thanks": "Signalement envoyé. Merci !"
   },
   "mentalSupport": {
-    "launchFailed": "Impossible de lancer l’appel."
+    "launchFailed": "Impossible de lancer l’appel.",
+    "bannerTitle": "Tu n’es pas seul(e).",
+    "bannerDesc": "Les lignes de crise sont gratuites, anonymes et disponibles 24h/24. Appuie sur un numéro pour appeler.",
+    "emergencyFooterTitle": "En cas d’urgence : {number}",
+    "emergencyFooterDesc": "Danger de mort — police, pompiers, ambulance."
   },
   "postCard": {
     "savedToast": "✓ Publication enregistrée.",
