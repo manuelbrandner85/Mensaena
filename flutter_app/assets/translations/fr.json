@@ -2163,6 +2163,7 @@
   "marketplace": {
     "sortTooltip": "Trier",
     "sortNewest": "Plus récents",
+    "sortRelevant": "Recommandés",
     "sortNearest": "Plus proches",
     "sortExpiring": "Bientôt expirés",
     "moreDetails": "Plus de détails",

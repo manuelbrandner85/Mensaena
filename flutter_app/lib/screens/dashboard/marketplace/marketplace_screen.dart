@@ -11,6 +11,7 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../models/marketplace_listing.dart';
 import '../../../repositories/marketplace_repository.dart';
+import '../../../repositories/profiles_repository.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
@@ -22,7 +23,7 @@ import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/image_carousel.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 
-enum _MpSort { newest, nearest, expiring }
+enum _MpSort { relevant, newest, nearest, expiring }
 
 class MarketplaceScreen extends ConsumerStatefulWidget {
   const MarketplaceScreen({super.key});
@@ -40,7 +41,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
   double? _maxPrice;
   double? _maxDistanceKm;
   ({double lat, double lng})? _myPos;
-  _MpSort _sort = _MpSort.newest;
+  _MpSort _sort = _MpSort.relevant;
 
   List<FilterOption<String>> get _types => [
         FilterOption(
@@ -101,7 +102,8 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       _maxPrice != null ||
       _maxDistanceKm != null;
 
-  List<MarketplaceListing> _apply(List<MarketplaceListing> all) {
+  List<MarketplaceListing> _apply(
+      List<MarketplaceListing> all, ({double lat, double lng})? pos) {
     final q = _search.trim().toLowerCase();
     final list = all.where((m) {
       if (_category != null && m.category != _category) return false;
@@ -122,14 +124,32 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
           m.description.toLowerCase().contains(q);
     }).toList();
     // Sortierung
-    if (_sort == _MpSort.newest) {
+    if (_sort == _MpSort.relevant) {
+      // Relevanz = Nähe + Aktualität kombiniert. Ohne Standort fällt es auf
+      // reine Aktualität zurück (≈ neueste zuerst) — kein GPS-Prompt nötig,
+      // [pos] kommt aus GPS-Filter ODER dem Profil-Heimatort.
+      final now = DateTime.now();
+      double score(MarketplaceListing m) {
+        final ageDays = now.difference(m.createdAt).inHours / 24.0;
+        final recency = 1.0 / (1.0 + ageDays / 14.0); // Halbwert ~14 Tage
+        if (pos == null || m.latitude == null || m.longitude == null) {
+          return recency;
+        }
+        final d = LocationService.haversineKm(
+            pos.lat, pos.lng, m.latitude!, m.longitude!);
+        final proximity = 1.0 / (1.0 + d / 10.0); // Halbwert ~10 km
+        return proximity * 0.6 + recency * 0.4;
+      }
+
+      list.sort((a, b) => score(b).compareTo(score(a)));
+    } else if (_sort == _MpSort.newest) {
       list.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-    } else if (_sort == _MpSort.nearest && _myPos != null) {
+    } else if (_sort == _MpSort.nearest && pos != null) {
       double dist(MarketplaceListing m) =>
           (m.latitude == null || m.longitude == null)
               ? double.infinity
               : LocationService.haversineKm(
-                  _myPos!.lat, _myPos!.lng, m.latitude!, m.longitude!);
+                  pos.lat, pos.lng, m.latitude!, m.longitude!);
       list.sort((a, b) => dist(a).compareTo(dist(b)));
     } else if (_sort == _MpSort.expiring) {
       final far = DateTime(9999);
@@ -175,6 +195,16 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
       (type: _type, includeClaimed: _showClaimed),
     ));
     final statsAsync = ref.watch(marketplaceStatsProvider);
+    // Effektive Position für Relevanz-/Nächste-Sortierung: präzises GPS
+    // (sobald der Distanz-Filter es geholt hat) ODER der Profil-Heimatort
+    // (sofort verfügbar, KEIN GPS-Prompt). null → Relevanz = nur Aktualität.
+    final profile = ref.watch(myProfileProvider).valueOrNull;
+    final homeLat = profile?.latitude ?? profile?.homeLat;
+    final homeLng = profile?.longitude ?? profile?.homeLng;
+    final effectivePos = _myPos ??
+        ((homeLat != null && homeLng != null)
+            ? (lat: homeLat, lng: homeLng)
+            : null);
     return DashboardScaffold(
       title: 'marketplace.screenTitle'.tr(),
       currentRoute: '/dashboard/marketplace',
@@ -245,6 +275,9 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                           size: 18, color: AppColors.bronze),
                       onSelected: (v) => setState(() => _sort = v),
                       itemBuilder: (_) => [
+                        PopupMenuItem(
+                            value: _MpSort.relevant,
+                            child: Text('marketplace.sortRelevant'.tr())),
                         PopupMenuItem(
                             value: _MpSort.newest,
                             child: Text('marketplace.sortNewest'.tr())),
@@ -368,7 +401,7 @@ class _MarketplaceScreenState extends ConsumerState<MarketplaceScreen> {
                     ),
                   ),
                   data: (all) {
-                    final list = _apply(all);
+                    final list = _apply(all, effectivePos);
                     if (list.isEmpty) {
                       return ListView(
                         physics:

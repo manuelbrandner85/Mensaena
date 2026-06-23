@@ -11,6 +11,7 @@ import '../../../models/farm_listing.dart';
 import '../../../repositories/organizations_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../services/locale_country_service.dart';
+import '../../../services/location_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/effects/animated_entrance.dart';
@@ -51,15 +52,28 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
   bool get _hasFilters =>
       _search.isNotEmpty || _category != null || _bioOnly;
 
-  List<FarmListing> _apply(List<FarmListing> all) {
+  List<FarmListing> _apply(List<FarmListing> all, double? lat, double? lng) {
     final q = _search.trim().toLowerCase();
-    return all.where((f) {
+    final filtered = all.where((f) {
       if (_category != null && f.category != _category) return false;
       if (_bioOnly && f.isBio != true) return false;
       if (q.isEmpty) return true;
       return f.name.toLowerCase().contains(q) ||
           f.city.toLowerCase().contains(q);
     }).toList();
+    // Relevanz: hat der Nutzer einen Standort (Profil/Home), zeigen wir die
+    // NÄCHSTEN Höfe zuerst — feste Orte, da ist Nähe die sinnvollste Ordnung
+    // (vorher rein alphabetisch aus dem Repo). Ohne Standort bleibt die
+    // Repo-Reihenfolge (verifiziert → alphabetisch); Höfe ohne Koordinaten
+    // wandern ans Ende.
+    if (lat != null && lng != null) {
+      double dist(FarmListing f) =>
+          (f.latitude == null || f.longitude == null)
+              ? double.infinity
+              : LocationService.haversineKm(lat, lng, f.latitude!, f.longitude!);
+      filtered.sort((a, b) => dist(a).compareTo(dist(b)));
+    }
+    return filtered;
   }
 
   @override
@@ -198,7 +212,7 @@ class _SupplyScreenState extends ConsumerState<SupplyScreen> {
                     ),
                   ),
                   data: (all) {
-                    final list = _apply(all);
+                    final list = _apply(all, lat, lng);
                     if (_view == _SupplyView.map) {
                       return LocationMapView(
                         markers: [
