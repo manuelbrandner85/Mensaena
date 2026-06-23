@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
 import '../../config/theme/app_colors.dart';
+import '../../config/theme/app_spacing.dart';
 import '../../models/post.dart';
 import '../../models/profile.dart';
 import '../effects/tilt_card.dart';
@@ -94,8 +95,8 @@ class _StatsRowState extends State<StatsRow> {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             childAspectRatio: 1.25,
-            crossAxisSpacing: 10,
-            mainAxisSpacing: 10,
+            crossAxisSpacing: AppSpacing.xs,
+            mainAxisSpacing: AppSpacing.xs,
             children: cards,
           );
         }
@@ -110,7 +111,8 @@ class _StatsRowState extends State<StatsRow> {
                 itemCount: cards.length,
                 itemBuilder: (context, i) {
                   return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
                     child: cards[i],
                   );
                 },

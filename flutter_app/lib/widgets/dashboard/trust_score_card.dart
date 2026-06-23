@@ -35,9 +35,9 @@ class TrustScoreCard extends StatelessWidget {
     // InkWell bleibt Listen-Rows vorbehalten.
     return Pressable(
       onTap: () => context.go('/dashboard/profile'),
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
@@ -48,7 +48,7 @@ class TrustScoreCard extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
           border: Border.all(color: AppColors.trust.withValues(alpha: 0.4)),
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
           children: [
