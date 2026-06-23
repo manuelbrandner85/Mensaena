@@ -1025,9 +1025,6 @@ class _AppearanceTab extends ConsumerWidget {
     final phase = ref.watch(effectiveCinemaPhaseProvider);
     final spec =
         phase != null ? CinemaTheme.specFor(phase) : null;
-    // Live-Vorschau-Status: aktuelle Effektstärke + ob „Maximale Effekte" an.
-    final effectStrength = ref.watch(cinemaEffectStrengthProvider);
-    final forcedEffects = ref.watch(forceFullEffectsProvider);
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -1096,16 +1093,6 @@ class _AppearanceTab extends ConsumerWidget {
                     border: Border.all(color: AppColors.line),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'settings.previewStatus'.tr(namedArgs: {
-                    'strength': '$effectStrength',
-                    'mode': forcedEffects
-                        ? 'settings.previewForced'.tr()
-                        : 'settings.previewAuto'.tr(),
-                  }),
-                  style: AppTypography.caption(),
-                ),
               ],
             ],
           ),
@@ -1134,8 +1121,6 @@ class _AppearanceTab extends ConsumerWidget {
         const _WeatherAdaptiveToggle(),
         const SizedBox(height: 12),
         const _SeasonalToggle(),
-        const SizedBox(height: 12),
-        const _VideoBackdropToggle(),
         const SizedBox(height: 12),
         const _ParallaxToggle(),
         const SizedBox(height: 16),
@@ -1652,50 +1637,6 @@ class _ParallaxToggle extends ConsumerWidget {
             activeColor: AppColors.amber,
             onChanged: (v) =>
                 ref.read(cinemaParallaxProvider.notifier).set(v),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// „Video-Hintergrund" — bewegtes Loop-Video je Tageszeit (render-intensiv,
-/// nur bei vollen Effekten; sonst Standbild / Gradient).
-class _VideoBackdropToggle extends ConsumerWidget {
-  const _VideoBackdropToggle();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final on = ref.watch(cinemaVideoBackdropProvider);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.elevated,
-        border: Border.all(color: on ? AppColors.amber : AppColors.line),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Icon(LucideIcons.clapperboard,
-              size: 18, color: on ? AppColors.amber : AppColors.mute),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('settings.videoBackdrop.label'.tr(),
-                    style: AppTypography.body(size: 14, color: AppColors.ink)),
-                const SizedBox(height: 2),
-                Text('settings.videoBackdrop.hint'.tr(),
-                    style: AppTypography.caption()),
-              ],
-            ),
-          ),
-          Switch.adaptive(
-            value: on,
-            activeColor: AppColors.amber,
-            onChanged: (v) =>
-                ref.read(cinemaVideoBackdropProvider.notifier).set(v),
           ),
         ],
       ),

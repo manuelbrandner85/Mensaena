@@ -179,40 +179,6 @@ final cinemaParallaxProvider =
     StateNotifierProvider<CinemaParallaxNotifier, bool>(
         (ref) => CinemaParallaxNotifier());
 
-const _videoBackdropStorageKey = 'cinema_video_backdrop_v1';
-
-/// Schalter: bewegter Video-Hintergrund je Tageszeit (statt statischem
-/// Mesh-Gradient). Render-intensiv → Default AUS (opt-in); läuft nur bei
-/// vollen Effekten, sonst Standbild-Fallback (CinematicVideoBackdrop) bzw.
-/// der Auto-Crash-Schutz schaltet zurück auf den Gradient.
-class CinemaVideoBackdropNotifier extends StateNotifier<bool> {
-  CinemaVideoBackdropNotifier() : super(false) {
-    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
-  }
-
-  Future<void> _load() async {
-    try {
-      final raw = await _storage.read(key: _videoBackdropStorageKey);
-      final loaded = raw == '1';
-      if (!mounted) return;
-      if (loaded != state) state = loaded;
-    } catch (_) {}
-  }
-
-  Future<void> set(bool value) async {
-    if (!mounted) return;
-    state = value;
-    try {
-      await _storage.write(
-          key: _videoBackdropStorageKey, value: value ? '1' : '0');
-    } catch (_) {}
-  }
-}
-
-final cinemaVideoBackdropProvider =
-    StateNotifierProvider<CinemaVideoBackdropNotifier, bool>(
-        (ref) => CinemaVideoBackdropNotifier());
-
 const _seasonalStorageKey = 'cinema_seasonal_v1';
 
 /// Schalter: dezente saisonale Stimmung (Winter-Kühle, Frühlingsgrün,

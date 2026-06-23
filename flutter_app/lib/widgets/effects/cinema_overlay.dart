@@ -33,7 +33,6 @@ import '../../services/device_tier_service.dart';
 import 'atmospheric_layers.dart';
 import 'chromatic_aberration.dart';
 import 'cinema_parallax.dart';
-import 'cinematic_video_backdrop.dart';
 import 'film_grain.dart';
 import 'lens_flare.dart';
 import 'light_leaks.dart';
@@ -62,11 +61,8 @@ class CinemaOverlay extends ConsumerWidget {
     final forceFull = ref.watch(forceFullEffectsProvider);
     final liteMode = ref.watch(liteModeActiveProvider) && !forceFull;
     final baseIntensity = profile.intensityFactor;
-    // Video + Parallax sind leicht (GPU-Video / günstiger Transform) und sollen
-    // auf JEDEM Gerät laufen, sobald ihr Schalter an ist — daher unabhängig
-    // von isFull/Lite. Die teuren Atmosphären-Ebenen bleiben über das
-    // intensity>=0.6-Gate trotzdem aus.
-    final videoOn = ref.watch(cinemaVideoBackdropProvider);
+    // Parallax ist leicht (günstiger Transform) und soll auf JEDEM Gerät
+    // laufen, sobald der Schalter an ist — daher unabhängig von isFull/Lite.
     final parallaxOn = ref.watch(cinemaParallaxProvider);
 
     // CRASH-FIX: Off-Mode (phase null oder intensity ~0) und On-Mode
@@ -78,9 +74,7 @@ class CinemaOverlay extends ConsumerWidget {
     // Auf Lite weiterhin abschalten — AUSSER Video/Parallax ist aktiv (die
     // sind leicht und vom User explizit gewünscht). reduceMotion/cinema-off
     // (profile.isOff) sowie phase==null bleiben hart aus.
-    if (phase == null ||
-        profile.isOff ||
-        (liteMode && !videoOn && !parallaxOn)) {
+    if (phase == null || profile.isOff || (liteMode && !parallaxOn)) {
       return KeyedSubtree(
         key: const ValueKey('cinema_overlay_off'),
         child: child,
@@ -109,9 +103,6 @@ class CinemaOverlay extends ConsumerWidget {
     final seasonalTint = seasonalBase == null
         ? null
         : Color.lerp(Colors.transparent, seasonalBase, intensity);
-    // Video-Hintergrund sobald der Schalter an ist (läuft auf jedem Gerät,
-    // GPU-dekodiert). alwaysPlay umgeht die isFull-Sperre im Widget.
-    final phaseVideo = videoOn ? _videoAssetsForPhase(phase) : null;
 
     return KeyedSubtree(
       key: const ValueKey('cinema_overlay_on'),
@@ -121,30 +112,18 @@ class CinemaOverlay extends ConsumerWidget {
         children: [
         // ═══════════ BACKGROUND-STACK (alle hinter Content) ═══════════
 
-        // 1. Hintergrund: bewegtes Video je Tageszeit (nur full + Schalter an)
-        // ODER der animierte Mesh-Gradient (Standard / bei Crash-Schutz).
-        // In CinemaParallax gewrappt → subtile Neige-Tiefe (nur full + an).
+        // 1. Hintergrund: animierter Mesh-Gradient, in CinemaParallax gewrappt
+        // → subtile Neige-Tiefe (nur bei aktivem Parallax-Schalter).
         CinemaParallax(
-          child: phaseVideo != null
-              ? RepaintBoundary(
-                  child: CinematicVideoBackdrop(
-                    key: ValueKey('video_${phase.name}'),
-                    videoAsset: phaseVideo.video,
-                    stillAsset: phaseVideo.still,
-                    alwaysPlay: true,
-                    topScrim: 0.25,
-                    bottomScrim: 0.7,
-                  ),
-                )
-              : RepaintBoundary(
-                  child: AnimatedSwitcher(
-                    duration: const Duration(seconds: 8),
-                    child: _MeshBackground(
-                      key: ValueKey('mesh_${phase.name}'),
-                      spec: spec,
-                    ),
-                  ),
-                ),
+          child: RepaintBoundary(
+            child: AnimatedSwitcher(
+              duration: const Duration(seconds: 8),
+              child: _MeshBackground(
+                key: ValueKey('mesh_${phase.name}'),
+                spec: spec,
+              ),
+            ),
+          ),
         ),
 
         // 1a2. Saisonaler Tint (Winter/Frühling/Sommer/Herbst).
@@ -260,30 +239,6 @@ class CinemaOverlay extends ConsumerWidget {
       ),
       ),
     );
-  }
-}
-
-/// Phase → (Loop-Video, Standbild-Fallback) für den Video-Hintergrund.
-({String video, String still}) _videoAssetsForPhase(CinemaPhase phase) {
-  switch (phase) {
-    case CinemaPhase.night:
-      return (
-        video: 'assets/videos/splash_cosmos.mp4',
-        still: 'assets/images/splash_cosmos.webp',
-      );
-    case CinemaPhase.dusk:
-    case CinemaPhase.evening:
-      return (
-        video: 'assets/videos/splash_dusk.mp4',
-        still: 'assets/images/splash_dusk.webp',
-      );
-    case CinemaPhase.dawn:
-    case CinemaPhase.morning:
-    case CinemaPhase.day:
-      return (
-        video: 'assets/videos/dorf_intro.mp4',
-        still: 'assets/images/dorf_morning.webp',
-      );
   }
 }
 
