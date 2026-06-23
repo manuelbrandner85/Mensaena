@@ -87,11 +87,11 @@ class CinemaOverlay extends ConsumerWidget {
     final strength = ref.watch(cinemaEffectStrengthProvider) / 100.0;
     final intensity =
         (isLight ? (baseIntensity * 0.3) : baseIntensity) * strength;
-    // Wetter-adaptiver Tint (Regen/Nebel/Schnee/Gewitter) — leichtgewichtig,
-    // mit der Intensität skaliert.
-    final weatherBase = ref.watch(cinemaWeatherAdaptiveProvider)
-        ? ref.watch(cinemaWeatherTintProvider).value
-        : null;
+    // ECHTE aktuelle Wetterlage am Standort (eine Quelle: Now-Provider).
+    // Tint/Kondition/Partikel werden hieraus abgeleitet — keine Stunden-/
+    // Zeitzonen-Fehlzuordnung mehr.
+    final weatherNow = ref.watch(cinemaWeatherNowProvider).value;
+    final weatherBase = weatherTintOf(weatherNow);
     // Intensitäts-Skalierung via lerp von transparent → Tint (kein Color.a,
     // versionsunabhängig).
     final weatherTint = weatherBase == null
@@ -110,11 +110,9 @@ class CinemaOverlay extends ConsumerWidget {
     // C: Wetter-Kondition → animierte Partikel/Nebel/Blitz. D: Saison-Partikel.
     // Teuer (eigener AnimationController) → nur bei vollen Effekten (>= 0.6).
     final heavyOn = intensity >= 0.6;
-    final weather = heavyOn
-        ? (ref.watch(cinemaWeatherConditionProvider).value ??
-            CinemaWeather.clear)
-        : CinemaWeather.clear;
-    final weatherParticles = heavyOn ? weatherParticleSpec(weather) : null;
+    final weather =
+        heavyOn ? weatherConditionOf(weatherNow) : CinemaWeather.clear;
+    final weatherParticles = heavyOn ? weatherParticleSpec(weatherNow) : null;
     // Saison-Partikel nur, wenn KEIN Wetter-Niederschlag aktiv ist (kein
     // Doppel-Schnee) und der Saison-Schalter an ist.
     final seasonalParticles =

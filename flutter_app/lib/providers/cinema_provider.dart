@@ -125,59 +125,44 @@ final cinemaWeatherAdaptiveProvider =
     StateNotifierProvider<CinemaWeatherAdaptiveNotifier, bool>(
         (ref) => CinemaWeatherAdaptiveNotifier());
 
-/// Aktueller Wetter-Tint (Farbe inkl. Alpha) basierend auf der WMO-Wetterlage
-/// am Standort; null = klar / keine Anpassung. Refresht alle 20 Minuten.
-final cinemaWeatherTintProvider = StreamProvider<Color?>((ref) async* {
-  Future<Color?> resolve() async {
+enum CinemaWeather { clear, cloudy, fog, rain, snow, thunder }
+
+/// EINE Quelle der Wahrheit: die ECHTE aktuelle Wetterlage am Standort
+/// (Open-Meteo `current`, `timezone=auto`). Tint, Kondition UND Partikel-
+/// Dichte werden hieraus als reine Funktionen abgeleitet — keine doppelten
+/// Fetches, keine Stunden-/Zeitzonen-Fehlzuordnung mehr (Bugfix
+/// „manchmal nicht richtig dargestellt"). Refresht alle 15 Min; null =
+/// Schalter aus / keine Standortdaten.
+final cinemaWeatherNowProvider = StreamProvider<WeatherNow?>((ref) async* {
+  if (!ref.watch(cinemaWeatherAdaptiveProvider)) {
+    yield null;
+    return;
+  }
+  Future<WeatherNow?> resolve() async {
     try {
       final p = await ProfilesRepository.getMine();
       final lat = p?.latitude ?? p?.homeLat;
       final lng = p?.longitude ?? p?.homeLng;
       if (lat == null || lng == null) return null;
-      final hours =
-          await WeatherService.hourly(latitude: lat, longitude: lng);
-      if (hours.isEmpty) return null;
-      return _weatherTintForCode(hours.first.code);
+      return await WeatherService.current(latitude: lat, longitude: lng);
     } catch (_) {
       return null;
     }
   }
 
   yield await resolve();
-  await for (final _ in Stream<void>.periodic(const Duration(minutes: 20))) {
+  await for (final _ in Stream<void>.periodic(const Duration(minutes: 15))) {
     yield await resolve();
   }
 });
 
-/// C: Wetter-Kondition (für animierte Partikel/Blitz) — abgeleitet aus dem
-/// WMO-Code am Standort. Refresht alle 20 Min; Default klar bei Fehler.
-enum CinemaWeather { clear, cloudy, fog, rain, snow, thunder }
+/// Live-Wetterlage → Kondition (für Partikel/Blitz).
+CinemaWeather weatherConditionOf(WeatherNow? now) =>
+    now == null ? CinemaWeather.clear : _weatherForCode(now.code);
 
-final cinemaWeatherConditionProvider =
-    StreamProvider<CinemaWeather>((ref) async* {
-  if (!ref.watch(cinemaWeatherAdaptiveProvider)) {
-    yield CinemaWeather.clear;
-    return;
-  }
-  Future<CinemaWeather> resolve() async {
-    try {
-      final p = await ProfilesRepository.getMine();
-      final lat = p?.latitude ?? p?.homeLat;
-      final lng = p?.longitude ?? p?.homeLng;
-      if (lat == null || lng == null) return CinemaWeather.clear;
-      final hours = await WeatherService.hourly(latitude: lat, longitude: lng);
-      if (hours.isEmpty) return CinemaWeather.clear;
-      return _weatherForCode(hours.first.code);
-    } catch (_) {
-      return CinemaWeather.clear;
-    }
-  }
-
-  yield await resolve();
-  await for (final _ in Stream<void>.periodic(const Duration(minutes: 20))) {
-    yield await resolve();
-  }
-});
+/// Live-Wetterlage → Stimmungs-Tint (null = klar/keine Anpassung).
+Color? weatherTintOf(WeatherNow? now) =>
+    now == null ? null : _weatherTintForCode(now.code);
 
 CinemaWeather _weatherForCode(int code) {
   if (code <= 1) return CinemaWeather.clear;
@@ -207,19 +192,52 @@ class CinemaParticleSpec {
   final int count;
 }
 
-/// C: Wetter → fallende Partikel (Regen/Schnee). null = keine (klar/bewölkt/
-/// Nebel → Tint bzw. Nebel-Drift übernehmen das). Gewitter = dichter Regen.
-CinemaParticleSpec? weatherParticleSpec(CinemaWeather w) {
+/// C: ECHTE Wetterlage → fallende Partikel mit realistischer Dichte. Die
+/// Anzahl skaliert mit dem gemessenen Niederschlag (mm) bzw. Schneefall (cm)
+/// am Standort — Niesel ≠ Wolkenbruch. null = klar/bewölkt/Nebel (Tint bzw.
+/// Nebel-Drift übernehmen). Gewitter = dichter Regen.
+CinemaParticleSpec? weatherParticleSpec(WeatherNow? now) {
+  if (now == null) return null;
+  final w = _weatherForCode(now.code);
   switch (w) {
     case CinemaWeather.rain:
-      return const CinemaParticleSpec(
-          kind: CinemaParticleKind.rain, color: Color(0xCCBFD4E8), count: 70);
     case CinemaWeather.thunder:
-      return const CinemaParticleSpec(
-          kind: CinemaParticleKind.rain, color: Color(0xE0AEC4DC), count: 110);
+      // mm/h aus rain+showers (fällt auf Gesamt-Niederschlag zurück).
+      final mm = (now.rainMm + now.showersMm) > 0
+          ? now.rainMm + now.showersMm
+          : now.precipitationMm;
+      int count;
+      if (mm < 0.3) {
+        count = 38; // Niesel / gerade aufgehört (Code sagt Regen)
+      } else if (mm < 1.5) {
+        count = 72; // leicht
+      } else if (mm < 4.0) {
+        count = 112; // mäßig
+      } else {
+        count = 150; // stark
+      }
+      if (w == CinemaWeather.thunder) {
+        final boosted = (count * 1.2).round();
+        count = boosted > 170 ? 170 : boosted;
+      }
+      return CinemaParticleSpec(
+          kind: CinemaParticleKind.rain,
+          color: const Color(0xCCBFD4E8),
+          count: count);
     case CinemaWeather.snow:
-      return const CinemaParticleSpec(
-          kind: CinemaParticleKind.snow, color: Color(0xF2EAF2FB), count: 48);
+      final cm = now.snowfallCm;
+      int count;
+      if (cm < 0.2) {
+        count = 32;
+      } else if (cm < 1.0) {
+        count = 54;
+      } else {
+        count = 82;
+      }
+      return CinemaParticleSpec(
+          kind: CinemaParticleKind.snow,
+          color: const Color(0xF2EAF2FB),
+          count: count);
     case CinemaWeather.clear:
     case CinemaWeather.cloudy:
     case CinemaWeather.fog:

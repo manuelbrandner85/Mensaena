@@ -16,9 +16,55 @@ class WeatherService {
   static final Map<String, _CacheEntry<List<WeatherDay>>> _forecastCache = {};
   static final Map<String, _CacheEntry<List<WeatherHourly>>> _hourlyCache = {};
   static final Map<String, _CacheEntry<AirQuality?>> _aqCache = {};
+  static final Map<String, _CacheEntry<WeatherNow?>> _currentCache = {};
 
   static String _key(double lat, double lng) =>
       '${lat.toStringAsFixed(2)},${lng.toStringAsFixed(2)}';
+
+  /// ECHTE aktuelle Wetterlage am Standort (Open-Meteo `current`-Block,
+  /// `timezone=auto` → keine Stunden-/Zeitzonen-Fehlzuordnung). Liefert die
+  /// Live-Beobachtung inkl. Niederschlag/Schneefall/Bewölkung für die
+  /// hyperrealistische Cinema-Atmosphäre. Cached 15 Minuten.
+  static Future<WeatherNow?> current({
+    required double latitude,
+    required double longitude,
+  }) async {
+    final key = _key(latitude, longitude);
+    final cached = _currentCache[key];
+    if (cached != null && !cached.isExpired) return cached.data;
+
+    final uri = Uri.https('api.open-meteo.com', '/v1/forecast', {
+      'latitude': latitude.toStringAsFixed(4),
+      'longitude': longitude.toStringAsFixed(4),
+      'current': 'temperature_2m,is_day,precipitation,rain,showers,'
+          'snowfall,weather_code,cloud_cover,wind_speed_10m',
+      'timezone': 'auto',
+    });
+    try {
+      final res = await http.get(uri).timeout(const Duration(seconds: 8));
+      if (res.statusCode != 200) return cached?.data;
+      final json = jsonDecode(res.body) as Map<String, dynamic>;
+      final c = json['current'] as Map<String, dynamic>?;
+      if (c == null) return cached?.data;
+      double d(String k) => (c[k] as num?)?.toDouble() ?? 0.0;
+      int n(String k) => (c[k] as num?)?.toInt() ?? 0;
+      final now = WeatherNow(
+        code: n('weather_code'),
+        tempC: d('temperature_2m'),
+        precipitationMm: d('precipitation'),
+        rainMm: d('rain'),
+        showersMm: d('showers'),
+        snowfallCm: d('snowfall'),
+        cloudCoverPct: n('cloud_cover'),
+        windKmh: d('wind_speed_10m'),
+        isDay: n('is_day') == 1,
+      );
+      _currentCache[key] = _CacheEntry(now, ttlMinutes: 15);
+      return now;
+    } catch (_) {
+      return cached?.data;
+    }
+  }
 
   /// 5-Tages-Vorhersage (täglich). Cached 30 Minuten.
   static Future<List<WeatherDay>> forecast({
@@ -184,11 +230,38 @@ class WeatherService {
 // ── Cache-Hilfklasse ─────────────────────────────────────────────────────────
 
 class _CacheEntry<T> {
-  _CacheEntry(this.data) : fetchedAt = DateTime.now();
+  _CacheEntry(this.data, {this.ttlMinutes = 30}) : fetchedAt = DateTime.now();
   final T data;
   final DateTime fetchedAt;
+  final int ttlMinutes;
   bool get isExpired =>
-      DateTime.now().difference(fetchedAt).inMinutes >= 30;
+      DateTime.now().difference(fetchedAt).inMinutes >= ttlMinutes;
+}
+
+/// Live-Wetterlage (Open-Meteo `current`). Niederschlag/Schneefall steuern die
+/// realistische Partikel-Dichte der Cinema-Atmosphäre.
+class WeatherNow {
+  const WeatherNow({
+    required this.code,
+    required this.tempC,
+    required this.precipitationMm,
+    required this.rainMm,
+    required this.showersMm,
+    required this.snowfallCm,
+    required this.cloudCoverPct,
+    required this.windKmh,
+    required this.isDay,
+  });
+
+  final int code;
+  final double tempC;
+  final double precipitationMm; // Gesamt-Niederschlag der aktuellen Stunde
+  final double rainMm;
+  final double showersMm;
+  final double snowfallCm;
+  final int cloudCoverPct;
+  final double windKmh;
+  final bool isDay;
 }
 
 // ── Modelle ───────────────────────────────────────────────────────────────────
