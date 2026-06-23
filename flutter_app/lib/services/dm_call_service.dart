@@ -150,10 +150,30 @@ class DmCallService {
           .maybeSingle();
       return row?['id'] as String?;
     } catch (e, st) {
+      final msg = e.toString();
+      // 23505 = Unique-Index idx_dm_calls_active_conv(_callee): es gibt bereits
+      // einen aktiven Call für (conversation, callee) — die Einladung ist also
+      // faktisch schon unterwegs. Statt „Einladung fehlgeschlagen" den
+      // bestehenden aktiven Call zurückgeben (idempotent).
+      if (msg.contains('23505')) {
+        try {
+          final existing = await sb
+              .from('dm_calls')
+              .select('id')
+              .eq('conversation_id', conversationId)
+              .eq('callee_id', calleeId)
+              .inFilter('status', const ['ringing', 'active'])
+              .order('created_at', ascending: false)
+              .limit(1)
+              .maybeSingle();
+          final id = existing?['id'] as String?;
+          if (id != null) return id;
+        } catch (_) {/* fällt unten auf null zurück */}
+      }
       // ignore: discarded_futures
       ErrorLogsRepository.log(
         errorType: 'dm_call_invite_failed',
-        message: e.toString(),
+        message: msg,
         stack: st.toString(),
       );
       return null;

@@ -100,15 +100,51 @@ class CallEventBus {
       );
       _contexts[callId] = ctx;
 
-      final state = pending['state'] as String?;
+      // WICHTIG: FlutterCallkitIncoming.activeCalls() liefert KEIN
+      // 'state'-Feld (immer null) → der alte `state=='accepted'`-Check feuerte
+      // NIE, der Callee kam nie in den Call-Screen und der CallKit-Eintrag
+      // blieb als Zombie liegen (wurde bei jedem Start erneut „recovered").
+      // Wahrheit ist jetzt der DB-Status: terminal/veraltet → Eintrag räumen;
+      // ringing/active + frisch → der App-Cold-Start kam vom Accept → beitreten.
+      String? status;
+      bool stale = false;
+      try {
+        final row = await sb
+            .from('dm_calls')
+            .select('status, created_at')
+            .eq('id', callId)
+            .maybeSingle();
+        status = row?['status'] as String?;
+        final createdRaw = row?['created_at'] as String?;
+        final created = createdRaw != null ? DateTime.tryParse(createdRaw) : null;
+        if (created != null) {
+          stale = DateTime.now().toUtc().difference(created.toUtc()).inSeconds >
+              90;
+        }
+      } catch (_) {/* DB nicht erreichbar → wie terminal behandeln */}
+
+      const terminalStates = ['ended', 'declined', 'cancelled', 'missed'];
+      final terminal = status == null || terminalStates.contains(status);
+
       unawaited(ErrorLogsRepository.log(
         errorType: 'call_coldstart',
-        message: 'recover callkit call=$callId state=$state '
+        message: 'recover callkit call=$callId status=$status stale=$stale '
             'room=${ctx.roomName.isEmpty ? "EMPTY" : "ok"}',
       ));
-      if (state == 'accepted' || state == 'connected') {
-        await _onAccept(ctx);
+
+      if (terminal || stale) {
+        // Zombie/abgelaufen: CallKit-Notification beenden + als behandelt
+        // markieren, damit derselbe tote Call nicht bei jedem Start erneut
+        // „recovered" wird.
+        unawaited(CallkitService.endCall(callId));
+        _handledAccepts.add(callId);
+        return;
       }
+
+      // Lebender Call (ringing/active) → der Cold-Start kam vom Accept aus
+      // dem killed-State. acceptFromOverlay dedupt via _handledAccepts und
+      // baut den Call-Screen auf (markiert active, navigiert).
+      await acceptFromOverlay(callId);
     } catch (e) {
       _logDev('[CallEventBus] recoverColdStart failed: $e');
     }
