@@ -91,21 +91,36 @@ class WeatherService {
       final json = jsonDecode(res.body) as Map<String, dynamic>;
       final daily = json['daily'] as Map<String, dynamic>?;
       if (daily == null) return cached?.data ?? const [];
-      final dates = (daily['time'] as List).cast<String>();
-      final tmax = (daily['temperature_2m_max'] as List)
-          .map((e) => (e as num).toDouble())
-          .toList();
-      final tmin = (daily['temperature_2m_min'] as List)
-          .map((e) => (e as num).toDouble())
-          .toList();
-      final codes = (daily['weathercode'] as List)
-          .map((e) => (e as num).toInt())
-          .toList();
-      final precip = (daily['precipitation_sum'] as List)
-          .map((e) => (e as num).toDouble())
-          .toList();
+      final dates =
+          (daily['time'] as List?)?.cast<String>() ?? const <String>[];
+      final tmax = (daily['temperature_2m_max'] as List?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          const <double>[];
+      final tmin = (daily['temperature_2m_min'] as List?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          const <double>[];
+      final codes = (daily['weathercode'] as List?)
+              ?.map((e) => (e as num).toInt())
+              .toList() ??
+          const <int>[];
+      final precip = (daily['precipitation_sum'] as List?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          const <double>[];
+      // Pflichtliste leer (oder API-Schema unerwartet) → gecachte Daten oder
+      // leere Liste, statt mit RangeError zu crashen.
+      if (dates.isEmpty) return cached?.data ?? const [];
       final out = <WeatherDay>[];
       for (var i = 0; i < dates.length; i++) {
+        // Parallel-Arrays können kürzer sein als `time` → defensiv abbrechen.
+        if (i >= tmin.length ||
+            i >= tmax.length ||
+            i >= codes.length ||
+            i >= precip.length) {
+          break;
+        }
         out.add(WeatherDay(
           // timezone=auto → date-only-Strings sind Standort-Lokaldatum; als
           // naive Lokalzeit parsen (KEIN .toUtc(), sonst verschiebt Mitternacht
@@ -147,19 +162,29 @@ class WeatherService {
       final json = jsonDecode(res.body) as Map<String, dynamic>;
       final h = json['hourly'] as Map<String, dynamic>?;
       if (h == null) return cached?.data ?? const [];
-      final times = (h['time'] as List).cast<String>();
-      final temps = (h['temperature_2m'] as List)
-          .map((e) => (e as num).toDouble())
-          .toList();
-      final humidity = (h['relativehumidity_2m'] as List)
-          .map((e) => (e as num).toInt())
-          .toList();
-      final codes = (h['weathercode'] as List)
-          .map((e) => (e as num).toInt())
-          .toList();
+      final times = (h['time'] as List?)?.cast<String>() ?? const <String>[];
+      final temps = (h['temperature_2m'] as List?)
+              ?.map((e) => (e as num).toDouble())
+              .toList() ??
+          const <double>[];
+      final humidity = (h['relativehumidity_2m'] as List?)
+              ?.map((e) => (e as num).toInt())
+              .toList() ??
+          const <int>[];
+      final codes = (h['weathercode'] as List?)
+              ?.map((e) => (e as num).toInt())
+              .toList() ??
+          const <int>[];
+      // Pflichtliste leer (oder API-Schema unerwartet) → gecachte Daten oder
+      // leere Liste, statt mit RangeError zu crashen.
+      if (times.isEmpty) return cached?.data ?? const [];
       final now = DateTime.now();
       final out = <WeatherHourly>[];
       for (var i = 0; i < times.length && out.length < 24; i++) {
+        // Parallel-Arrays können kürzer sein als `time` → defensiv abbrechen.
+        if (i >= temps.length || i >= humidity.length || i >= codes.length) {
+          break;
+        }
         final t = DateTime.parse(times[i]);
         if (t.isBefore(now.subtract(const Duration(hours: 1)))) continue;
         out.add(WeatherHourly(
@@ -197,19 +222,33 @@ class WeatherService {
       final json = jsonDecode(res.body) as Map<String, dynamic>;
       final h = json['hourly'] as Map<String, dynamic>?;
       if (h == null) return cached?.data;
-      final pm25list = (h['pm2_5'] as List)
-          .map((e) => e == null ? 0.0 : (e as num).toDouble())
-          .toList();
-      final pm10list = (h['pm10'] as List)
-          .map((e) => e == null ? 0.0 : (e as num).toDouble())
-          .toList();
-      final aqiList = (h['european_aqi'] as List)
-          .map((e) => e == null ? 0 : (e as num).toInt())
-          .toList();
+      final pm25list = (h['pm2_5'] as List?)
+              ?.map((e) => e == null ? 0.0 : (e as num).toDouble())
+              .toList() ??
+          const <double>[];
+      final pm10list = (h['pm10'] as List?)
+              ?.map((e) => e == null ? 0.0 : (e as num).toDouble())
+              .toList() ??
+          const <double>[];
+      final aqiList = (h['european_aqi'] as List?)
+              ?.map((e) => e == null ? 0 : (e as num).toInt())
+              .toList() ??
+          const <int>[];
+      // Pflichtlisten leer (oder API-Schema unerwartet) → gecachte Daten,
+      // statt mit RangeError zu crashen.
+      if (pm25list.isEmpty || pm10list.isEmpty || aqiList.isEmpty) {
+        return cached?.data;
+      }
       // Aktuelle Stunde suchen (letzter nicht-null Wert)
       int idx = pm25list.length - 1;
       final now = DateTime.now().hour;
       if (now < pm25list.length) idx = now;
+      // Parallel-Arrays können unterschiedlich lang sein → Index absichern.
+      if (idx < 0 ||
+          idx >= pm10list.length ||
+          idx >= aqiList.length) {
+        return cached?.data;
+      }
       final aq = AirQuality(
         pm25: pm25list[idx],
         pm10: pm10list[idx],
