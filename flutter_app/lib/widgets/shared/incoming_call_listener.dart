@@ -193,12 +193,9 @@ class _IncomingCallListenerState
       for (final c in calls) {
         if (c is! Map) continue;
         final id = c['id'] as String?;
-        final state = c['state'] as String?;
         if (id == null) continue;
-        if (state == 'accepted' || state == 'connected') {
-          _handledCallIds.add(id);
-          CallEventBus.recordHandledAccept(id);
-        }
+        _handledCallIds.add(id);
+        CallEventBus.recordHandledAccept(id);
       }
     } catch (_) {/* non-fatal */}
   }
