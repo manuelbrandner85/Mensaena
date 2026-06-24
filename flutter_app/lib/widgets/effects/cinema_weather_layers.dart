@@ -1,9 +1,11 @@
 /// SKILL: mensaena-design
 /// Cinema Wetter-/Saison-Ebenen (Batch C + D) — hyperrealistische, animierte
 /// Atmosphäre, die das ECHTE Wetter und die Jahreszeit einblendet. Alle
-/// Ebenen liegen HINTER dem Content (IgnorePointer), beeinträchtigen die
-/// Lesbarkeit nie und laufen nur bei vollen Effekten (intensity >= 0.6) —
-/// der Lite-Mode / Memory-Cap schaltet sie auf schwachen Geräten ohnehin ab.
+/// Ebenen liegen HINTER dem Content (IgnorePointer) und beeinträchtigen die
+/// Lesbarkeit nie. Der wetter-adaptive Hintergrund ist IMMER live, sobald der
+/// Schalter an ist (Default an) — unabhängig vom Effekt-Profil und Light-Mode.
+/// NUR auf Lite-Geräten (ARM32) bleiben die animierten Partikel aus
+/// (Crash-Schutz); Tint/Kondition laufen auch dort.
 ///
 ///   * CinemaParticleLayer — fallende/schwebende Partikel: Regen-Schlieren,
 ///     Schnee-Flocken, Herbst-Laub, Frühlings-Blüten, Sommer-Pollen.
@@ -164,41 +166,58 @@ class _ParticlePainter extends CustomPainter {
     }
   }
 
-  // Regen: kurze, leicht schräge Schlieren, schnell fallend.
+  // Regen: schräge Schlieren mit TIEFE (nahe Tropfen heller/dicker/länger +
+  // leicht unscharf, ferne Tropfen fein/blass) und zeitlich variierendem
+  // Wind (Böen) → wirkt deutlich realistischer als eine uniforme Ebene.
   void _paintRain(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color.withValues(alpha: 0.55 * intensity)
-      ..strokeWidth = 1.4
-      ..strokeCap = StrokeCap.round;
-    const angle = 0.18; // leichte Schräge
+    // Windwinkel pendelt sanft (Böen) um eine leichte Grund-Schräge.
+    final wind = 0.16 + math.sin(t * math.pi * 2) * 0.07;
     for (final p in particles) {
-      final y = (p.y + t * (1.6 + p.speed)) % 1.2 - 0.1;
-      final x = (p.x + angle * y) % 1.0;
-      final len = (10 + p.size * 14) * (0.6 + intensity * 0.4);
+      // p.size ∈ ~0.5..1.5 → Tiefe: groß = nah, klein = fern.
+      final depth = (p.size - 0.5).clamp(0.0, 1.0); // 0 = fern, 1 = nah
+      final y = (p.y + t * (1.5 + p.speed * 1.1)) % 1.25 - 0.1;
+      final x = (p.x + wind * y) % 1.0;
+      final len = (9 + depth * 26) * (0.6 + intensity * 0.4);
       final sx = x * size.width;
       final sy = y * size.height;
+      final paint = Paint()
+        ..color = color.withValues(alpha: (0.22 + depth * 0.34) * intensity)
+        ..strokeWidth = 0.7 + depth * 1.3
+        ..strokeCap = StrokeCap.round;
+      // Nahe Tropfen mit minimalem Bewegungs-/Tiefenunschärfe-Hauch.
+      if (depth > 0.7) {
+        paint.maskFilter = const MaskFilter.blur(BlurStyle.normal, 0.7);
+      }
       canvas.drawLine(
         Offset(sx, sy),
-        Offset(sx + angle * len, sy + len),
+        Offset(sx + wind * len, sy + len),
         paint,
       );
     }
   }
 
-  // Schnee / Pollen: weiche runde Punkte. fall=true sinkt, sonst schwebt.
+  // Schnee / Pollen: weiche runde Punkte mit TIEFENSCHÄRFE. Nahe Flocken sind
+  // groß, stärker weichgezeichnet und etwas blasser (Depth-of-Field), ferne
+  // klein und schärfer. Doppelte Schwing-Frequenz → natürlicheres Treiben.
   void _paintRound(Canvas canvas, Size size,
       {required bool blur, required bool fall}) {
     final paint = Paint();
     for (final p in particles) {
+      final depth = (p.size - 0.5).clamp(0.0, 1.0); // 0 = fern, 1 = nah
       final prog = fall
-          ? (p.y + t * (0.4 + p.speed * 0.5)) % 1.1 - 0.05
+          ? (p.y + t * (0.32 + p.speed * (0.4 + depth * 0.5))) % 1.1 - 0.05
           : (p.y - t * (0.15 + p.speed * 0.2)) % 1.1; // Pollen steigt leicht
-      final x = p.x + math.sin(t * math.pi * 2 * 0.5 + p.swayPhase) * p.swayAmp;
-      final r = p.size * (fall ? 2.6 : 1.6);
+      // Zwei überlagerte Schwingungen für unregelmäßiges, weiches Treiben.
+      final sway = math.sin(t * math.pi * 2 * 0.5 + p.swayPhase) * p.swayAmp +
+          math.sin(t * math.pi * 2 * 1.3 + p.spin) * p.swayAmp * 0.4;
+      final x = p.x + sway;
+      final r = (fall ? (1.6 + depth * 2.6) : (1.2 + depth * 1.2));
+      final a = fall ? (0.95 - depth * 0.35) : (0.6 - depth * 0.2);
       paint
-        ..color = color.withValues(alpha: (fall ? 0.85 : 0.6) * intensity)
-        ..maskFilter =
-            blur ? MaskFilter.blur(BlurStyle.normal, r * 0.7) : null;
+        ..color = color.withValues(alpha: a * intensity)
+        ..maskFilter = blur
+            ? MaskFilter.blur(BlurStyle.normal, r * (0.5 + depth * 0.5))
+            : null;
       canvas.drawCircle(
         Offset((x % 1.0) * size.width, prog * size.height),
         r,
