@@ -195,20 +195,30 @@ class MemoryWatchdogService {
     final ratioBefore = cache.maximumSizeBytes > 0
         ? cache.currentSizeBytes / cache.maximumSizeBytes
         : 0.0;
+    // War der Bild-Cache ohnehin leer, gab es keinen echten Druck auf den
+    // ImageCache — nur sauber leeren und KEIN Telemetrie-Event feuern, sonst
+    // melden harmlose OS-Pressure-Hinweise false-positives ins error_logs.
+    if (cache.currentSizeBytes == 0 && cache.liveImageCount == 0) {
+      cache.clear();
+      return;
+    }
     cache.clear();
     cache.clearLiveImages();
     if (kDebugMode) {
       debugPrint('[MemoryWatchdog] OS-MemoryPressure → Cache komplett geleert');
     }
-    // OS-MemoryPressure ist ALWAYS reportwürdig (ohne Cooldown). Das ist
-    // ein echtes Warnsignal — der nächste Schritt ist OOM-Kill durch Android.
-    _lastTelemetryAt = null;
-    _maybeReport(
-      kind: 'os_pressure',
-      ratio: ratioBefore,
-      liveCount: cache.liveImageCount,
-      pendingCount: cache.pendingImageCount,
-    );
+    // OS-MemoryPressure ist reportwürdig (ohne Cooldown) — aber nur bei echtem
+    // Druck (ratioBefore > 0). Das ist ein echtes Warnsignal — der nächste
+    // Schritt ist OOM-Kill durch Android.
+    if (ratioBefore > 0) {
+      _lastTelemetryAt = null;
+      _maybeReport(
+        kind: 'os_pressure',
+        ratio: ratioBefore,
+        liveCount: cache.liveImageCount,
+        pendingCount: cache.pendingImageCount,
+      );
+    }
   }
 
   /// App geht in den Hintergrund → "lebende" Bilder freigeben (der User
