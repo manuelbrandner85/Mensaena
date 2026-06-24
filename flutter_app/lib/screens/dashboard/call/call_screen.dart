@@ -767,13 +767,20 @@ class _CallScreenState extends ConsumerState<CallScreen> {
   Future<void> _hangUp() async {
     // Punkt 6: echtes Auflegen → Holder leeren (trennt + disposed Room).
     _hungUp = true;
+    // Riverpod VOR den async-Gaps greifen: legt die Gegenseite während der
+    // awaits auf, ist dieses Widget disposed → ref.read würde "Cannot use ref
+    // after dispose" werfen (häufiger Crash lt. error_logs). Der Notifier lebt
+    // global (nicht am Widget), das spätere state=null ist daher sicher.
+    final callNotifier = ref.read(activeCallProvider.notifier);
+    final isThisCallActive =
+        ref.read(activeCallProvider)?.callId == widget.callId;
     LiveAudioService.stop(); // Punkt 11
     _room = null; // dispose() soll den Room nicht doppelt anfassen
     await CallRoomHolder.clear();
     await DmCallService.end(widget.callId);
     await EndToneService.play();
-    if (ref.read(activeCallProvider)?.callId == widget.callId) {
-      ref.read(activeCallProvider.notifier).state = null;
+    if (isThisCallActive) {
+      callNotifier.state = null;
     }
     // Post-Call-Note: zeigt sich vor der Navigation, async.
     await _maybeShowPostCallNote();
