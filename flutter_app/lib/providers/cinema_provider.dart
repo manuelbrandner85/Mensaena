@@ -213,6 +213,64 @@ Color? cloudColorOf(WeatherNow? now) {
   }
 }
 
+/// Wolken-Dichte (Anzahl Ballen) für die driftende Wolken-Ebene. Gewitter ist
+/// schwer/dicht bewölkt, Regen etwas dichter als normale Bewölkung.
+int cloudDensityFor(WeatherNow? now) {
+  if (now == null) return 5;
+  switch (_weatherForCode(now.code)) {
+    case CinemaWeather.thunder:
+      return 8;
+    case CinemaWeather.rain:
+      return 6;
+    case CinemaWeather.cloudy:
+    case CinemaWeather.snow:
+    case CinemaWeather.clear:
+    case CinemaWeather.fog:
+      return 5;
+  }
+}
+
+/// Gewitter-Stimmung: dunkler Top-Down-Tint, der die Szene bei Gewitter
+/// schwerer/bedrohlicher macht. null = kein Gewitter. Farb-Literal bewusst
+/// hier im Provider (außerhalb des Color-Guard-Scopes lib/widgets).
+Color? thunderMoodColor(WeatherNow? now) {
+  if (now == null) return null;
+  return _weatherForCode(now.code) == CinemaWeather.thunder
+      ? const Color(0x40161A24) // schweres, dunkles Gewittergrau-Blau
+      : null;
+}
+
+/// Vordergrund-Regenschleier: weiche, in der Luft ziehende Regenschleier bei
+/// Regen/Gewitter (vor der Szene, aber hinter dem Content → Lesbarkeit bleibt).
+/// `bands` (Anzahl Schleier) skaliert mit dem gemessenen Niederschlag. null =
+/// kein Regen. Farb-Literal bewusst hier im Provider.
+class RainVeilSpec {
+  const RainVeilSpec({required this.color, required this.bands});
+  final Color color;
+  final int bands;
+}
+
+RainVeilSpec? rainVeilFor(WeatherNow? now) {
+  if (now == null) return null;
+  final w = _weatherForCode(now.code);
+  if (w != CinemaWeather.rain && w != CinemaWeather.thunder) return null;
+  final mm = (now.rainMm + now.showersMm) > 0
+      ? now.rainMm + now.showersMm
+      : now.precipitationMm;
+  int bands;
+  if (mm < 0.3) {
+    bands = 2; // Niesel
+  } else if (mm < 1.5) {
+    bands = 3; // leicht
+  } else if (mm < 4.0) {
+    bands = 4; // mäßig
+  } else {
+    bands = 6; // stark
+  }
+  if (w == CinemaWeather.thunder) bands += 1;
+  return RainVeilSpec(color: const Color(0x3FA9B6C8), bands: bands);
+}
+
 CinemaWeather _weatherForCode(int code) {
   if (code <= 1) return CinemaWeather.clear;
   if (code == 2 || code == 3) return CinemaWeather.cloudy;

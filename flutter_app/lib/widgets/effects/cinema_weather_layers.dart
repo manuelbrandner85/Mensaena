@@ -262,11 +262,13 @@ class CloudDriftLayer extends StatefulWidget {
   const CloudDriftLayer({
     required this.color,
     required this.intensity,
+    this.count = 5,
     super.key,
   });
 
   final Color color;
   final double intensity; // 0.0 – 1.0
+  final int count; // Wolken-Dichte (Gewitter dichter als normal bewölkt)
 
   @override
   State<CloudDriftLayer> createState() => _CloudDriftLayerState();
@@ -275,7 +277,7 @@ class CloudDriftLayer extends StatefulWidget {
 class _CloudDriftLayerState extends State<CloudDriftLayer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _ctrl;
-  late final List<_Cloud> _clouds;
+  late List<_Cloud> _clouds;
 
   @override
   void initState() {
@@ -284,8 +286,12 @@ class _CloudDriftLayerState extends State<CloudDriftLayer>
       vsync: this,
       duration: const Duration(seconds: 80),
     )..repeat();
+    _clouds = _build(widget.count);
+  }
+
+  List<_Cloud> _build(int count) {
     final rng = math.Random(7);
-    _clouds = List.generate(5, (_) {
+    return List.generate(count, (_) {
       return _Cloud(
         x: rng.nextDouble(),
         y: 0.04 + rng.nextDouble() * 0.42, // obere ~46 %
@@ -294,6 +300,12 @@ class _CloudDriftLayerState extends State<CloudDriftLayer>
         puffSeed: rng.nextInt(99999),
       );
     });
+  }
+
+  @override
+  void didUpdateWidget(CloudDriftLayer old) {
+    super.didUpdateWidget(old);
+    if (old.count != widget.count) _clouds = _build(widget.count);
   }
 
   @override
@@ -377,6 +389,119 @@ class _CloudPainter extends CustomPainter {
   @override
   bool shouldRepaint(_CloudPainter old) =>
       old.t != t || old.intensity != intensity || old.color != color;
+}
+
+// ── RainVeilLayer — Vordergrund-Regenschleier (Regen/Gewitter) ──────────
+// Weiche, in der Luft ziehende Regenschleier VOR der Szene (aber hinter dem
+// Content → Lesbarkeit bleibt). Gibt dem Regen räumliche Tiefe, statt nur
+// Schlieren in einer Ebene. Anzahl Bahnen kommt aus dem Provider (Niederschlag).
+class RainVeilLayer extends StatefulWidget {
+  const RainVeilLayer({
+    required this.spec,
+    required this.intensity,
+    super.key,
+  });
+
+  final RainVeilSpec spec;
+  final double intensity; // 0.0 – 1.0
+
+  @override
+  State<RainVeilLayer> createState() => _RainVeilLayerState();
+}
+
+class _RainVeilLayerState extends State<RainVeilLayer>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 7),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.intensity <= 0.01) return const SizedBox.shrink();
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, __) => RepaintBoundary(
+          child: CustomPaint(
+            painter: _RainVeilPainter(
+              color: widget.spec.color,
+              bands: widget.spec.bands,
+              intensity: widget.intensity,
+              t: _ctrl.value,
+            ),
+            size: Size.infinite,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RainVeilPainter extends CustomPainter {
+  _RainVeilPainter({
+    required this.color,
+    required this.bands,
+    required this.intensity,
+    required this.t,
+  });
+
+  final Color color;
+  final int bands;
+  final double intensity;
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Leicht schräge, breite, weichgezeichnete Schleier die horizontal
+    // driften — wie Regenwände in der Tiefe. Gesamt-Deckkraft via lerp
+    // (versionsunabhängig) über intensity skaliert.
+    final base = Color.lerp(Colors.transparent, color, intensity)!;
+    final skew = size.width * 0.10; // sanfte Schräge der Schleier
+    for (var i = 0; i < bands; i++) {
+      final dir = i.isEven ? 1.0 : -1.0;
+      final phase = (t * dir * (0.6 + i * 0.12) + i * 0.37) % 1.0;
+      final cx = (phase * 1.4 - 0.2) * size.width;
+      final w = size.width * (0.18 + i * 0.03);
+      final paint = Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+          colors: [
+            Colors.transparent,
+            base,
+            Colors.transparent,
+          ],
+          stops: const [0.0, 0.5, 1.0],
+        ).createShader(
+          Rect.fromLTWH(cx - w / 2, 0, w, size.height),
+        )
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 24);
+      final path = Path()
+        ..moveTo(cx - w / 2 + skew, 0)
+        ..lineTo(cx + w / 2 + skew, 0)
+        ..lineTo(cx + w / 2 - skew, size.height)
+        ..lineTo(cx - w / 2 - skew, size.height)
+        ..close();
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_RainVeilPainter old) =>
+      old.t != t || old.intensity != intensity || old.bands != bands;
 }
 
 // ── FogDriftLayer — langsam driftende Nebel-Schwaden ────────────────────
