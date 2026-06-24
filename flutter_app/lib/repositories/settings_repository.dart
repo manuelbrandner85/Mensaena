@@ -99,6 +99,64 @@ class SettingsRepository {
     }
   }
 
+  // ── Atmosphäre: Live-Wetter-Hintergrund (geräteübergreifend) ──────────────
+
+  /// Liest die Präferenz „animierter Live-Wetter-Hintergrund" aus
+  /// `profiles.app_preferences` (JSONB). Liefert **`null`**, wenn der Nutzer
+  /// den Wert noch nie gesetzt hat (Key fehlt) — so kann der Aufrufer eine
+  /// zuvor lokal getroffene Wahl in die Cloud hochmigrieren, statt sie mit
+  /// einem Default zu überschreiben. Abgemeldet / Fehler → `null`.
+  static Future<bool?> getLiveWeatherBackground() async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return null;
+    try {
+      final row = await sb
+          .from('profiles')
+          .select('app_preferences')
+          .eq('id', uid)
+          .maybeSingle();
+      final raw = row?['app_preferences'];
+      return parseLiveWeatherBackground(
+          raw is Map ? Map<String, dynamic>.from(raw) : null);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Reine Parse-Logik (ohne Netz, testbar): `app_preferences`-Map →
+  /// Live-Wetter-Präferenz. `null`, wenn der Key fehlt (Nutzer hat nie
+  /// gewählt); sonst der gespeicherte Bool-Wert.
+  static bool? parseLiveWeatherBackground(Map<String, dynamic>? prefs) {
+    if (prefs == null || !prefs.containsKey('live_weather_background')) {
+      return null;
+    }
+    return prefs['live_weather_background'] == true;
+  }
+
+  /// Speichert die Präferenz „animierter Live-Wetter-Hintergrund". Merged in
+  /// das bestehende `app_preferences`-Objekt (künftige Keys bleiben erhalten).
+  static Future<bool> setLiveWeatherBackground(bool enabled) async {
+    final uid = SupabaseService.currentUser?.id;
+    if (uid == null) return false;
+    try {
+      final row = await sb
+          .from('profiles')
+          .select('app_preferences')
+          .eq('id', uid)
+          .maybeSingle();
+      final current = <String, dynamic>{};
+      final raw = row?['app_preferences'];
+      if (raw is Map) current.addAll(Map<String, dynamic>.from(raw));
+      current['live_weather_background'] = enabled;
+      await sb
+          .from('profiles')
+          .update({'app_preferences': current}).eq('id', uid);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// DSGVO-Art.-20-Export: alle Rows einer Tabelle, in denen der User in
   /// EINER Spalte steht. Fehler → leere Liste (Export bleibt vollständig
   /// lauffähig, auch wenn einzelne Tabellen/RLS-Policies fehlen).

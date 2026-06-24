@@ -412,6 +412,7 @@
       "dangerZone": "DANGER ZONE",
       "currentMood": "CURRENT MOOD",
       "cinemaMode": "CINEMA MODE",
+      "atmosphere": "Atmosphere",
       "effectStrength": "EFFECT STRENGTH",
       "sound": "SOUND",
       "callSound": "CALL SOUND & VOLUME",
@@ -593,6 +594,10 @@
     "weatherAdaptive": {
       "label": "Weather-adaptive mood",
       "hint": "The background adapts to the real weather at your location (rain, fog, snow, storm)."
+    },
+    "atmosphere": {
+      "introTitle": "Live weather background",
+      "introBody": "Experience the real weather at your location as a gently animated background – rain, snow, clouds, sun and thunderstorms, subtly behind your content. Location-based, data-light and synced across your devices."
     },
     "seasonal": {
       "label": "Seasonal accents",

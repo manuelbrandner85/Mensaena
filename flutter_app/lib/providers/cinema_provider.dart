@@ -18,6 +18,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../config/theme/cinema_theme.dart';
 import '../repositories/profiles_repository.dart';
+import '../repositories/settings_repository.dart';
 import '../services/sunrise_sunset_service.dart';
 import '../services/weather_service.dart';
 
@@ -94,29 +95,57 @@ final cinemaEffectStrengthProvider =
 
 const _weatherAdaptiveStorageKey = 'cinema_weather_adaptive_v1';
 
-/// Schalter: Cinema-Stimmung an das ECHTE Wetter am Standort anpassen
-/// (Regen/Nebel/Schnee/Gewitter legen einen subtilen Tint über den
-/// Hintergrund). Default an — sehr leichtgewichtig (eine Farb-Ebene).
+/// Schalter „Atmosphäre — Live-Wetter-Hintergrund": Cinema-Stimmung an das
+/// ECHTE Wetter am Standort anpassen (Regen/Schnee/Wolken/Sonne/Gewitter als
+/// animierte Ebene + subtiler Tint über dem Hintergrund). Default an — sehr
+/// leichtgewichtig (Partikel laufen ohnehin nur bei vollen Effekten).
+///
+/// Persistenz ist **offline-first + geräteübergreifend**: der lokale
+/// Secure-Storage-Cache liefert den Wert sofort beim Start (auch offline), die
+/// Quelle der Wahrheit ist aber `profiles.app_preferences` in Supabase
+/// (SettingsRepository). Beim ersten Frame wird mit der Cloud abgeglichen.
 class CinemaWeatherAdaptiveNotifier extends StateNotifier<bool> {
   CinemaWeatherAdaptiveNotifier() : super(true) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   Future<void> _load() async {
+    // 1) Lokaler Cache zuerst (sofort, auch ohne Netz).
     try {
       final raw = await _storage.read(key: _weatherAdaptiveStorageKey);
-      final loaded = raw == null ? true : raw == '1';
+      if (raw != null) {
+        final local = raw == '1';
+        if (mounted && local != state) state = local;
+      }
+    } catch (_) {}
+    // 2) Mit Supabase abgleichen. Kennt die Cloud den Wert noch nicht
+    //    (null = Key fehlt), wird der aktuelle (lokale/Default-)Wert
+    //    hochmigriert — eine zuvor lokal getroffene Wahl bleibt so erhalten.
+    try {
+      final remote = await SettingsRepository.getLiveWeatherBackground();
       if (!mounted) return;
-      if (loaded != state) state = loaded;
+      if (remote == null) {
+        await SettingsRepository.setLiveWeatherBackground(state);
+      } else {
+        if (remote != state) state = remote;
+        try {
+          await _storage.write(
+              key: _weatherAdaptiveStorageKey, value: remote ? '1' : '0');
+        } catch (_) {}
+      }
     } catch (_) {}
   }
 
   Future<void> set(bool value) async {
     if (!mounted) return;
     state = value;
+    // Lokaler Cache (sofort) + Cloud (geräteübergreifend). Beide best-effort.
     try {
       await _storage.write(
           key: _weatherAdaptiveStorageKey, value: value ? '1' : '0');
+    } catch (_) {}
+    try {
+      await SettingsRepository.setLiveWeatherBackground(value);
     } catch (_) {}
   }
 }

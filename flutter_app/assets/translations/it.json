@@ -412,6 +412,7 @@
       "dangerZone": "ZONA PERICOLO",
       "currentMood": "UMORE ATTUALE",
       "cinemaMode": "MODALITÀ CINEMA",
+      "atmosphere": "Atmosfera",
       "effectStrength": "INTENSITÀ EFFETTO",
       "sound": "AUDIO",
       "callSound": "SUONO E VOLUME CHIAMATE",
@@ -593,6 +594,10 @@
     "weatherAdaptive": {
       "label": "Atmosfera adattiva al meteo",
       "hint": "Lo sfondo si adatta al meteo reale della tua posizione (pioggia, nebbia, neve, temporale)."
+    },
+    "atmosphere": {
+      "introTitle": "Sfondo meteo in tempo reale",
+      "introBody": "Vivi il meteo reale della tua posizione come uno sfondo animato e delicato: pioggia, neve, nuvole, sole e temporali, con discrezione dietro ai tuoi contenuti. Basato sulla posizione, leggero nei dati e sincronizzato su tutti i tuoi dispositivi."
     },
     "seasonal": {
       "label": "Accenti stagionali",
