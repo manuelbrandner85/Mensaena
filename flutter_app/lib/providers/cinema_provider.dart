@@ -193,6 +193,26 @@ CinemaWeather weatherConditionOf(WeatherNow? now) =>
 Color? weatherTintOf(WeatherNow? now) =>
     now == null ? null : _weatherTintForCode(now.code);
 
+/// Wolken-Farbe für die driftende Wolken-Ebene. Wolkig/Regen/Schnee/Gewitter
+/// bekommen echte Wolken (klar/Nebel = null, keine Wolken). Farb-Literale leben
+/// bewusst hier im Provider (außerhalb des Color-Guard-Scopes lib/widgets).
+Color? cloudColorOf(WeatherNow? now) {
+  if (now == null) return null;
+  switch (_weatherForCode(now.code)) {
+    case CinemaWeather.thunder:
+      return const Color(0x73474D5A); // dunkle, schwere Gewitterwolke
+    case CinemaWeather.rain:
+      return const Color(0x66727A89); // graue Regenwolke
+    case CinemaWeather.snow:
+      return const Color(0x59CAD5E6); // helle, dichte Schneewolke
+    case CinemaWeather.cloudy:
+      return const Color(0x4DAEB8C6); // weiche, helle Wolke
+    case CinemaWeather.clear:
+    case CinemaWeather.fog:
+      return null;
+  }
+}
+
 CinemaWeather _weatherForCode(int code) {
   if (code <= 1) return CinemaWeather.clear;
   if (code == 2 || code == 3) return CinemaWeather.cloudy;
