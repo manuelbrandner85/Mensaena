@@ -105,6 +105,10 @@ class CinemaOverlay extends ConsumerWidget {
     // Lite-Geräten weiter AUS (ARM32-Crash-Historie). Tint + Kondition (Nebel/
     // Blitz-Tint) sind reine Farb-/Maluebenen und laufen auch dort.
     final weatherParticlesEnabled = weatherAdaptiveOn && !liteMode;
+    // Echte driftende Wolken bei wolkig/Regen/Schnee/Gewitter (eigener
+    // Controller → auf Lite aus). null = klar/Nebel (keine Wolken).
+    final cloudColor =
+        weatherParticlesEnabled ? cloudColorOf(weatherNow) : null;
     final weatherTint = (weatherBase == null || !weatherAdaptiveOn)
         ? null
         : Color.lerp(Colors.transparent, weatherBase, weatherStrength);
@@ -176,6 +180,16 @@ class CinemaOverlay extends ConsumerWidget {
             intensity: intensity,
           ),
         ),
+
+        // 2b. Wetter-Wolken (wolkig/Regen/Schnee/Gewitter) — echte driftende
+        // Wolken, damit JEDE Wetterlage sichtbar dem echten Wetter entspricht.
+        if (cloudColor != null)
+          RepaintBoundary(
+            child: CloudDriftLayer(
+              color: cloudColor,
+              intensity: weatherStrength,
+            ),
+          ),
 
         // 3. Starfield (Nacht)
         if (spec.hasStarfield)

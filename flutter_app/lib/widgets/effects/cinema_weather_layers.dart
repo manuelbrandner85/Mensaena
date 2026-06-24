@@ -254,6 +254,131 @@ class _ParticlePainter extends CustomPainter {
       old.t != t || old.intensity != intensity || old.kind != kind;
 }
 
+// ── CloudDriftLayer — langsam driftende, weiche Wolken ──────────────────
+// Echte Wolken bei wolkig/Regen/Schnee/Gewitter (Farbe vom Provider). Eine
+// Wolke = mehrere überlappende, weichgezeichnete Ballen; driftet langsam quer
+// und wrappt. Ein AnimationController, daher auf Lite-Geräten ausgeschaltet.
+class CloudDriftLayer extends StatefulWidget {
+  const CloudDriftLayer({
+    required this.color,
+    required this.intensity,
+    super.key,
+  });
+
+  final Color color;
+  final double intensity; // 0.0 – 1.0
+
+  @override
+  State<CloudDriftLayer> createState() => _CloudDriftLayerState();
+}
+
+class _CloudDriftLayerState extends State<CloudDriftLayer>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final List<_Cloud> _clouds;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 80),
+    )..repeat();
+    final rng = math.Random(7);
+    _clouds = List.generate(5, (_) {
+      return _Cloud(
+        x: rng.nextDouble(),
+        y: 0.04 + rng.nextDouble() * 0.42, // obere ~46 %
+        scale: 0.7 + rng.nextDouble() * 0.95,
+        speed: 0.5 + rng.nextDouble() * 0.8,
+        puffSeed: rng.nextInt(99999),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.intensity <= 0.01) return const SizedBox.shrink();
+    return IgnorePointer(
+      child: AnimatedBuilder(
+        animation: _ctrl,
+        builder: (_, __) => RepaintBoundary(
+          child: CustomPaint(
+            painter: _CloudPainter(
+              clouds: _clouds,
+              color: widget.color,
+              intensity: widget.intensity,
+              t: _ctrl.value,
+            ),
+            size: Size.infinite,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Cloud {
+  const _Cloud({
+    required this.x,
+    required this.y,
+    required this.scale,
+    required this.speed,
+    required this.puffSeed,
+  });
+  final double x, y, scale, speed;
+  final int puffSeed;
+}
+
+class _CloudPainter extends CustomPainter {
+  _CloudPainter({
+    required this.clouds,
+    required this.color,
+    required this.intensity,
+    required this.t,
+  });
+
+  final List<_Cloud> clouds;
+  final Color color;
+  final double intensity;
+  final double t;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Gesamt-Deckkraft der Wolken über intensity skalieren (versionsunabhängig
+    // via lerp statt Color.a).
+    final base = Color.lerp(Colors.transparent, color, intensity)!;
+    for (final c in clouds) {
+      final drift = (c.x + t * c.speed * 0.3) % 1.3 - 0.15; // langsam + wrap
+      final cx = drift * size.width;
+      final cy = c.y * size.height;
+      final w = size.shortestSide * 0.55 * c.scale;
+      final h = w * 0.42;
+      final rng = math.Random(c.puffSeed);
+      final paint = Paint()
+        ..color = base
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, h * 0.55);
+      final puffs = 4 + rng.nextInt(3);
+      for (var i = 0; i < puffs; i++) {
+        final px = cx + (rng.nextDouble() - 0.5) * w;
+        final py = cy + (rng.nextDouble() - 0.5) * h * 0.5;
+        final pr = h * (0.5 + rng.nextDouble() * 0.6);
+        canvas.drawCircle(Offset(px, py), pr, paint);
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_CloudPainter old) =>
+      old.t != t || old.intensity != intensity || old.color != color;
+}
+
 // ── FogDriftLayer — langsam driftende Nebel-Schwaden ────────────────────
 class FogDriftLayer extends StatefulWidget {
   const FogDriftLayer({
