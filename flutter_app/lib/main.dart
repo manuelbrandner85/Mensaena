@@ -73,6 +73,12 @@ Future<void> main() async {
   // Globaler Crash-Reporter → error_logs Tabelle in Supabase.
   // Per fail-silent: ErrorLogsRepository fängt eigene Exceptions ab.
   FlutterError.onError = (details) {
+    // Transiente Netzwerk-/Auth-Refresh-Fehler (flakiges Netz, Background-
+    // Token-Refresh) sind kein App-Bug → NICHT als Fatal-Crash melden.
+    if (isTransientAuthNetworkError(details.exception)) {
+      if (kDebugMode) FlutterError.presentError(details);
+      return;
+    }
     FlutterError.presentError(details);
     ErrorLogsRepository.log(
       errorType: 'FlutterError',
@@ -81,6 +87,9 @@ Future<void> main() async {
     );
   };
   PlatformDispatcher.instance.onError = (error, stack) {
+    // Siehe oben: transiente Netzwerk-/Auth-Fehler still verschlucken, statt
+    // sie als Uncaught-Crash zu loggen.
+    if (isTransientAuthNetworkError(error)) return true;
     ErrorLogsRepository.log(
       errorType: 'Uncaught',
       message: error.toString(),
@@ -257,7 +266,7 @@ Future<void> _initBackgroundServices() async {
       default:
         break;
     }
-  });
+  }, onError: handleAuthStreamError);
 
   // Kaltstart mit bestehender Session (kein signedIn-Event) → ebenfalls markieren.
   if (sb.auth.currentSession != null) {

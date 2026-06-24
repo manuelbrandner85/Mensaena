@@ -86,7 +86,7 @@ class _AuthScreenState extends State<AuthScreen>
       if (data.event == AuthChangeEvent.passwordRecovery) {
         setState(() => _mode = _AuthMode.reset);
       }
-    });
+    }, onError: handleAuthStreamError);
   }
 
   @override

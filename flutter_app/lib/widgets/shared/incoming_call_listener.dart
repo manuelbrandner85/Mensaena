@@ -59,7 +59,7 @@ class _IncomingCallListenerState
       _handledCallIds.clear();
       CallEventBus.clearHandled();
       _setupListeners();
-    });
+    }, onError: handleAuthStreamError);
   }
 
   /// Nach Decline: kleines Bottom-Sheet mit 3 Quick-Reply-Buttons.
