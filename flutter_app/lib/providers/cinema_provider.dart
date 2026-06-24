@@ -19,6 +19,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/theme/cinema_theme.dart';
 import '../repositories/profiles_repository.dart';
 import '../repositories/settings_repository.dart';
+import '../services/location_service.dart';
 import '../services/sunrise_sunset_service.dart';
 import '../services/weather_service.dart';
 
@@ -170,8 +171,19 @@ final cinemaWeatherNowProvider = StreamProvider<WeatherNow?>((ref) async* {
   Future<WeatherNow?> resolve() async {
     try {
       final p = await ProfilesRepository.getMine();
-      final lat = p?.latitude ?? p?.homeLat;
-      final lng = p?.longitude ?? p?.homeLng;
+      double? lat = p?.latitude ?? p?.homeLat;
+      double? lng = p?.longitude ?? p?.homeLng;
+      // Kein gespeicherter Profil-/Home-Standort → Geräte-GPS (letzte bekannte
+      // Position genügt, kein harter Fix nötig). Damit ist der Live-Wetter-
+      // Hintergrund auch sichtbar, BEVOR der User seinen Standort gesetzt hat
+      // — sonst blieb `weatherNow` null und die Atmosphäre unsichtbar.
+      if (lat == null || lng == null) {
+        final pos = await LocationService.getBestPosition();
+        if (pos != null) {
+          lat = pos.latitude;
+          lng = pos.longitude;
+        }
+      }
       if (lat == null || lng == null) return null;
       return await WeatherService.current(latitude: lat, longitude: lng);
     } catch (_) {
