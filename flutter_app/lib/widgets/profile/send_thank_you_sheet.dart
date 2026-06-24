@@ -79,8 +79,9 @@ class _SendThankYouSheetState extends State<SendThankYouSheet> {
     );
     if (!mounted) return;
     setState(() => _sending = false);
+    final messenger = ScaffoldMessenger.of(context);
     if (ok) Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    messenger.showSnackBar(SnackBar(
       backgroundColor: AppColors.surface,
       content: Text(
         ok

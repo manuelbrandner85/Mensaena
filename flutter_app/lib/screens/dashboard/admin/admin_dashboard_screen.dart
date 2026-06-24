@@ -1192,8 +1192,14 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
         return;
       }
       ref.invalidate(adminScheduledBroadcastsProvider);
+      final scheduledMessenger = ScaffoldMessenger.of(context);
       Navigator.pop(context);
-      AppSnackBar.info(context, 'admin.broadcastScheduled'.tr());
+      scheduledMessenger.showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('admin.broadcastScheduled'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+        duration: const Duration(milliseconds: 4000),
+      ));
       return;
     }
 
@@ -1211,8 +1217,9 @@ class _BroadcastSheetState extends ConsumerState<_BroadcastSheet> {
     }
     // Notification-Count im Dashboard auffrischen.
     ref.invalidate(adminStatsProvider);
+    final messenger = ScaffoldMessenger.of(context);
     Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.showSnackBar(
       SnackBar(
         content: Text('admin.broadcastSuccess'
             .tr(namedArgs: {'count': '$count'})),

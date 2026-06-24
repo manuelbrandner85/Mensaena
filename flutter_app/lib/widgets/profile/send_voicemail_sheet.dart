@@ -102,8 +102,9 @@ class _SendVoicemailSheetState extends ConsumerState<SendVoicemailSheet> {
         seconds: seconds,
       );
       if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      messenger.showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text('voicemail.sent'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.ink)),

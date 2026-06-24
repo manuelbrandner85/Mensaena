@@ -116,8 +116,9 @@ class _TrustRatingModalState extends State<TrustRatingModal> {
     if (!mounted) return;
     setState(() => _submitting = false);
     if (ok) {
+      final messenger = ScaffoldMessenger.of(context);
       Navigator.of(context).pop(true);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      messenger.showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
           'trust.thanks'.tr(),
