@@ -109,6 +109,15 @@ class CinemaOverlay extends ConsumerWidget {
     // Controller → auf Lite aus). null = klar/Nebel (keine Wolken).
     final cloudColor =
         weatherParticlesEnabled ? cloudColorOf(weatherNow) : null;
+    final cloudDensity = cloudDensityFor(weatherNow);
+    // Vordergrund-Regenschleier (Regen/Gewitter, eigener Controller → Lite aus).
+    final rainVeil = weatherParticlesEnabled ? rainVeilFor(weatherNow) : null;
+    // Gewitter-Stimmung: schwerer, dunkler Top-Tint. Reine Farb-Ebene → läuft
+    // auch auf Lite (nur am Wetter-Schalter, nicht an den Partikeln).
+    final thunderBase = weatherAdaptiveOn ? thunderMoodColor(weatherNow) : null;
+    final thunderMood = thunderBase == null
+        ? null
+        : Color.lerp(Colors.transparent, thunderBase, weatherStrength);
     final weatherTint = (weatherBase == null || !weatherAdaptiveOn)
         ? null
         : Color.lerp(Colors.transparent, weatherBase, weatherStrength);
@@ -172,6 +181,24 @@ class CinemaOverlay extends ConsumerWidget {
             child: IgnorePointer(child: ColoredBox(color: weatherTint)),
           ),
 
+        // 1c. Gewitter-Stimmung — zusätzlicher dunkler Top-Down-Tint, der die
+        // Szene bei echtem Gewitter schwerer/bedrohlicher macht.
+        if (thunderMood != null)
+          Positioned.fill(
+            child: IgnorePointer(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [thunderMood, Colors.transparent],
+                    stops: const [0.0, 0.75],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
         // 2. Atmospheric Haze (Tiefen-Eindruck oben→unten)
         RepaintBoundary(
           child: AtmosphericHaze(
@@ -188,6 +215,7 @@ class CinemaOverlay extends ConsumerWidget {
             child: CloudDriftLayer(
               color: cloudColor,
               intensity: weatherStrength,
+              count: cloudDensity,
             ),
           ),
 
@@ -282,6 +310,14 @@ class CinemaOverlay extends ConsumerWidget {
         // 9e. C — Gewitter-Blitz (gelegentlicher Doppelschlag).
         if (weather == CinemaWeather.thunder && weatherParticlesEnabled)
           RepaintBoundary(child: LightningFlash(intensity: weatherStrength)),
+
+        // 9f. C — Vordergrund-Regenschleier (Regen/Gewitter): ziehende, weiche
+        // Schleier VOR der Szene für Tiefe — letzte Atmosphäre-Ebene, aber
+        // weiter HINTER dem Content (Lesbarkeit bleibt unangetastet).
+        if (rainVeil != null)
+          RepaintBoundary(
+            child: RainVeilLayer(spec: rainVeil, intensity: weatherStrength),
+          ),
 
         // ═══════════ CONTENT (nie überlagert) ═══════════
         child,
