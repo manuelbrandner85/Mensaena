@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../config/theme/cinema_theme.dart';
+import '../../providers/accessibility_provider.dart';
 import '../../providers/cinema_provider.dart';
 import '../../providers/effects_gate_provider.dart';
 import '../../providers/theme_mode_provider.dart';
@@ -66,54 +67,34 @@ class CinemaOverlay extends ConsumerWidget {
     // laufen, sobald der Schalter an ist — daher unabhängig von isFull/Lite.
     final parallaxOn = ref.watch(cinemaParallaxProvider);
 
-    // CRASH-FIX: Off-Mode (phase null oder intensity ~0) und On-Mode
-    // ergeben strukturell SEHR unterschiedliche Widget-Trees (SizedBox vs
-    // RepaintBoundary > Stack > 9+ AnimationControllers). Beim Toggle
-    // kann die Disposal-Reihenfolge der alten Controllers mit dem Mount
-    // der neuen kollidieren → Crash bei Navigation. KeyedSubtree
-    // erzwingt sauberen Unmount der einen Variante vor Mount der anderen.
-    // Auf Lite weiterhin abschalten — AUSSER Video/Parallax ist aktiv (die
-    // sind leicht und vom User explizit gewünscht). reduceMotion/cinema-off
-    // (profile.isOff) sowie phase==null bleiben hart aus.
-    if (phase == null || profile.isOff || (liteMode && !parallaxOn)) {
-      return KeyedSubtree(
-        key: const ValueKey('cinema_overlay_off'),
-        child: child,
-      );
-    }
-
-    final spec = CinemaTheme.specFor(phase);
+    final reduceMotion = ref.watch(a11yProvider).effectiveReduceMotion;
     // Feinregler (0–100 %) skaliert die atmosphärische Stärke stufenlos.
     final strength = ref.watch(cinemaEffectStrengthProvider) / 100.0;
-    final intensity =
-        (isLight ? (baseIntensity * 0.3) : baseIntensity) * strength;
-    // ECHTE aktuelle Wetterlage am Standort (eine Quelle: Now-Provider).
-    // Tint/Kondition/Partikel werden hieraus abgeleitet — keine Stunden-/
-    // Zeitzonen-Fehlzuordnung mehr.
+
+    // ═══════════ WETTER-ATMOSPHÄRE — eigene, vom Cinema-Master ENTKOPPELTE
+    // Ebene. Der Live-Wetter-Hintergrund hat einen EIGENEN Schalter (Default
+    // an) und soll laut Design IMMER live sein — unabhängig vom Effekt-Profil,
+    // Light-Mode UND davon, ob das übrige Kino läuft. Deshalb VOR dem
+    // Cinema-Gate berechnet und (unten) auch dann gerendert, wenn das Kino aus
+    // ist (Mode=Aus / A11y / Lite). Vorher hing alles am Early-Return → wer das
+    // Kino aus hatte (oder ein Lite-Gerät nutzte), sah NIE Wetter.
     final weatherNow = ref.watch(cinemaWeatherNowProvider).value;
     final weatherBase = weatherTintOf(weatherNow);
-    // WETTER-ADAPTIVE STIMMUNG = eigene, leichte Ebene. Sie ist sichtbar,
-    // sobald der Schalter an ist (Default an) — UNABHÄNGIG vom Effekt-Profil
-    // und Light-Mode. Vorher hing sie an intensity>=0.6, war also im
-    // Light-Mode (×0.3) und auf reduced/minimal NIE zu sehen → "nicht immer
-    // live". Eigene Stärke mit sichtbarem Floor, vom 0–100%-Regler skaliert.
     final weatherAdaptiveOn = ref.watch(cinemaWeatherAdaptiveProvider);
     final weatherStrength = weatherAdaptiveOn
         ? (((isLight ? 0.60 : 0.82) * strength).clamp(0.45, 1.0)).toDouble()
         : 0.0;
-    // Partikel (Regen/Schnee) haben einen eigenen AnimationController → auf
-    // Lite-Geräten weiter AUS (ARM32-Crash-Historie). Tint + Kondition (Nebel/
-    // Blitz-Tint) sind reine Farb-/Maluebenen und laufen auch dort.
-    final weatherParticlesEnabled = weatherAdaptiveOn && !liteMode;
-    // Echte driftende Wolken bei wolkig/Regen/Schnee/Gewitter (eigener
-    // Controller → auf Lite aus). null = klar/Nebel (keine Wolken).
-    final cloudColor =
-        weatherParticlesEnabled ? cloudColorOf(weatherNow) : null;
+    // Animierte Wetter-Ebenen (Wolken/Partikel/Schleier/Blitz) haben eigene
+    // AnimationController → auf Lite-Geräten (ARM32-Crash-Historie) UND bei
+    // A11y-Bewegungsreduktion AUS. Tint/Mood sind reine Farb-Ebenen und laufen
+    // auch dort (kein Controller).
+    final weatherMotion = weatherAdaptiveOn && !liteMode && !reduceMotion;
+    // Echte driftende Wolken bei wolkig/Regen/Schnee/Gewitter. null = klar/Nebel.
+    final cloudColor = weatherMotion ? cloudColorOf(weatherNow) : null;
     final cloudDensity = cloudDensityFor(weatherNow);
-    // Vordergrund-Regenschleier (Regen/Gewitter, eigener Controller → Lite aus).
-    final rainVeil = weatherParticlesEnabled ? rainVeilFor(weatherNow) : null;
-    // Gewitter-Stimmung: schwerer, dunkler Top-Tint. Reine Farb-Ebene → läuft
-    // auch auf Lite (nur am Wetter-Schalter, nicht an den Partikeln).
+    // Vordergrund-Regenschleier (Regen/Gewitter).
+    final rainVeil = weatherMotion ? rainVeilFor(weatherNow) : null;
+    // Gewitter-Stimmung: schwerer, dunkler Top-Tint (reine Farb-Ebene).
     final thunderBase = weatherAdaptiveOn ? thunderMoodColor(weatherNow) : null;
     final thunderMood = thunderBase == null
         ? null
@@ -121,6 +102,35 @@ class CinemaOverlay extends ConsumerWidget {
     final weatherTint = (weatherBase == null || !weatherAdaptiveOn)
         ? null
         : Color.lerp(Colors.transparent, weatherBase, weatherStrength);
+    final weather =
+        weatherAdaptiveOn ? weatherConditionOf(weatherNow) : CinemaWeather.clear;
+    final weatherParticles =
+        weatherMotion ? weatherParticleSpec(weatherNow) : null;
+
+    // CRASH-FIX: Off-Mode und On-Mode ergeben strukturell SEHR unterschiedliche
+    // Widget-Trees (SizedBox vs RepaintBoundary > Stack > 9+ Controllers). Beim
+    // Toggle kann die Disposal-Reihenfolge kollidieren → KeyedSubtree erzwingt
+    // sauberen Unmount. Cinema-Master aus (phase==null/Mode=Aus, profile.isOff
+    // via A11y/minimal, oder Lite ohne Parallax) → KEIN volles Kino. Die
+    // Wetter-Atmosphäre bleibt aber über _weatherOnlyOverlay sichtbar.
+    if (phase == null || profile.isOff || (liteMode && !parallaxOn)) {
+      return _weatherOnlyOverlay(
+        child: child,
+        weatherTint: weatherTint,
+        thunderMood: thunderMood,
+        cloudColor: cloudColor,
+        cloudDensity: cloudDensity,
+        weather: weather,
+        weatherParticles: weatherParticles,
+        rainVeil: rainVeil,
+        strength: weatherStrength,
+        motion: weatherMotion,
+      );
+    }
+
+    final spec = CinemaTheme.specFor(phase);
+    final intensity =
+        (isLight ? (baseIntensity * 0.3) : baseIntensity) * strength;
     // Saisonaler Tint (datumsbasiert, keine Netzwerklast).
     final seasonalBase = ref.watch(cinemaSeasonalProvider)
         ? seasonalTintForMonth(DateTime.now().month)
@@ -134,11 +144,8 @@ class CinemaOverlay extends ConsumerWidget {
     // C: Wetter-Kondition → animierte Partikel/Nebel/Blitz. D: Saison-Partikel.
     // Teuer (eigener AnimationController) → nur bei vollen Effekten (>= 0.6).
     final heavyOn = intensity >= 0.6;
-    // Wetter-Kondition/Partikel hängen am Wetter-Schalter, NICHT an heavyOn.
-    final weather =
-        weatherAdaptiveOn ? weatherConditionOf(weatherNow) : CinemaWeather.clear;
-    final weatherParticles =
-        weatherParticlesEnabled ? weatherParticleSpec(weatherNow) : null;
+    // `weather` und `weatherParticles` sind oben (vor dem Cinema-Gate) bereits
+    // berechnet — vom Wetter-Schalter abhängig, NICHT von heavyOn.
     // Saison-Partikel nur, wenn KEIN Wetter-Niederschlag aktiv ist (kein
     // Doppel-Schnee) und der Saison-Schalter an ist.
     final seasonalParticles =
@@ -308,7 +315,7 @@ class CinemaOverlay extends ConsumerWidget {
           ),
 
         // 9e. C — Gewitter-Blitz (gelegentlicher Doppelschlag).
-        if (weather == CinemaWeather.thunder && weatherParticlesEnabled)
+        if (weather == CinemaWeather.thunder && weatherMotion)
           RepaintBoundary(child: LightningFlash(intensity: weatherStrength)),
 
         // 9f. C — Vordergrund-Regenschleier (Regen/Gewitter): ziehende, weiche
@@ -346,6 +353,96 @@ class CinemaOverlay extends ConsumerWidget {
           ),
       ],
       ),
+      ),
+    );
+  }
+
+  /// Wetter-Atmosphäre OHNE das übrige Kino (Sonne/Mond/Grain/God-Rays). Wird
+  /// gerendert, wenn der Cinema-Master aus ist (Mode=Aus / A11y / Lite), der
+  /// Live-Wetter-Schalter aber an ist. So bleibt der Wetter-Hintergrund „immer
+  /// live", unabhängig vom Effekt-Profil. Tint/Mood (reine Farb-Ebenen) laufen
+  /// immer; animierte Ebenen (Wolken/Nebel/Partikel/Blitz/Schleier) nur, wenn
+  /// [motion] erlaubt ist (kein Lite, keine A11y-Bewegungsreduktion). Gibt es
+  /// nichts zu zeigen (klarer Himmel / Daten fehlen), kommt der reine Content.
+  Widget _weatherOnlyOverlay({
+    required Widget child,
+    required Color? weatherTint,
+    required Color? thunderMood,
+    required Color? cloudColor,
+    required int cloudDensity,
+    required CinemaWeather weather,
+    required CinemaParticleSpec? weatherParticles,
+    required RainVeilSpec? rainVeil,
+    required double strength,
+    required bool motion,
+  }) {
+    final layers = <Widget>[
+      // Statischer Wetter-Tint (Regen/Nebel/Schnee/Gewitter).
+      if (weatherTint != null)
+        Positioned.fill(
+          child: IgnorePointer(child: ColoredBox(color: weatherTint)),
+        ),
+      // Gewitter-Stimmung (dunkler Top-Down-Tint).
+      if (thunderMood != null)
+        Positioned.fill(
+          child: IgnorePointer(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [thunderMood, Colors.transparent],
+                  stops: const [0.0, 0.75],
+                ),
+              ),
+            ),
+          ),
+        ),
+      // Driftende Wolken (nur mit Bewegung).
+      if (motion && cloudColor != null)
+        RepaintBoundary(
+          child: CloudDriftLayer(
+            color: cloudColor,
+            intensity: strength,
+            count: cloudDensity,
+          ),
+        ),
+      // Nebel-Drift.
+      if (motion && weather == CinemaWeather.fog && weatherTint != null)
+        RepaintBoundary(
+          child: FogDriftLayer(color: weatherTint, intensity: strength),
+        ),
+      // Regen-/Schnee-Partikel.
+      if (motion && weatherParticles != null)
+        RepaintBoundary(
+          child: CinemaParticleLayer(spec: weatherParticles, intensity: strength),
+        ),
+      // Gewitter-Blitz.
+      if (motion && weather == CinemaWeather.thunder)
+        RepaintBoundary(child: LightningFlash(intensity: strength)),
+      // Vordergrund-Regenschleier.
+      if (motion && rainVeil != null)
+        RepaintBoundary(
+          child: RainVeilLayer(spec: rainVeil, intensity: strength),
+        ),
+    ];
+
+    if (layers.isEmpty) {
+      return KeyedSubtree(
+        key: const ValueKey('cinema_overlay_off'),
+        child: child,
+      );
+    }
+    return KeyedSubtree(
+      key: const ValueKey('cinema_overlay_weather_only'),
+      child: RepaintBoundary(
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ...layers,
+            child,
+          ],
+        ),
       ),
     );
   }
