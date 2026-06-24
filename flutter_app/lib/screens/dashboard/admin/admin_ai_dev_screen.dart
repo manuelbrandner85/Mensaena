@@ -4651,8 +4651,14 @@ class _DevChatSheetState extends State<_DevChatSheet> {
     if (!mounted) return;
     setState(() => _confirming = false);
     if (ok) {
+      final messenger = ScaffoldMessenger.of(context);
       Navigator.of(context).pop();
-      AppSnackBar.info(context, 'adminDev.queued'.tr());
+      messenger.showSnackBar(SnackBar(
+        backgroundColor: AppColors.surface,
+        content: Text('adminDev.queued'.tr(),
+            style: AppTypography.body(size: 13, color: AppColors.ink)),
+        duration: const Duration(milliseconds: 4000),
+      ));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -106,6 +106,7 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
     var emoji = '💬';
     var isPrivate = false;
     var busy = false;
+    final messenger = ScaffoldMessenger.of(context);
     final created = await showModalBottomSheet<bool>(
       context: context,
       isScrollControlled: true,
@@ -254,13 +255,13 @@ class _MessagesScreenState extends ConsumerState<MessagesScreen>
     if (!mounted) return;
     if (created == true) {
       setState(_load);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      messenger.showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text('chat.channelCreated'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.ink)),
       ));
     } else if (created == false) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      messenger.showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text('chat.createChannelFailed'.tr(),
             style: AppTypography.body(size: 13, color: AppColors.herzrotWarm)),

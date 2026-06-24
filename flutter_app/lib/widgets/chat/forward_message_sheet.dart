@@ -87,8 +87,9 @@ class _ForwardMessageSheetState extends ConsumerState<ForwardMessageSheet> {
         content: '[FORWARDED]\n${widget.originalContent}',
       );
       if (!mounted) return;
+      final messenger = ScaffoldMessenger.of(context);
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      messenger.showSnackBar(SnackBar(
         backgroundColor: AppColors.surface,
         content: Text(
           'chat.forwardedTo'.tr(namedArgs: {'name': title}),
