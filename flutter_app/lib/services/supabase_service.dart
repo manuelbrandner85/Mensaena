@@ -1,3 +1,6 @@
+import 'dart:io' show SocketException;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -54,9 +57,39 @@ class SupabaseService {
 /// Kurzform — global verwendet.
 SupabaseClient get sb => SupabaseService.client;
 
-/// Riverpod Auth-State-Stream.
+/// True, wenn der Fehler ein transienter Netzwerk-/Token-Refresh-Fehler ist
+/// und KEIN App-Bug. `AuthRetryableFetchException` (gotrue) und
+/// `SocketException` (dart:io) treten bei flakigem Netz oder beim
+/// Background-Token-Refresh auf — sie dürfen die App NICHT crashen lassen.
+bool isTransientAuthNetworkError(Object error) =>
+    error is AuthRetryableFetchException || error is SocketException;
+
+/// Standard-`onError` für alle `sb.auth.onAuthStateChange.listen(...)`-Abos.
+/// Verschluckt transiente Netzwerk-/Auth-Fehler still (kein Rethrow), damit
+/// ein kurzer Verbindungsausfall keinen Fatal-Crash auslöst. Im Debug-Build
+/// wird die Ursache geloggt; unerwartete Fehler werden ebenfalls geloggt,
+/// aber nicht eskaliert.
+void handleAuthStreamError(Object error, [StackTrace? stack]) {
+  if (isTransientAuthNetworkError(error)) {
+    if (kDebugMode) {
+      debugPrint('[auth] transienter Netzwerkfehler ignoriert: $error');
+    }
+    return;
+  }
+  if (kDebugMode) {
+    debugPrint('[auth] unerwarteter Auth-Stream-Fehler: $error');
+  }
+}
+
+/// Riverpod Auth-State-Stream. Transiente Netzwerk-/Refresh-Fehler werden
+/// still verschluckt, damit der Provider sie nicht als `AsyncError` an die
+/// UI durchreicht (sonst Red-Screen bei kurzem Verbindungsverlust).
 final authStateProvider = StreamProvider<AuthState>((ref) {
-  return sb.auth.onAuthStateChange;
+  return sb.auth.onAuthStateChange.handleError(
+    (Object error, StackTrace _) => handleAuthStreamError(error),
+    test: (Object? error) =>
+        error != null && isTransientAuthNetworkError(error),
+  );
 });
 
 /// Aktueller User aus Auth-State.

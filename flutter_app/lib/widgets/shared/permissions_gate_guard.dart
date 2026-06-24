@@ -49,7 +49,7 @@ class _PermissionsGateGuardState extends ConsumerState<PermissionsGateGuard> {
       } else if (evt.event == AuthChangeEvent.signedOut) {
         _sessionId = DateTime.now().millisecondsSinceEpoch.toString();
       }
-    });
+    }, onError: handleAuthStreamError);
   }
 
   @override
