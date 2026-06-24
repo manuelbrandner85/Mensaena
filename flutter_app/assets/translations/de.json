@@ -412,6 +412,7 @@
       "dangerZone": "GEFAHRENZONE",
       "currentMood": "AKTUELLE STIMMUNG",
       "cinemaMode": "CINEMA-MODUS",
+      "atmosphere": "Atmosphäre",
       "effectStrength": "EFFEKT-STÄRKE",
       "sound": "SOUND",
       "callSound": "ANRUF-TON & LAUTSTÄRKE",
@@ -593,6 +594,10 @@
     "weatherAdaptive": {
       "label": "Wetter-adaptive Stimmung",
       "hint": "Der Hintergrund passt sich ans echte Wetter am Standort an (Regen, Nebel, Schnee, Gewitter)."
+    },
+    "atmosphere": {
+      "introTitle": "Live-Wetter-Hintergrund",
+      "introBody": "Erlebe das echte Wetter an deinem Standort als sanft animierten Hintergrund – Regen, Schnee, Wolken, Sonne und Gewitter, dezent hinter deinen Inhalten. Standortbasiert, datensparsam und über deine Geräte hinweg gespeichert."
     },
     "seasonal": {
       "label": "Saisonale Akzente",

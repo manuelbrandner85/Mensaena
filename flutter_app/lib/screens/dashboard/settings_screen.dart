@@ -1118,11 +1118,15 @@ class _AppearanceTab extends ConsumerWidget {
         const SizedBox(height: 12),
         const _ForceFullEffectsToggle(),
         const SizedBox(height: 12),
-        const _WeatherAdaptiveToggle(),
-        const SizedBox(height: 12),
         const _SeasonalToggle(),
         const SizedBox(height: 12),
         const _ParallaxToggle(),
+        const SizedBox(height: 16),
+        // Atmosphäre — dedizierte Sektion für den Live-Wetter-Hintergrund.
+        Text('settings.sections.atmosphere'.tr(),
+            style: AppTypography.label(size: 10, color: AppColors.mute)),
+        const SizedBox(height: 8),
+        const _AtmosphereSection(),
         const SizedBox(height: 16),
         Text('settings.sections.sound'.tr(),
             style: AppTypography.label(size: 10, color: AppColors.mute)),
@@ -1683,6 +1687,56 @@ class _SeasonalToggle extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// „Atmosphäre" — dedizierte Sektion für den animierten Live-Wetter-
+/// Hintergrund. Eine erklärende Intro-Karte (teal/primary) plus der Master-
+/// Schalter. Die Präferenz ist über [cinemaWeatherAdaptiveProvider] →
+/// SettingsRepository geräteübergreifend in Supabase gespeichert.
+class _AtmosphereSection extends StatelessWidget {
+  const _AtmosphereSection();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.tealSoft.withValues(alpha: 0.10),
+            border: Border.all(color: AppColors.teal.withValues(alpha: 0.30)),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const Icon(LucideIcons.cloudSunRain,
+                      color: AppColors.teal, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text('settings.atmosphere.introTitle'.tr(),
+                        style: AppTypography.body(
+                            size: 15,
+                            color: AppColors.ink,
+                            weight: FontWeight.w600)),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text('settings.atmosphere.introBody'.tr(),
+                  style:
+                      AppTypography.body(size: 13, color: AppColors.inkSoft)),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+        const _WeatherAdaptiveToggle(),
+      ],
     );
   }
 }

@@ -412,6 +412,7 @@
       "dangerZone": "ZONE DE DANGER",
       "currentMood": "HUMEUR ACTUELLE",
       "cinemaMode": "MODE CINÉMA",
+      "atmosphere": "Atmosphère",
       "effectStrength": "INTENSITÉ DE L'EFFET",
       "sound": "SON",
       "callSound": "SON ET VOLUME DES APPELS",
@@ -593,6 +594,10 @@
     "weatherAdaptive": {
       "label": "Ambiance selon la météo",
       "hint": "L'arrière-plan s'adapte à la météo réelle de ta position (pluie, brouillard, neige, orage)."
+    },
+    "atmosphere": {
+      "introTitle": "Arrière-plan météo en direct",
+      "introBody": "Vis la météo réelle de ton emplacement sous forme d'arrière-plan délicatement animé – pluie, neige, nuages, soleil et orages, discrètement derrière ton contenu. Basé sur la localisation, léger en données et synchronisé sur tous tes appareils."
     },
     "seasonal": {
       "label": "Accents saisonniers",

@@ -412,6 +412,7 @@
       "dangerZone": "TEHLİKE BÖLGESİ",
       "currentMood": "MEVCUT RUH HALİ",
       "cinemaMode": "SİNEMA MODU",
+      "atmosphere": "Atmosfer",
       "effectStrength": "EFEKT YOĞUNLUĞU",
       "sound": "SES",
       "callSound": "ARAMA SESİ VE SES SEVİYESİ",
@@ -593,6 +594,10 @@
     "weatherAdaptive": {
       "label": "Hava durumuna uyumlu atmosfer",
       "hint": "Arka plan konumundaki gerçek hava durumuna uyum sağlar (yağmur, sis, kar, fırtına)."
+    },
+    "atmosphere": {
+      "introTitle": "Canlı hava durumu arka planı",
+      "introBody": "Konumundaki gerçek hava durumunu hafifçe canlandırılmış bir arka plan olarak yaşa – yağmur, kar, bulutlar, güneş ve fırtınalar, içeriğinin arkasında zarifçe. Konum tabanlı, az veri kullanır ve cihazların arasında eşitlenir."
     },
     "seasonal": {
       "label": "Mevsimsel tonlar",

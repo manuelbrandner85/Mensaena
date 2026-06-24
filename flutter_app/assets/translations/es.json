@@ -412,6 +412,7 @@
       "dangerZone": "ZONA DE PELIGRO",
       "currentMood": "ESTADO DE ÁNIMO ACTUAL",
       "cinemaMode": "MODO CINE",
+      "atmosphere": "Atmósfera",
       "effectStrength": "INTENSIDAD DEL EFECTO",
       "sound": "SONIDO",
       "callSound": "SONIDO Y VOLUMEN DE LLAMADA",
@@ -593,6 +594,10 @@
     "weatherAdaptive": {
       "label": "Ambiente según el clima",
       "hint": "El fondo se adapta al clima real de tu ubicación (lluvia, niebla, nieve, tormenta)."
+    },
+    "atmosphere": {
+      "introTitle": "Fondo del tiempo en vivo",
+      "introBody": "Vive el tiempo real de tu ubicación como un fondo con animación suave: lluvia, nieve, nubes, sol y tormentas, de forma discreta tras tus contenidos. Basado en la ubicación, ligero en datos y sincronizado entre tus dispositivos."
     },
     "seasonal": {
       "label": "Acentos de temporada",
