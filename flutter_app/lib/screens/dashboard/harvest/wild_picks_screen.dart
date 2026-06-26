@@ -82,6 +82,10 @@ class _WildPicksScreenState extends ConsumerState<WildPicksScreen> {
   }
 
   Future<void> _load() async {
+    // _load() wird nach async-Gaps aus _initAndLoad gerufen (GPS-await) —
+    // Widget kann zwischenzeitlich disposed sein → setState ohne mounted-Check
+    // crasht.
+    if (!mounted) return;
     setState(() => _loading = true);
     final spots = await MundraubService.nearby(
       lat: _center.latitude,
