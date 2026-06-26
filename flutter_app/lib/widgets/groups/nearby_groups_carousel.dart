@@ -131,7 +131,7 @@ class _NearbyTile extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     'groups.memberCount'
-                        .tr(namedArgs: {'n': '${group.memberCount}'}),
+                        .tr(namedArgs: {'count': '${group.memberCount}'}),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.caption(),
