@@ -29,6 +29,10 @@ class _SosScreenState extends ConsumerState<SosScreen>
 
   String _selectedType = 'medical';
   bool _sending = false;
+
+  /// Optimistischer lokaler Zustand: hält den frisch gesendeten Alarm, bis der
+  /// Realtime-Stream (emergencyAlertsProvider) ihn liefert. Quelle der Wahrheit
+  /// für einen laufenden Alarm ist der Provider (siehe build()).
   EmergencyAlert? _myAlert;
 
   @override
@@ -78,9 +82,9 @@ class _SosScreenState extends ConsumerState<SosScreen>
     }
   }
 
-  Future<void> _resolveMyAlert() async {
-    if (_myAlert == null) return;
-    final ok = await EmergencyRepository.resolveAlert(_myAlert!.id);
+  Future<void> _resolveMyAlert(EmergencyAlert? alert) async {
+    if (alert == null) return;
+    final ok = await EmergencyRepository.resolveAlert(alert.id);
     if (!mounted) return;
     if (ok) {
       setState(() => _myAlert = null);
@@ -99,6 +103,24 @@ class _SosScreenState extends ConsumerState<SosScreen>
   @override
   Widget build(BuildContext context) {
     final alerts = ref.watch(emergencyAlertsProvider);
+    final currentUserId = sb.auth.currentUser?.id;
+
+    // Eigenen laufenden Alarm aus dem Provider ableiten (Quelle der Wahrheit):
+    // der Stream filtert bereits status='active', also gilt jeder eigene Eintrag
+    // als offen. Fallback auf den optimistischen _myAlert-State, solange der
+    // frisch gesendete Alarm noch nicht im Stream angekommen ist. So wird ein
+    // laufender Alarm nach Re-Open des Screens korrekt als aktiv erkannt.
+    EmergencyAlert? ownAlert;
+    final loadedAlerts = alerts.asData?.value;
+    if (loadedAlerts != null && currentUserId != null) {
+      for (final a in loadedAlerts) {
+        if (a.userId == currentUserId && a.isActive) {
+          ownAlert = a;
+          break;
+        }
+      }
+    }
+    ownAlert ??= _myAlert;
 
     return DashboardScaffold(
       title: 'sos.screenTitle'.tr(),
@@ -111,10 +133,10 @@ class _SosScreenState extends ConsumerState<SosScreen>
           const SizedBox(height: 24),
           _SosButton(
             sending: _sending,
-            hasActiveAlert: _myAlert != null,
+            hasActiveAlert: ownAlert != null,
             pulseAnim: _pulseAnim,
             onSend: _sendSos,
-            onResolve: _resolveMyAlert,
+            onResolve: () => _resolveMyAlert(ownAlert),
           ),
           const SizedBox(height: 24),
           alerts.when(
@@ -157,8 +179,7 @@ class _SosScreenState extends ConsumerState<SosScreen>
                         separatorBuilder: (_, __) => const SizedBox(height: 8),
                         itemBuilder: (_, i) => _AlertCard(
                           alert: list[i],
-                          isOwn: list[i].userId ==
-                              sb.auth.currentUser?.id,
+                          isOwn: list[i].userId == currentUserId,
                           onRespond: () => _respond(list[i]),
                         ),
                       ),
