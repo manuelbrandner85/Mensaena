@@ -28,13 +28,14 @@ class LiveLocationService {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return false;
 
-    final perm = await Geolocator.checkPermission();
+    var perm = await Geolocator.checkPermission();
+    if (perm == LocationPermission.deniedForever) return false;
     if (perm == LocationPermission.denied) {
-      final req = await Geolocator.requestPermission();
-      if (req == LocationPermission.denied ||
-          req == LocationPermission.deniedForever) {
-        return false;
-      }
+      perm = await Geolocator.requestPermission();
+    }
+    if (perm != LocationPermission.whileInUse &&
+        perm != LocationPermission.always) {
+      return false;
     }
     _conversationId = conversationId;
     final expiresAt = DateTime.now().add(duration);
