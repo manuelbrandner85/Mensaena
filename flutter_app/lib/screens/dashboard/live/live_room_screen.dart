@@ -259,8 +259,11 @@ class _LiveRoomScreenState extends ConsumerState<LiveRoomScreen> {
     _listener?.dispose();
     _listener = null;
     if (mounted) setState(() => _state = _RoomState.connecting);
-    await _connect();
-    _reconnecting = false;
+    try {
+      await _connect();
+    } finally {
+      if (mounted) _reconnecting = false;
+    }
   }
 
   /// Telegram-Modell: Reattach an den im Holder laufenden Room (Rückkehr
