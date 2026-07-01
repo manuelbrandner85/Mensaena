@@ -116,12 +116,31 @@ class EventsRepository {
   }
 
   /// Laedt alle Teilnehmer mit profiles-Join (name, avatar_url, display_name, trust_score).
-  static Future<List<Map<String, dynamic>>> loadAttendees(String eventId) async {
+  ///
+  /// Stabil sortiert nach `created_at` und in Seiten von 200 (Range-Pagination)
+  /// geladen, damit sehr grosse Events nicht die gesamte Tabelle auf einmal in
+  /// den RAM ziehen. `maxRows` deckelt die Gesamtmenge (Default 2000).
+  static Future<List<Map<String, dynamic>>> loadAttendees(
+    String eventId, {
+    int pageSize = 200,
+    int maxRows = 2000,
+  }) async {
     try {
-      final rows = await sb.from('event_attendees')
-          .select('*, profiles:user_id(id, name, avatar_url, display_name, trust_score)')
-          .eq('event_id', eventId);
-      return (rows as List).whereType<Map<String, dynamic>>().toList();
+      final result = <Map<String, dynamic>>[];
+      var from = 0;
+      while (result.length < maxRows) {
+        final to = from + pageSize - 1;
+        final rows = await sb.from('event_attendees')
+            .select('*, profiles:user_id(id, name, avatar_url, display_name, trust_score)')
+            .eq('event_id', eventId)
+            .order('created_at')
+            .range(from, to);
+        final page = (rows as List).whereType<Map<String, dynamic>>().toList();
+        result.addAll(page);
+        if (page.length < pageSize) break; // letzte Seite erreicht
+        from += pageSize;
+      }
+      return result;
     } catch (_) {
       return const [];
     }
@@ -390,6 +409,7 @@ final myRsvpProvider =
     FutureProvider.family<String?, String>((ref, eventId) => EventsRepository.myRsvp(eventId));
 
 /// Teilnehmer-Liste fuer ein Event.
-final eventAttendeesProvider = FutureProvider.family<List<Map<String, dynamic>>, String>(
+final eventAttendeesProvider =
+    FutureProvider.family.autoDispose<List<Map<String, dynamic>>, String>(
   (ref, eventId) => EventsRepository.loadAttendees(eventId),
 );
