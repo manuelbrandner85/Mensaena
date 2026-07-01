@@ -1512,7 +1512,6 @@
     "duplicateProceed": "Yine de yap",
     "model": {
       "label": "Model",
-      "fast": "Hızlı",
       "standard": "Standart",
       "thorough": "Kapsamlı"
     },

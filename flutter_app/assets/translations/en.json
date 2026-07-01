@@ -1513,7 +1513,6 @@
     "duplicateProceed": "Do it anyway",
     "model": {
       "label": "Model",
-      "fast": "Fast",
       "standard": "Standard",
       "thorough": "Thorough"
     },
