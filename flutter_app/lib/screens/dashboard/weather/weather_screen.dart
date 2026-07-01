@@ -13,6 +13,11 @@ import '../../../widgets/layouts/dashboard_scaffold.dart';
 
 // ── Providers ─────────────────────────────────────────────────────────────────
 
+final _weatherScreenCurrentProvider =
+    FutureProvider.autoDispose.family<WeatherNow?, ({double lat, double lng})>(
+  (ref, geo) => WeatherService.current(latitude: geo.lat, longitude: geo.lng),
+);
+
 final _weatherScreenForecastProvider =
     FutureProvider.autoDispose.family<List<WeatherDay>, ({double lat, double lng})>(
   (ref, geo) => WeatherService.forecast(latitude: geo.lat, longitude: geo.lng),
@@ -39,6 +44,7 @@ class WeatherScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final geo = (lat: lat, lng: lng);
+    final current = ref.watch(_weatherScreenCurrentProvider(geo));
     final forecast = ref.watch(_weatherScreenForecastProvider(geo));
     final hourly = ref.watch(_weatherScreenHourlyProvider(geo));
     final aq = ref.watch(_weatherScreenAqProvider(geo));
@@ -52,6 +58,7 @@ class WeatherScreen extends ConsumerWidget {
           tooltip: 'weather.refresh'.tr(),
           onPressed: () {
             WeatherService.clearCache();
+            ref.invalidate(_weatherScreenCurrentProvider);
             ref.invalidate(_weatherScreenForecastProvider);
             ref.invalidate(_weatherScreenHourlyProvider);
             ref.invalidate(_weatherScreenAqProvider);
@@ -70,7 +77,10 @@ class WeatherScreen extends ConsumerWidget {
               ),
               data: (days) => days.isEmpty
                   ? const SizedBox.shrink()
-                  : _CurrentWeatherCard(day: days.first),
+                  : _CurrentWeatherCard(
+                      day: days.first,
+                      now: current.valueOrNull,
+                    ),
             ),
 
             const SizedBox(height: 16),
@@ -133,29 +143,59 @@ class WeatherScreen extends ConsumerWidget {
 // ── Aktuelles Wetter ──────────────────────────────────────────────────────────
 
 class _CurrentWeatherCard extends StatelessWidget {
-  const _CurrentWeatherCard({required this.day});
+  const _CurrentWeatherCard({required this.day, this.now});
   final WeatherDay day;
+
+  /// Live-Beobachtung (Open-Meteo `current`). Kann `null` sein, solange der
+  /// Current-Provider noch lädt oder die API scheitert → Fallback auf die
+  /// Tages-Vorhersage (Max/Min).
+  final WeatherNow? now;
 
   @override
   Widget build(BuildContext context) {
+    final live = now;
     return _Card(
       child: Row(
         children: [
-          Text(day.emoji, style: const TextStyle(fontSize: 56, height: 1)),
+          Text(live?.emoji ?? day.emoji,
+              style: const TextStyle(fontSize: 56, height: 1)),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Ist-Temperatur (Live), sonst Fallback auf Tages-Max/Min.
                 Text(
-                  '${day.tempMax.round()}° / ${day.tempMin.round()}°',
+                  live != null
+                      ? '${live.tempC.round()}°'
+                      : '${day.tempMax.round()}° / ${day.tempMin.round()}°',
                   style: AppTypography.display(size: 28),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  day.labelKey.tr(),
+                  (live?.labelKey ?? day.labelKey).tr(),
                   style: AppTypography.body(size: 14, color: AppColors.inkSoft),
                 ),
+                // Sekundäre Zeile: Max/Min des Tages (nur wenn oben die
+                // Ist-Temperatur steht, sonst wäre es redundant).
+                if (live != null) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      const Icon(LucideIcons.arrowUp,
+                          size: 13, color: AppColors.bronzeSoft),
+                      const SizedBox(width: 2),
+                      Text('${day.tempMax.round()}°',
+                          style: AppTypography.caption()),
+                      const SizedBox(width: 12),
+                      const Icon(LucideIcons.arrowDown,
+                          size: 13, color: AppColors.tealSoft),
+                      const SizedBox(width: 2),
+                      Text('${day.tempMin.round()}°',
+                          style: AppTypography.caption()),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 6),
                 Row(
                   children: [
