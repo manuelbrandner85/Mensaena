@@ -218,134 +218,142 @@ class PostContactActions extends ConsumerWidget {
       }
     }
     final methods = pref?.enabledMethods ?? const ['in_app_chat'];
-    final msgCtrl = TextEditingController();
+    // late-Field für den Nachrichten-Controller: wird nach Schließen des
+    // Modals im finally-Block disposed, damit kein Controller leakt.
+    late final TextEditingController msgCtrl = TextEditingController();
     String selectedMethod = methods.first;
 
-    final result = await showModalBottomSheet<String?>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: AppColors.sheetBackground,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        return StatefulBuilder(builder: (ctx, setState) {
-          return Padding(
-            padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              top: 22,
-              bottom: MediaQuery.of(ctx).viewInsets.bottom + 22,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('contact.requests.choose_method'.tr(),
-                    style: AppTypography.display(
-                        size: 16, color: AppColors.ink)),
-                const SizedBox(height: 12),
-                Wrap(
-                  spacing: 6,
-                  children: [
-                    for (final m in methods)
-                      ChoiceChip(
-                        label: Text(_methodLabel(m)),
-                        selected: selectedMethod == m,
-                        onSelected: (_) =>
-                            setState(() => selectedMethod = m),
-                        selectedColor:
-                            AppColors.bronze.withValues(alpha: 0.3),
-                        backgroundColor: AppColors.elevated,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: selectedMethod == m
-                                ? AppColors.bronze
-                                : AppColors.line,
+    try {
+      final result = await showModalBottomSheet<String?>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: AppColors.sheetBackground,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (ctx) {
+          return StatefulBuilder(builder: (ctx, setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 22,
+                bottom: MediaQuery.of(ctx).viewInsets.bottom + 22,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('contact.requests.choose_method'.tr(),
+                      style: AppTypography.display(
+                          size: 16, color: AppColors.ink)),
+                  const SizedBox(height: 12),
+                  Wrap(
+                    spacing: 6,
+                    children: [
+                      for (final m in methods)
+                        ChoiceChip(
+                          label: Text(_methodLabel(m)),
+                          selected: selectedMethod == m,
+                          onSelected: (_) =>
+                              setState(() => selectedMethod = m),
+                          selectedColor:
+                              AppColors.bronze.withValues(alpha: 0.3),
+                          backgroundColor: AppColors.elevated,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(
+                              color: selectedMethod == m
+                                  ? AppColors.bronze
+                                  : AppColors.line,
+                            ),
                           ),
                         ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: msgCtrl,
+                    maxLines: 4,
+                    maxLength: 400,
+                    style:
+                        AppTypography.body(size: 14, color: AppColors.ink),
+                    decoration: InputDecoration(
+                      hintText:
+                          'contact.requests.message_placeholder'.tr(),
+                      filled: true,
+                      fillColor: AppColors.elevated,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
                       ),
-                  ],
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: msgCtrl,
-                  maxLines: 4,
-                  maxLength: 400,
-                  style:
-                      AppTypography.body(size: 14, color: AppColors.ink),
-                  decoration: InputDecoration(
-                    hintText:
-                        'contact.requests.message_placeholder'.tr(),
-                    filled: true,
-                    fillColor: AppColors.elevated,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
                     ),
                   ),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: FilledButton.icon(
-                    onPressed: () =>
-                        Navigator.pop(ctx, selectedMethod),
-                    icon: const Icon(LucideIcons.send, size: 14),
-                    label: Text(intent.primaryCtaKey.tr()),
-                    style: FilledButton.styleFrom(
-                      backgroundColor: _ctaColor(intent),
-                      foregroundColor: AppColors.voidColor,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    width: double.infinity,
+                    child: FilledButton.icon(
+                      onPressed: () =>
+                          Navigator.pop(ctx, selectedMethod),
+                      icon: const Icon(LucideIcons.send, size: 14),
+                      label: Text(intent.primaryCtaKey.tr()),
+                      style: FilledButton.styleFrom(
+                        backgroundColor: _ctaColor(intent),
+                        foregroundColor: AppColors.voidColor,
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          );
-        });
-      },
-    );
+                ],
+              ),
+            );
+          });
+        },
+      );
 
-    if (result == null) return;
-    try {
-      await ref
-          .read(postContactRepositoryProvider)
-          .createContactRequest(
-            postId: post.id,
-            postOwnerId: post.userId,
-            contactMethod: result,
-            message: msgCtrl.text.trim().isEmpty ? null : msgCtrl.text.trim(),
-          );
-      ref.invalidate(myRequestForPostProvider(post.id));
-      ref.invalidate(helperCountProvider(post.id));
-      if (!context.mounted) return;
-      // Animation je nach Intent
-      if (intent == PostIntent.eventInvite) {
-        CelebrateBurst.fire(context, ref: ref);
-      } else {
-        Haptics.success();
+      if (result == null) return;
+      try {
+        await ref
+            .read(postContactRepositoryProvider)
+            .createContactRequest(
+              postId: post.id,
+              postOwnerId: post.userId,
+              contactMethod: result,
+              message:
+                  msgCtrl.text.trim().isEmpty ? null : msgCtrl.text.trim(),
+            );
+        ref.invalidate(myRequestForPostProvider(post.id));
+        ref.invalidate(helperCountProvider(post.id));
+        if (!context.mounted) return;
+        // Animation je nach Intent
+        if (intent == PostIntent.eventInvite) {
+          CelebrateBurst.fire(context, ref: ref);
+        } else {
+          Haptics.success();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text('contact.request_sent'.tr(),
+              style:
+                  AppTypography.body(size: 13, color: AppColors.ink)),
+        ));
+      } on StateError catch (e) {
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.surface,
+          content: Text(
+            e.message == 'already_open'
+                ? 'contact.already_requested'.tr()
+                : e.message,
+            style: AppTypography.body(size: 13, color: AppColors.ink),
+          ),
+        ));
+      } catch (_) {
+        // ignore – silent fail beyond debug log in repo
       }
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text('contact.request_sent'.tr(),
-            style:
-                AppTypography.body(size: 13, color: AppColors.ink)),
-      ));
-    } on StateError catch (e) {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        backgroundColor: AppColors.surface,
-        content: Text(
-          e.message == 'already_open'
-              ? 'contact.already_requested'.tr()
-              : e.message,
-          style: AppTypography.body(size: 13, color: AppColors.ink),
-        ),
-      ));
-    } catch (_) {
-      // ignore – silent fail beyond debug log in repo
+    } finally {
+      // Modal geschlossen (oder Fehlerpfad) → Controller freigeben.
+      msgCtrl.dispose();
     }
   }
 

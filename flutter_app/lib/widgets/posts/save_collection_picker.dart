@@ -46,9 +46,28 @@ class _PickerSheet extends ConsumerStatefulWidget {
 }
 
 class _PickerSheetState extends ConsumerState<_PickerSheet> {
+  late final TextEditingController nameCtrl;
+  late final TextEditingController emojiCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    nameCtrl = TextEditingController();
+    emojiCtrl = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    nameCtrl.dispose();
+    emojiCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _create() async {
-    final nameCtrl = TextEditingController();
-    final emojiCtrl = TextEditingController();
+    // Felder bei jedem Öffnen leeren, damit kein Text aus einem vorherigen
+    // (abgebrochenen) Versuch stehen bleibt.
+    nameCtrl.clear();
+    emojiCtrl.clear();
     final ok = await showDialog<bool>(
       context: context,
       builder: (dCtx) => AlertDialog(
