@@ -48,6 +48,37 @@ void main() {
     });
   });
 
+  group('WeatherNow', () {
+    WeatherNow now(int code) => WeatherNow(
+          code: code,
+          tempC: 17.4,
+          precipitationMm: 0,
+          rainMm: 0,
+          showersMm: 0,
+          snowfallCm: 0,
+          cloudCoverPct: 0,
+          windKmh: 5,
+          isDay: true,
+        );
+
+    test('emoji for clear sky', () {
+      expect(now(0).emoji, '☀️');
+    });
+
+    test('emoji for thunderstorm', () {
+      expect(now(95).emoji, '⛈️');
+    });
+
+    test('labelKey for rain', () {
+      expect(now(63).labelKey, 'weather.condRain');
+    });
+
+    test('labelKey unknown fallback', () {
+      // Code 40 fällt durch alle WMO-Bereiche → Unbekannt.
+      expect(now(40).labelKey, 'weather.condUnknown');
+    });
+  });
+
   group('AirQuality', () {
     test('aqiLabelKey good', () {
       const aq = AirQuality(pm25: 3, pm10: 8, europeanAqi: 15);
