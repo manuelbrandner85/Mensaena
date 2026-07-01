@@ -137,9 +137,12 @@ jobs:
             NIEMALS committen.
 
             Ablauf (so kurz wie möglich):
-            1. Lies CLAUDE.md (Pflichtregeln) UND docs/godmode/conventions.md
-               (echte AppColors/Widgets/APIs + bekannte Stolperfallen) + die
-               beteiligten Dateien (gezielt lesen, nicht den ganzen Codebase).
+            1. Lies CLAUDE.md (Pflichtregeln), docs/godmode/conventions.md
+               (echte AppColors/Widgets/APIs + bekannte Stolperfallen UND
+               bewährte Patterns) und docs/godmode/architecture-map.md
+               (Modul-Struktur, Datenfluss, Cinema-Gating, Auth/Push/i18n-
+               Konventionen) + die beteiligten Dateien (gezielt lesen, nicht
+               den ganzen Codebase).
             2. Branch erstellen: agent/task-${{ inputs.task_id }}
             3. Änderungen umsetzen. Nutze NUR Symbole, die laut conventions.md
                bzw. per Code-Grep wirklich existieren — niemals raten.
@@ -166,6 +169,13 @@ jobs:
                Edge-Cases (null/leer/Fehlerzustand), Regelverstöße (i18n, Streams,
                Design, Secrets), unnötige/überflüssige Änderungen. Bessere nach,
                BEVOR du den PR erstellst.
+               DESIGN-GATE (nur bei UI/Design-Aufgaben): vergleiche den neuen/
+               geänderten Screen konkret mit 2-3 bestehenden Premium-Screens
+               (z. B. Onboarding, Profil, Settings) — gleiche Spacing-Rhythmik,
+               gleiche Typo-Hierarchie, gleiche Card-/Button-Sprache, gleiche
+               Motion-Sparsamkeit? Wirkt er GENAUSO hochwertig, oder fällt er
+               dagegen ab? Wenn er abfällt: konkret nachbessern, nicht nur
+               abnicken.
             6. Commit + Push + PR gegen main erstellen.
 
             Effizienz-Regeln:
@@ -184,18 +194,40 @@ jobs:
               Unit-Tests unter flutter_app/test/ anlegen (reine Logik, KEINE
               Netzwerk-/Supabase-Calls; ggf. mocken). Reine UI-Tweaks brauchen keine.
 
-            Spezialisierung — handle je nach Art der Aufgabe als Experte:
-            - DESIGN/UI: Ziel elegant, professionell, subtil, viel Weißraum.
-              Nur AppColors-Tokens (kein hartes Color(0x…)), konsistente Cards/
-              Buttons/Abstände, dezente Animationen. Orientiere dich an
-              bestehenden Premium-Screens. (Skill-Geist: impeccable / emil.)
-            - SECURITY: RLS für jeden neuen Tabellenzugriff, Eingaben validieren,
-              keine fremden Nutzerdaten exponieren, Secrets nur via Secrets.
-            - PERFORMANCE: Rebuilds minimieren (const, Keys), Streams mit .limit()
-              + autoDispose, keine N+1-Queries, Bilder cachen.
-            - I18N: jeder String via .tr() in allen 7 JSON-Dateien, natürliche
-              Sprache je Land (keine Wort-für-Wort-Maschinenübersetzung).
-            Wähle die passende Brille selbst anhand der Aufgabe/Kategorie.
+            Spezialisierung — die AUFGABE beginnt oft mit einem Kategorie-Präfix
+            aus der Dashboard-Chipleiste, GENAU einer dieser Strings:
+            "[UI/UX]", "[Feature]", "[Bugfix]", "[Performance]",
+            "[i18n/Translations]", "[Database]", "[Security]", "[Configuration]"
+            (oder ein selbstgelernter eigener Kategorie-Name). Erkennst du eines
+            dieser Präfixe, ist DAS deine PRIMÄRE Fachbrille (nicht raten) — die
+            anderen Regeln unten gelten trotzdem zusätzlich, wo relevant. Kein
+            Präfix → Brille anhand der Aufgabe selbst wählen.
+
+            - "[UI/UX]": Ziel elegant, professionell, subtil, viel Weißraum. Nur
+              AppColors-Tokens (kein hartes Color(0x…)), konsistente Cards/
+              Buttons/Abstände, dezente Animationen. PFLICHT: rufe VOR dem
+              Schreiben von Code das Skill-Tool mit "impeccable" auf (Modus je
+              nach Aufgabe: polish/audit/animate/typeset/colorize — passend
+              wählen) UND bei Animationen/Transitions zusätzlich
+              "emil-design-eng". Wende die dortigen Prinzipien tatsächlich an,
+              orientiere dich zusätzlich an bestehenden Premium-Screens
+              (Onboarding/Profil/Settings).
+            - "[Security]": RLS für jeden neuen Tabellenzugriff, Eingaben
+              validieren, keine fremden Nutzerdaten exponieren, Secrets nur via
+              Secrets.
+            - "[Performance]": Rebuilds minimieren (const, Keys), Streams mit
+              .limit() + autoDispose, keine N+1-Queries, Bilder cachen.
+            - "[i18n/Translations]": jeder String via .tr() in allen 7 JSON-
+              Dateien, natürliche Sprache je Land (keine Wort-für-Wort-
+              Maschinenübersetzung).
+            - "[Database]": Migration idempotent (IF NOT EXISTS/OR REPLACE),
+              eindeutiger 14-stelliger Versions-Timestamp NEUER als die letzte
+              Datei in supabase/migrations/ (Guard
+              `check_migration_timestamps.py` prüft das im PR), RLS
+              standardmäßig mitdenken.
+            - "[Configuration]": CI/Workflow-Änderungen sparsam und mit
+              Kommentar, warum — dieser Bereich betrifft die gesamte Pipeline
+              für alle künftigen Aufträge.
 
             Auto-Doku: Wenn du die Architektur spürbar änderst (neues Modul, neue
             Tabelle/Edge-Function, neuer Pipeline-Schritt), aktualisiere die

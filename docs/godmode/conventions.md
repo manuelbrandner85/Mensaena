@@ -23,6 +23,7 @@ verifizieren.
 | `DashboardScaffold(actions: ...)` | `DashboardScaffold(appBarActions: ...)` |
 | rohe `Map`/`List` ohne Typargumente | `Map<String, dynamic>` / `List<Widget>` (strict_raw_type ist warning = fatal) |
 | `import 'package:intl/intl.dart'` zusätzlich zu easy_localization | weglassen (unnecessary_import = warning) |
+| Zwei Migrationsdateien mit demselben 14-stelligen Versions-Timestamp | Timestamp MUSS eindeutig + NEUER als die letzte Datei in `supabase/migrations/` sein (`ls supabase/migrations/ \| tail -1` prüfen) — sonst SQLSTATE 23505, Deploy rot. Guard: `python3 scripts/check_migration_timestamps.py`. |
 
 ## AppColors (echte Tokens — `config/theme/app_colors.dart`)
 
@@ -63,7 +64,44 @@ Light-Theme: `lightVoid`, `lightDeep`, `lightSurface`, `lightElevated`,
 - `pubspec.yaml`-Version NICHT ohne Auftrag ändern. Neue NATIVE Dependency →
   Versions-Bump (kein OTA); reine Dart-Pakete unkritisch.
 
+## ✅ Bewährte Patterns (real im Projekt etabliert — als Vorbild nutzen)
+
+Diese Patterns haben sich in echten PRs bewährt. Bei ähnlichen Aufgaben
+DARAN orientieren, statt neu zu erfinden.
+
+- **Standort-Provider brauchen einen GPS-Fallback.** Jeder Provider, der einen
+  Nutzerstandort braucht (Wetter, Karte, Nachbarschaft), sollte NICHT nur den
+  gespeicherten Profil-/Home-Standort lesen — sonst ist die Funktion für Nutzer
+  ohne gesetzten Standort komplett unsichtbar. Fallback:
+  `LocationService.getBestPosition()` (liefert notfalls die letzte bekannte
+  Position, kein neuer Permission-Dialog, kein harter Fehler). Siehe
+  `cinema_provider.dart` (`cinemaWeatherNowProvider`).
+- **Ambient-/Hintergrund-Features NIE an einen übergeordneten Master-Schalter
+  koppeln, wenn sie einen EIGENEN Schalter haben.** Ein Feature mit eigenem
+  Default-an-Toggle (z. B. „Live-Wetter-Hintergrund") darf nicht implizit
+  verschwinden, nur weil ein GRÖSSERES Gate (Kino-Modus/Effekt-Profil/
+  A11y/Lite-Mode) aus ist. Wenn das passiert: die Berechnung VOR das größere
+  Gate heben und einen eigenen, leichteren Render-Pfad für den
+  „Master-aus"-Fall anbieten (siehe `cinema_overlay.dart`,
+  `_weatherOnlyOverlay`) — animierte Teile bleiben trotzdem an
+  Lite/A11y-Schutz gekoppelt (Crash-Vermeidung geht vor).
+- **Farb-Literale (`Color(0x...)`) gehören in `lib/providers/*`, NIEMALS in
+  `lib/widgets/*`** — der Design-Guard scannt nur `lib/screens` + `lib/widgets`.
+  Provider liefern fertige `Color`-Werte an Widgets durch (siehe
+  `cloudColorOf`, `weatherTintOf`, `thunderMoodColor` in `cinema_provider.dart`).
+- **Migrationen sind idempotent** (`ADD COLUMN IF NOT EXISTS`,
+  `CREATE ... IF NOT EXISTS`, `ON CONFLICT DO UPDATE`) — ein erneuter Lauf
+  (Retry, Repair) darf nie fehlschlagen.
+- **CI-Guards VOR dem Commit lokal ausführen**, nicht erst hoffen, dass CI sie
+  fängt: `flutter analyze`, `check_stream_limits.py`, `check_ui_supabase.py`,
+  `check_design_i18n.py`, `check_migration_timestamps.py` (bei
+  Migrations-Änderungen). Alle grün = guter Indikator, dass der PR durchläuft.
+- **Neue Guards/Konventionen werden immer in genau EINEM eigenen PR ausgeliefert**,
+  getrennt von Feature-/Fix-PRs — leichter zu reviewen, leichter zu revertieren.
+
 ## Pflege
 
 Der Selbstheilungs-Agent ergänzt hier eine knappe Zeile, wenn er einen NEUEN,
 wiederkehrenden Fehlertyp behebt — so wird diese Liste mit der Zeit klüger.
+Ebenso: findet der Agent bei einer Aufgabe ein PATTERN, das sich klar bewährt
+hat (und wiederverwendbar ist), ergänzt er es knapp unter „Bewährte Patterns".

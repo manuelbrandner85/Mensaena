@@ -104,8 +104,30 @@ jobs:
         if: env.SKIP_SCAN != '1'
         run: npm install -g @anthropic-ai/claude-code
 
+      # Modul-Liste AUTOMATISCH aus lib/screens/dashboard/* ableiten, statt
+      # hartcodiert im Prompt. Neue Module (neuer Ordner) tauchen automatisch
+      # in der Health-Matrix auf — kein Workflow-Edit mehr nötig, wenn ein
+      # Godmode-Auftrag ein neues Modul anlegt. `admin`/`module`/`create`/
+      # `invite` sind keine fachlichen Module (Infrastruktur/Shell) → raus.
+      - name: Modul-Liste ableiten
+        if: env.SKIP_SCAN != '1'
+        run: |
+          EXCLUDE="admin module create invite"
+          MODULES=$(find flutter_app/lib/screens/dashboard -maxdepth 1 -mindepth 1 -type d -printf '%f\n' \
+            | sort \
+            | while read -r m; do
+                skip=0
+                for e in $EXCLUDE; do [ "$m" = "$e" ] && skip=1; done
+                [ "$skip" = "0" ] && echo "$m"
+              done \
+            | paste -sd ',' -)
+          echo "Erkannte Module: $MODULES"
+          echo "MODULE_LIST=$MODULES" >> "$GITHUB_ENV"
+
       - name: Analyse-Prompt schreiben
         if: env.SKIP_SCAN != '1'
+        env:
+          MODULE_LIST: ${{ env.MODULE_LIST }}
         run: |
           {
             echo "Du bist der Mensaena-Qualitäts-Analyst. Analysiere die GESAMTE"
@@ -143,9 +165,10 @@ jobs:
             echo "- test-coverage: wichtige Repositories/Services/Logik OHNE Tests."
             echo "- rls-security:  Zugriffe ohne passende RLS, fremde Nutzerdaten"
             echo "  erreichbar, fehlende Eingabevalidierung."
-            echo "Verteile die Vorschläge über ALLE Module (Marktplatz, Events,"
-            echo "Skills, Krise, Gruppen, Chat, Profil, Karte, Nachbarschaft …) —"
-            echo "konzentriere dich nicht nur auf ein Modul."
+            echo "Verteile die Vorschläge über ALLE Module — konzentriere dich"
+            echo "nicht nur auf eines. Die AKTUELLE Modul-Liste (automatisch aus"
+            echo "lib/screens/dashboard/* abgeleitet, immer aktuell):"
+            echo "$MODULE_LIST"
             echo ""
             echo "WICHTIG — schlage AUSDRÜCKLICH auch NEUERUNGEN vor (komplett"
             echo "neue Features/Module/Ideen, die die App besser machen), nicht"
@@ -194,9 +217,8 @@ jobs:
             echo "sind besonders wertvoll — bewerte ehrlich, nicht alles auf 5."
             echo ""
             echo "MODUL-HEALTH-MATRIX: Gib im selben JSON zusätzlich ein Feld"
-            echo '"modules" aus — eine Bewertung JEDES größeren App-Moduls'
-            echo "(z. B. marketplace, events, skills, crisis, groups, chat,"
-            echo "profile, map, neighborhood, dashboard). Bewerte ehrlich 0-100:"
+            echo '"modules" aus — eine Bewertung JEDES Moduls aus der Liste oben'
+            echo "($MODULE_LIST). Bewerte ehrlich 0-100:"
             echo '{ "modules": [ {'
             echo '  "module": "kurzer-schlüssel (z. B. marketplace)",'
             echo '  "label": "Lesbarer Name (z. B. Marktplatz)",'

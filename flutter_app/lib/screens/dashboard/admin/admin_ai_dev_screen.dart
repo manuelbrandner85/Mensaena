@@ -7024,7 +7024,7 @@ class _PromptEditResult {
   final bool awaitReview;
   final bool planMode;
   final bool wantScreens;
-  final String model; // 'fast' | 'standard' | 'thorough'
+  final String model; // 'standard' (Sonnet 5) | 'thorough' (Opus 4.8)
   final String? epicId; // optionale Roadmap-Zuordnung
 }
 
@@ -7057,7 +7057,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
   bool _awaitReview = false;
   bool _planMode = false;
   bool _wantScreens = false;
-  String _model = 'standard'; // fast | standard | thorough
+  String _model = 'standard'; // standard (Sonnet 5) | thorough (Opus 4.8)
   String? _epicId;
 
   @override
@@ -7190,7 +7190,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
               Wrap(
                 spacing: 6,
                 children: [
-                  for (final m in const ['fast', 'standard', 'thorough'])
+                  for (final m in const ['standard', 'thorough'])
                     ChoiceChip(
                       label: Text('adminDev.model.$m'.tr(),
                           style: AppTypography.label(size: 10)),

@@ -1512,7 +1512,6 @@
     "duplicateProceed": "Trotzdem umsetzen",
     "model": {
       "label": "Modell",
-      "fast": "Schnell",
       "standard": "Standard",
       "thorough": "Gründlich"
     },

@@ -720,13 +720,14 @@ Antworte AUSSCHLIESSLICH als JSON: {"steps":["Schritt 1","Schritt 2", ...]}`
     : []
   // Modellwahl pro Task: UI sendet eine Stufe, hier auf konkrete Modell-ID
   // gemappt (insuliert die App vor ID-Aenderungen). Leer = Action-Default.
+  // Godmode arbeitet BEWUSST nur mit zwei Modellen (kein Haiku mehr) —
+  // Sonnet 5 für Standard-Aufträge, Opus 4.8 für gründliche/komplexe.
   const MODEL_MAP: Record<string, string> = {
-    fast: 'claude-haiku-4-5-20251001',
-    standard: 'claude-sonnet-4-6',
+    standard: 'claude-sonnet-5',
     thorough: 'claude-opus-4-8',
   }
-  // Standard ist IMMER Opus 4.8 (beste Qualität). Nur wenn der Admin bewusst
-  // eine andere Stufe wählt, wird Haiku/Sonnet genutzt.
+  // Standard ist IMMER Opus 4.8 (beste Qualität), solange der Admin nicht
+  // bewusst 'standard' (Sonnet 5) wählt.
   const model = MODEL_MAP[String(body?.model ?? '')] ?? 'claude-opus-4-8'
   // Optionale Epic-Zuordnung (Roadmap). Leer = nicht zugeordnet.
   const epicId = body?.epic_id ? String(body.epic_id) : null

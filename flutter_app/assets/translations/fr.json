@@ -1513,7 +1513,6 @@
     "duplicateProceed": "Lancer quand même",
     "model": {
       "label": "Modèle",
-      "fast": "Rapide",
       "standard": "Standard",
       "thorough": "Approfondi"
     },
