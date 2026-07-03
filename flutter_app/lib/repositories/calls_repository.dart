@@ -23,7 +23,7 @@ class CallsRepository {
               '*, caller:caller_id(id, display_name, avatar_url), callee:callee_id(id, display_name, avatar_url)')
           .or('caller_id.eq.$uid,callee_id.eq.$uid')
           .eq('is_cancelled', false)
-          .gte('scheduled_at', DateTime.now().toIso8601String())
+          .gte('scheduled_at', DateTime.now().toUtc().toIso8601String())
           .order('scheduled_at', ascending: true)
           .limit(50);
       return (rows as List).whereType<Map<String, dynamic>>().toList();
