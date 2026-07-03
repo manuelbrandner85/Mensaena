@@ -16,7 +16,7 @@ class ScheduledStreamsRepository {
           .from('scheduled_streams')
           .select()
           .eq('is_cancelled', false)
-          .gte('scheduled_at', DateTime.now().toIso8601String())
+          .gte('scheduled_at', DateTime.now().toUtc().toIso8601String())
           .order('scheduled_at', ascending: true)
           .limit(100);
       return (rows as List).whereType<Map<String, dynamic>>().toList();

@@ -75,7 +75,7 @@ class DailyChallengesRepository {
     final uid = SupabaseService.currentUser?.id;
     if (uid == null) return const [];
     try {
-      final today = DateTime.now();
+      final today = DateTime.now().toUtc();
       final dateStr =
           '${today.year}-${today.month.toString().padLeft(2, '0')}-${today.day.toString().padLeft(2, '0')}';
       var rows = await sb
