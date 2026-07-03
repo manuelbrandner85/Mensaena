@@ -43,7 +43,7 @@ class CallsRepository {
       await sb.from('scheduled_calls').insert({
         'caller_id': uid,
         'callee_id': calleeId,
-        'scheduled_at': scheduledAt.toIso8601String(),
+        'scheduled_at': scheduledAt.toUtc().toIso8601String(),
         'call_type': callType,
       });
       return true;
