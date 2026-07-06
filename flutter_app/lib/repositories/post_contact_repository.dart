@@ -15,6 +15,9 @@ class PostContactRepository {
 
   // ── Preferences ────────────────────────────────────────────────────
 
+  /// Direkt-Select der eigenen Prefs (Owner-Edit-Formular). RLS beschränkt den
+  /// Direkt-Zugriff auf den Owner — Fremde bekommen hier bewusst `null`, ihre
+  /// sichtbaren Metadaten liefert [getContactMeta].
   Future<PostContactPreference?> getPreferencesForPost(String postId) async {
     try {
       final row = await sb
@@ -26,6 +29,25 @@ class PostContactRepository {
       return PostContactPreference.fromJson(row);
     } catch (e) {
       debugPrint('[PostContact] getPreferencesForPost failed: $e');
+      return null;
+    }
+  }
+
+  /// Nicht-sensible Kontakt-Metadaten (allow_*-Flags, Verfügbarkeit, Notizen)
+  /// für jeden angemeldeten Nutzer — via SECURITY-DEFINER-RPC, damit die
+  /// Kontakt-CTA gerendert werden kann OHNE Telefon/E-Mail/WhatsApp
+  /// preiszugeben (diese liefert ausschließlich [getRevealedContactInfo]).
+  Future<PostContactPreference?> getContactMeta(String postId) async {
+    try {
+      final res = await sb.rpc<dynamic>('get_post_contact_meta',
+          params: {'p_post_id': postId});
+      if (res is List && res.isNotEmpty && res.first is Map) {
+        return PostContactPreference.fromJson(
+            Map<String, dynamic>.from(res.first as Map));
+      }
+      return null;
+    } catch (e) {
+      debugPrint('[PostContact] getContactMeta failed: $e');
       return null;
     }
   }
@@ -213,18 +235,28 @@ class PostContactRepository {
     }
   }
 
-  /// R7 Datenschutz: gibt PostContactPreference nur zurueck wenn:
-  ///   a) der aktuelle User Owner ist (sieht eigene Daten), ODER
-  ///   b) der aktuelle User eine status='accepted' Anfrage hat.
-  /// Sonst null.
+  /// R7 Datenschutz: liefert die sensiblen Kontaktfelder (Telefon, E-Mail,
+  /// WhatsApp, …) nur zurück, wenn der aktuelle User Owner ist ODER eine
+  /// status='accepted'-Anfrage hat.
+  ///
+  /// Die Prüfung läuft serverseitig in der SECURITY-DEFINER-RPC
+  /// `get_revealed_contact_info` (Migration 20260706120000) — nicht mehr im
+  /// Client. So kann niemand die Freigabe-Logik umgehen und die Klartext-
+  /// Kontaktdaten per Direkt-Select abgreifen. Gibt `null` zurück, wenn keine
+  /// Freigabe besteht (RPC liefert dann keine Zeile).
   Future<PostContactPreference?> getRevealedContactInfo(String postId) async {
-    final pref = await getPreferencesForPost(postId);
-    if (pref == null) return null;
-    final uid = SupabaseService.currentUser?.id;
-    if (uid == null) return null;
-    if (pref.userId == uid) return pref; // eigene Daten
-    final my = await getMyRequestForPost(postId);
-    if (my == null || !my.isAccepted) return null;
-    return pref;
+    if (SupabaseService.currentUser?.id == null) return null;
+    try {
+      final res = await sb.rpc<dynamic>('get_revealed_contact_info',
+          params: {'p_post_id': postId});
+      if (res is List && res.isNotEmpty && res.first is Map) {
+        return PostContactPreference.fromJson(
+            Map<String, dynamic>.from(res.first as Map));
+      }
+      return null;
+    } catch (e) {
+      debugPrint('[PostContact] getRevealedContactInfo failed: $e');
+      return null;
+    }
   }
 }
