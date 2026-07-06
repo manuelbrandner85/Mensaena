@@ -13,6 +13,7 @@
 library;
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -29,6 +30,7 @@ import '../../../repositories/notifications_repository.dart';
 import '../../../repositories/posts_repository.dart';
 import '../../../repositories/profiles_repository.dart';
 import '../../../services/permissions_gate.dart';
+import '../../../services/supabase_service.dart';
 import '../../../widgets/dashboard/activity_feed_widget.dart';
 import '../../../widgets/dashboard/alerts_badge_widget.dart';
 import '../../../widgets/dashboard/dashboard_section.dart';
@@ -92,6 +94,7 @@ import '../../../widgets/dashboard/widget_grid_settings.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/post_card.dart';
 
 class DashboardHomeScreen extends ConsumerStatefulWidget {
@@ -190,30 +193,44 @@ class _DashboardHomeScreenState
   }
 
   Future<_DashboardData> _loadAll() async {
-    // Profil zuerst — wir brauchen lat/lng + radius_km fuer den Nearby-Call.
-    // Ohne Koordinaten fiel getNearby() blind auf _latestActive(limit:10)
-    // zurueck — geografisches Ranking war ausgeschaltet.
-    final profile = await ProfilesRepository.getMine();
-    final lat = profile?.latitude ?? profile?.homeLat;
-    final lng = profile?.longitude ?? profile?.homeLng;
-    final radiusKm = profile?.radiusKm ?? 25;
-    final results = await Future.wait<dynamic>([
-      Future<Profile?>.value(profile),
-      NotificationsRepository.unreadCount(),
-      InteractionsRepository.activeCount(),
-      PostsRepository.getNearby(
-        lat: lat,
-        lng: lng,
-        radiusKm: radiusKm,
-        limit: 15,
-      ),
-    ]);
-    return _DashboardData(
-      profile: results[0] as Profile?,
-      unreadCount: results[1] as int,
-      activeInteractions: results[2] as int,
-      posts: results[3] as List<Post>,
-    );
+    // Komplett gekapselt: ein Netzausfall/Backend-Fehler beim ersten Laden
+    // darf keinen ungefangenen Future-Fehler (Red-Screen) erzeugen. Wir
+    // loggen im Debug-Build und reichen den Fehler kontrolliert an den
+    // FutureBuilder durch (→ freundlicher Offline-/Retry-Zustand).
+    try {
+      // Profil zuerst — wir brauchen lat/lng + radius_km fuer den Nearby-Call.
+      // Ohne Koordinaten fiel getNearby() blind auf _latestActive(limit:10)
+      // zurueck — geografisches Ranking war ausgeschaltet.
+      final profile = await ProfilesRepository.getMine();
+      final lat = profile?.latitude ?? profile?.homeLat;
+      final lng = profile?.longitude ?? profile?.homeLng;
+      final radiusKm = profile?.radiusKm ?? 25;
+      final results = await Future.wait<dynamic>([
+        Future<Profile?>.value(profile),
+        NotificationsRepository.unreadCount(),
+        InteractionsRepository.activeCount(),
+        PostsRepository.getNearby(
+          lat: lat,
+          lng: lng,
+          radiusKm: radiusKm,
+          limit: 15,
+        ),
+      ]);
+      return _DashboardData(
+        profile: results[0] as Profile?,
+        unreadCount: results[1] as int,
+        activeInteractions: results[2] as int,
+        posts: results[3] as List<Post>,
+      );
+    } catch (error, stack) {
+      if (kDebugMode) {
+        debugPrint('[dashboard] Laden fehlgeschlagen: $error\n$stack');
+      }
+      // Weiterreichen an den FutureBuilder (snap.hasError). Dort wird via
+      // isTransientAuthNetworkError zwischen Offline und echtem Fehler
+      // unterschieden.
+      rethrow;
+    }
   }
 
   Future<void> _refresh() async {
@@ -272,6 +289,31 @@ class _DashboardHomeScreenState
             final data = snap.data;
             if (loading && data == null) {
               return const ListSkeleton(count: 5);
+            }
+            // Fehler beim Erst-Laden (kein Cache vorhanden): freundlicher
+            // Offline-/Retry-Zustand statt Red-Screen oder leerer Fläche.
+            // Scrollbar gehalten, damit Pull-to-Refresh weiter funktioniert.
+            if (snap.hasError && data == null) {
+              final offline = isTransientAuthNetworkError(snap.error!);
+              return ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 16, vertical: 64),
+                children: [
+                  ErrorStateWidget(
+                    icon: offline
+                        ? LucideIcons.wifiOff
+                        : LucideIcons.alertTriangle,
+                    subtitle: offline
+                        ? 'errors.network'.tr()
+                        : 'errors.generic'.tr(),
+                    onRetry: () {
+                      ref.invalidate(dashboardWidgetConfigProvider);
+                      setState(() => _data = _loadAll());
+                    },
+                  ),
+                ],
+              );
             }
             final isEditMode = ref.watch(isDashboardEditModeProvider);
             return PopScope(
