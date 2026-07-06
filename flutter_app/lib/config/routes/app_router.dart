@@ -833,12 +833,17 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/dashboard/community-calendar',
         pageBuilder: (_, state) {
-          final lat = double.tryParse(state.uri.queryParameters['lat'] ?? '') ?? 48.1351;
-          final lng = double.tryParse(state.uri.queryParameters['lng'] ?? '') ?? 11.5820;
+          // Standort primär aus expliziten Query-Parametern, sonst aus dem
+          // vorhandenen Profil-Provider (wie mini_map_widget/nearby_neighbors);
+          // München dient dort erst als allerletzter Fallback.
+          final lat = double.tryParse(state.uri.queryParameters['lat'] ?? '');
+          final lng = double.tryParse(state.uri.queryParameters['lng'] ?? '');
           final radius = double.tryParse(state.uri.queryParameters['radius'] ?? '') ?? 10.0;
           return mensaenaTransition<void>(
             key: state.pageKey,
-            child: CommunityCalendarScreen(lat: lat, lng: lng, radiusKm: radius),
+            child: (lat != null && lng != null)
+                ? CommunityCalendarScreen(lat: lat, lng: lng, radiusKm: radius)
+                : CommunityCalendarLocationGate(radiusKm: radius),
           );
         },
       ),
