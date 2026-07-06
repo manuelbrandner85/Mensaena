@@ -3338,6 +3338,8 @@
     "schedule_title_field": "Titel",
     "schedule_description": "Beschreibung (optional)",
     "schedule_button": "Stream planen",
+    "schedule_created": "Stream wurde geplant.",
+    "schedule_failed": "Stream konnte nicht geplant werden.",
     "no_scheduled": "Keine geplanten Streams.",
     "pick_time": "Datum & Uhrzeit wählen",
     "reminder_on": "Erinnern",

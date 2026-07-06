@@ -3339,6 +3339,8 @@
     "schedule_title_field": "Título",
     "schedule_description": "Descripción (opcional)",
     "schedule_button": "Programar transmisión",
+    "schedule_created": "Transmisión programada.",
+    "schedule_failed": "No se pudo programar la transmisión.",
     "no_scheduled": "Sin transmisiones programadas.",
     "pick_time": "Elige fecha y hora",
     "reminder_on": "Recordarme",

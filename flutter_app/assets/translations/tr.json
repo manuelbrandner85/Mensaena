@@ -3338,6 +3338,8 @@
     "schedule_title_field": "Başlık",
     "schedule_description": "Açıklama (isteğe bağlı)",
     "schedule_button": "Yayını planla",
+    "schedule_created": "Yayın planlandı.",
+    "schedule_failed": "Yayın planlanamadı.",
     "no_scheduled": "Planlanan yayın yok.",
     "pick_time": "Tarih ve saat seç",
     "reminder_on": "Hatırlat",
