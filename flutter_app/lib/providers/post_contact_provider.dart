@@ -12,10 +12,13 @@ final postContactRepositoryProvider = Provider<PostContactRepository>((ref) {
   return const PostContactRepository();
 });
 
+// Nicht-sensible Kontakt-Metadaten (allow_*-Flags, Verfügbarkeit) für die
+// CTA-Darstellung. Sensible Felder (Telefon/E-Mail/WhatsApp) NICHT enthalten —
+// die liefert ausschließlich [revealedContactInfoProvider].
 final postContactPreferenceProvider =
     FutureProvider.family.autoDispose<PostContactPreference?, String>(
         (ref, postId) async {
-  return ref.read(postContactRepositoryProvider).getPreferencesForPost(postId);
+  return ref.read(postContactRepositoryProvider).getContactMeta(postId);
 });
 
 final myIncomingContactRequestsProvider =
