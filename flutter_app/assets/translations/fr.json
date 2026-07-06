@@ -3339,6 +3339,8 @@
     "schedule_title_field": "Titre",
     "schedule_description": "Description (facultative)",
     "schedule_button": "Programmer le live",
+    "schedule_created": "Live programmé.",
+    "schedule_failed": "Impossible de programmer le live.",
     "no_scheduled": "Aucun live programmé.",
     "pick_time": "Choisir date et heure",
     "reminder_on": "Me rappeler",

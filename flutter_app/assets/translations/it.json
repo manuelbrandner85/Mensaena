@@ -3339,6 +3339,8 @@
     "schedule_title_field": "Titolo",
     "schedule_description": "Descrizione (facoltativa)",
     "schedule_button": "Programma diretta",
+    "schedule_created": "Diretta programmata.",
+    "schedule_failed": "Impossibile programmare la diretta.",
     "no_scheduled": "Nessuna diretta programmata.",
     "pick_time": "Scegli data e ora",
     "reminder_on": "Promemoria",

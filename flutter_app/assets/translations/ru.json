@@ -3338,6 +3338,8 @@
     "schedule_title_field": "Заголовок",
     "schedule_description": "Описание (необязательно)",
     "schedule_button": "Запланировать стрим",
+    "schedule_created": "Стрим запланирован.",
+    "schedule_failed": "Не удалось запланировать стрим.",
     "no_scheduled": "Нет запланированных стримов.",
     "pick_time": "Выбери дату и время",
     "reminder_on": "Напомнить",

@@ -150,7 +150,20 @@ class ScheduledStreamsScreen extends ConsumerWidget {
         scheduledAt: when!,
       );
       ref.invalidate(scheduledStreamsProvider);
-    } catch (_) {}
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.leben,
+          content: Text('live.schedule_created'.tr()),
+        ));
+      }
+    } catch (_) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          backgroundColor: AppColors.herzrot,
+          content: Text('live.schedule_failed'.tr()),
+        ));
+      }
+    }
   }
 
   @override
