@@ -10,11 +10,76 @@ import '../../config/theme/app_colors.dart';
 import '../../config/theme/app_typography.dart';
 import '../../models/community_calendar_entry.dart';
 import '../../providers/community_calendar_provider.dart';
+import '../../repositories/profiles_repository.dart';
 import '../../services/haptics.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/empty_state_widget.dart';
 import '../../widgets/shared/error_state_widget.dart';
 import '../../widgets/effects/shimmer_skeleton.dart';
+
+/// München als allerletzter Fallback, falls der Nutzer keinerlei
+/// Standort-Koordinaten hinterlegt hat.
+const double _fallbackLat = 48.1351;
+const double _fallbackLng = 11.5820;
+
+/// Löst den Standort für den Community-Kalender aus dem vorhandenen
+/// Profil-Provider auf (dieselbe Quelle, die mini_map_widget /
+/// nearby_neighbors nutzen) und rendert dann [CommunityCalendarScreen].
+/// Wird von der Route genutzt, wenn keine expliziten lat/lng-Query-Parameter
+/// übergeben werden. München greift nur, wenn gar keine Koordinaten
+/// vorliegen.
+class CommunityCalendarLocationGate extends ConsumerWidget {
+  const CommunityCalendarLocationGate({super.key, this.radiusKm = 10});
+
+  final double radiusKm;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(myProfileProvider);
+    return profileAsync.when(
+      loading: () => _LocationLoadingScaffold(),
+      // Profil nicht ladbar → München als letzter Fallback.
+      error: (_, __) => CommunityCalendarScreen(
+        lat: _fallbackLat,
+        lng: _fallbackLng,
+        radiusKm: radiusKm,
+      ),
+      data: (profile) {
+        final lat = profile?.latitude ?? profile?.homeLat ?? _fallbackLat;
+        final lng = profile?.longitude ?? profile?.homeLng ?? _fallbackLng;
+        return CommunityCalendarScreen(
+          lat: lat,
+          lng: lng,
+          radiusKm: radiusKm,
+        );
+      },
+    );
+  }
+}
+
+/// Ladezustand während der Standort aus dem Profil aufgelöst wird —
+/// visuell konsistent mit dem Lade-Skeleton des Kalenders.
+class _LocationLoadingScaffold extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return DashboardScaffold(
+      title: 'communityCalendar.screenTitle'.tr(),
+      currentRoute: '/dashboard/community-calendar',
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: const [
+          ShimmerBox(height: 320, borderRadius: 16),
+          SizedBox(height: 16),
+          ShimmerBox(height: 80),
+          SizedBox(height: 8),
+          ShimmerBox(height: 80),
+          SizedBox(height: 8),
+          ShimmerBox(height: 80),
+        ],
+      ),
+    );
+  }
+}
 
 /// Community-Kalender: aggregierte Ansicht aller Events, Zeitbank-Slots,
 /// Gruppen-Treffen und Skill-Zeitfenster im Radius um den Nutzer.
