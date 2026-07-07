@@ -26,9 +26,11 @@ class AccountDeletionRepository {
       'user_id': uid,
       'reason': reason,
       'cancelled': false,
-      'requested_at': DateTime.now().toIso8601String(),
-      'scheduled_for':
-          DateTime.now().add(const Duration(days: 14)).toIso8601String(),
+      'requested_at': DateTime.now().toUtc().toIso8601String(),
+      'scheduled_for': DateTime.now()
+          .toUtc()
+          .add(const Duration(days: 14))
+          .toIso8601String(),
     }, onConflict: 'user_id');
   }
 
@@ -90,7 +92,7 @@ class UserStreaksRepository {
         'current_streak': newCur,
         'longest_streak': newCur > longest ? newCur : longest,
         'last_active_date': todayDate,
-        'updated_at': DateTime.now().toIso8601String(),
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
       }).eq('user_id', uid);
     } catch (_) {}
   }

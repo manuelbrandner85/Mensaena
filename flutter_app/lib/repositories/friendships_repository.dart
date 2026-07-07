@@ -99,7 +99,7 @@ class FriendshipsRepository {
             .from('friendships')
             .update({
               'status': 'accepted',
-              'responded_at': DateTime.now().toIso8601String(),
+              'responded_at': DateTime.now().toUtc().toIso8601String(),
             })
             .eq('requester_id', requesterId)
             .eq('addressee_id', me);
@@ -119,7 +119,7 @@ class FriendshipsRepository {
           .from('friendships')
           .update({
             'status': 'declined',
-            'responded_at': DateTime.now().toIso8601String(),
+            'responded_at': DateTime.now().toUtc().toIso8601String(),
           })
           .eq('requester_id', requesterId)
           .eq('addressee_id', me);
