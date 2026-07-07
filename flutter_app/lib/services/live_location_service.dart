@@ -38,7 +38,8 @@ class LiveLocationService {
       return false;
     }
     _conversationId = conversationId;
-    final expiresAt = DateTime.now().add(duration);
+    final now = DateTime.now().toUtc();
+    final expiresAt = now.add(duration);
 
     Future<void> publish(Position pos) async {
       try {
@@ -47,7 +48,7 @@ class LiveLocationService {
           'conversation_id': conversationId,
           'latitude': pos.latitude,
           'longitude': pos.longitude,
-          'updated_at': DateTime.now().toIso8601String(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
           'expires_at': expiresAt.toIso8601String(),
         }, onConflict: 'user_id,conversation_id');
       } catch (_) {}
