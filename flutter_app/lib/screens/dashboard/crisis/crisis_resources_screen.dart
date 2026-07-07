@@ -12,6 +12,12 @@ import '../../../services/locale_country_service.dart';
 import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 
+/// Bereinigt eine Telefonnummer für den `tel:`-Aufruf: entfernt Leerzeichen,
+/// Bindestriche und Klammern, damit der Dialer eine gültige Nummer erhält.
+/// Genutzt von [_Tile] und [_FallbackTile], damit beide identisch bereinigen.
+String _sanitizePhoneNumber(String number) =>
+    number.replaceAll(RegExp(r'[\s\-()]'), '');
+
 /// SKILL: mensaena-features
 /// Notruf-Nummern + Resourcen-Page (emergency_numbers tabelle).
 ///
@@ -415,7 +421,7 @@ class _Tile extends StatelessWidget {
   final EmergencyNumber n;
 
   Future<void> _call() async {
-    await safeLaunch('tel:${n.number}');
+    await safeLaunch('tel:${_sanitizePhoneNumber(n.number)}');
   }
 
   @override
@@ -528,8 +534,7 @@ class _FallbackTile extends StatelessWidget {
   final _FallbackNumber n;
 
   Future<void> _call() async {
-    final sanitized = n.number.replaceAll(RegExp(r'[\s\-()]'), '');
-    await safeLaunch('tel:$sanitized');
+    await safeLaunch('tel:${_sanitizePhoneNumber(n.number)}');
   }
 
   @override
