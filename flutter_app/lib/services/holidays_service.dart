@@ -4,6 +4,7 @@
 library;
 
 import 'dart:convert';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 import 'package:http/http.dart' as http;
 
 class Holiday {
@@ -39,6 +40,19 @@ class Holiday {
 class HolidaysService {
   const HolidaysService._();
 
+  /// Parst ein API-Datum ('2026-07-06') als *floating date*: nur Jahr/Monat/Tag,
+  /// als lokales `DateTime(y, m, d)` (Mitternacht). So bleibt der Feiertag
+  /// unabhängig von der Zeitzone auf dem korrekten Kalendertag — `.toUtc()`
+  /// hätte ihn je nach Offset auf den Vor-/Folgetag verschoben.
+  @visibleForTesting
+  static DateTime parseFloatingDate(String raw) {
+    final parts = raw.split('T').first.split('-');
+    final y = int.parse(parts[0]);
+    final m = int.parse(parts[1]);
+    final d = int.parse(parts[2]);
+    return DateTime(y, m, d);
+  }
+
   /// Holt Feiertage eines Jahres für einen Country-Code (z. B. 'DE', 'AT').
   static Future<List<Holiday>> forCountry(String countryCode,
       {int? year}) async {
@@ -52,7 +66,7 @@ class HolidaysService {
       return list
           .whereType<Map<String, dynamic>>()
           .map((m) => Holiday(
-                date: DateTime.parse(m['date'] as String).toUtc(),
+                date: parseFloatingDate(m['date'] as String),
                 localName: m['localName'] as String? ?? '',
                 name: m['name'] as String? ?? '',
                 countryCode: m['countryCode'] as String?,
