@@ -158,6 +158,18 @@ jobs:
                setze sie um und benenne die Alternative kurz im PR-Text.
                NIEMALS wegen Unklarheit einfach nichts tun.
 
+            FUNDORT (Pflicht-Zeile, exaktes Format): Schreibe in JEDE
+            PR-Beschreibung eine eigene Zeile, die mit "📍 Zu finden:" beginnt
+            — sie sagt dem Admin, WO in der App die Änderung sichtbar ist.
+            Format = Navigationspfad mit "→", so wie ein Nutzer klickt:
+              📍 Zu finden: Dashboard → Teilen → Zeitbank
+              📍 Zu finden: Einstellungen → Atmosphäre → Live-Wetter
+              📍 Zu finden: Profil → Bearbeiten (neuer Schalter unten)
+            Bei NICHT sichtbaren Änderungen (CI, Datenbank, Refactoring ohne
+            UI) exakt: "📍 Zu finden: Nicht sichtbar (interne Änderung)".
+            Die Zeile wird maschinell extrahiert und im Dashboard an der
+            Auftragskarte + im Changelog angezeigt — Format nie variieren.
+
             WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
             liegen, sieh sie dir ZUERST mit dem Read-Tool an. Diese Bilder
             NIEMALS committen.

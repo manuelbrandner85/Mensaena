@@ -3478,6 +3478,10 @@ class _TaskCard extends StatelessWidget {
     final ciRunUrl = task['ci_run_url'] as String?;
     final summary = task['summary'] as String?;
     final error = task['error'] as String?;
+    final location = (task['location'] as String?)?.trim();
+    final showLocation = location != null &&
+        location.isNotEmpty &&
+        !location.toLowerCase().startsWith('nicht sichtbar');
     final imageCount = (task['image_urls'] as List?)?.length ?? 0;
     final meta = _statusMeta(status);
 
@@ -3703,6 +3707,28 @@ class _TaskCard extends StatelessWidget {
               return const SizedBox.shrink();
             }),
           ],
+          // Fundort: WO in der App die Änderung sichtbar ist (aus dem
+          // "📍 Zu finden:"-Pflichtblock des Agent-PRs extrahiert).
+          if (showLocation) ...[
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Icon(LucideIcons.mapPin,
+                    size: 12, color: AppColors.teal),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    '${'adminDev.location'.tr()}: $location',
+                    style: AppTypography.body(
+                        size: 11,
+                        color: AppColors.teal,
+                        weight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ],
           if (summary != null && summary.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(summary,
@@ -3897,6 +3923,7 @@ class _TaskDetailSheet extends StatelessWidget {
     final ciStatus = task['ci_status'] as String?;
     final instruction = task['instruction'] as String? ?? '';
     final summary = task['summary'] as String?;
+    final location = (task['location'] as String?)?.trim();
     final error = task['error'] as String?;
     final prUrl = task['pr_url'] as String?;
     final runUrl = task['run_url'] as String?;
@@ -3965,6 +3992,28 @@ class _TaskDetailSheet extends StatelessWidget {
               instruction,
               style: AppTypography.body(size: 13, color: AppColors.lightInk),
             ),
+            if (location != null &&
+                location.isNotEmpty &&
+                !location.toLowerCase().startsWith('nicht sichtbar')) ...[
+              const SizedBox(height: 14),
+              _detailLabel('adminDev.location'.tr()),
+              const SizedBox(height: 4),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Icon(LucideIcons.mapPin,
+                      size: 13, color: AppColors.teal),
+                  const SizedBox(width: 5),
+                  Expanded(
+                    child: SelectableText(location,
+                        style: AppTypography.body(
+                            size: 12,
+                            color: AppColors.teal,
+                            weight: FontWeight.w600)),
+                  ),
+                ],
+              ),
+            ],
             if (summary != null && summary.isNotEmpty) ...[
               const SizedBox(height: 14),
               _detailLabel('adminDev.detail.summary'.tr()),
@@ -5351,6 +5400,9 @@ class _ChangelogCard extends StatelessWidget {
                 final title = e['title'] as String? ?? '';
                 final pr = e['pr_number'];
                 final summary = (e['summary'] as String?)?.trim() ?? '';
+                final loc = (e['location'] as String?)?.trim() ?? '';
+                final showLoc = loc.isNotEmpty &&
+                    !loc.toLowerCase().startsWith('nicht sichtbar');
                 final files = (e['files'] as List?)
                         ?.map((f) => f.toString())
                         .toList() ??
@@ -5398,6 +5450,29 @@ class _ChangelogCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                             style: AppTypography.caption(
                                 color: AppColors.lightMute),
+                          ),
+                        ),
+                      ],
+                      if (showLoc) ...[
+                        const SizedBox(height: 3),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 21),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(LucideIcons.mapPin,
+                                  size: 11, color: AppColors.teal),
+                              const SizedBox(width: 4),
+                              Expanded(
+                                child: Text(
+                                  loc,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTypography.caption(
+                                      color: AppColors.teal),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],

@@ -1697,7 +1697,8 @@
       "title": "Modül sağlık matrisi",
       "subscores": "Tamlık {comp} · Kalite {qual} · Test {tests}"
     },
-    "retryBadge": "Deneme {n}/3"
+    "retryBadge": "Deneme {n}/3",
+    "location": "Nerede bulunur"
   },
   "create": {
     "stepOf": "Adım {i}/{n}",

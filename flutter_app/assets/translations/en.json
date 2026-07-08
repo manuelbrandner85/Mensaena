@@ -1698,7 +1698,8 @@
       "title": "Module health matrix",
       "subscores": "Completeness {comp} · Quality {qual} · Tests {tests}"
     },
-    "retryBadge": "Attempt {n}/3"
+    "retryBadge": "Attempt {n}/3",
+    "location": "Where to find it"
   },
   "create": {
     "stepOf": "Step {i}/{n}",
