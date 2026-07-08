@@ -3515,6 +3515,10 @@ class _TaskCard extends StatelessWidget {
     final showLocation = location != null &&
         location.isNotEmpty &&
         !location.toLowerCase().startsWith('nicht sichtbar');
+    // Live-Fortschritt (#4): welche Datei der Agent gerade bearbeitet.
+    final liveFile = (task['current_file'] as String?)?.trim();
+    final liveCount = (task['analyzed_files'] as num?)?.toInt() ?? 0;
+    final showLive = status == 'running' && liveFile != null && liveFile.isNotEmpty;
     final imageCount = (task['image_urls'] as List?)?.length ?? 0;
     final meta = _statusMeta(status);
 
@@ -3757,6 +3761,27 @@ class _TaskCard extends StatelessWidget {
                         size: 11,
                         color: AppColors.teal,
                         weight: FontWeight.w600),
+                  ),
+                ),
+              ],
+            ),
+          ],
+          // Live-Fortschritt (#4): pulsierende Datei-Anzeige während der Agent
+          // arbeitet — der Tailer schreibt current_file/analyzed_files laufend.
+          if (showLive) ...[
+            const SizedBox(height: 6),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const Icon(LucideIcons.fileEdit, size: 12, color: AppColors.amber),
+                const SizedBox(width: 5),
+                Expanded(
+                  child: Text(
+                    liveCount > 0 ? '$liveFile  ·  $liveCount' : '$liveFile',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.body(
+                        size: 11, color: AppColors.amber, weight: FontWeight.w600),
                   ),
                 ),
               ],
