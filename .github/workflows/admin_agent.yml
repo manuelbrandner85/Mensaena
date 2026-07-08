@@ -140,6 +140,24 @@ jobs:
             ${{ inputs.instruction }}
             === ENDE AUFGABE ===
 
+            PROMPT-VERSTÄNDNIS — die Aufgabe kommt vom Admin oft wie eine
+            Chat-Nachricht: umgangssprachlich, knapp, mit Tippfehlern oder
+            Diktier-Fehlern ("eracheunungsbild" = Erscheinungsbild), ohne
+            Dateipfade. Das ist OK und erwartet. Deine Pflicht:
+            1. Interpretiere WOHLWOLLEND und professionell — erschließe die
+               INTENTION (was soll sich für den Nutzer ändern?), nicht den
+               Wortlaut. Korrigiere offensichtliche Vertipper stillschweigend.
+            2. Finde die betroffenen Stellen selbst (Grep/architecture-map),
+               statt Pfade im Auftrag zu erwarten.
+            3. Schreibe an den ANFANG der PR-Beschreibung 1-2 Sätze
+               "**Verstanden als:** …" — deine professionelle Interpretation
+               des Auftrags. So sieht der Admin sofort, ob du ihn richtig
+               verstanden hast.
+            4. Nur wenn der Auftrag WIRKLICH mehrdeutig ist (zwei plausible,
+               gegensätzliche Umsetzungen): wähle die wahrscheinlichere,
+               setze sie um und benenne die Alternative kurz im PR-Text.
+               NIEMALS wegen Unklarheit einfach nichts tun.
+
             WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
             liegen, sieh sie dir ZUERST mit dem Read-Tool an. Diese Bilder
             NIEMALS committen.

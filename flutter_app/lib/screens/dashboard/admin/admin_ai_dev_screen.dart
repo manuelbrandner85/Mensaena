@@ -441,18 +441,18 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.lightSurface,
         title: Row(children: [
           const Icon(LucideIcons.copy, size: 18, color: AppColors.amber),
           const SizedBox(width: 8),
           Expanded(
               child: Text('adminDev.duplicateTitle'.tr(),
-                  style:
-                      AppTypography.display(size: 16, color: AppColors.ink))),
+                  style: AppTypography.display(
+                      size: 16, color: AppColors.lightInk))),
         ]),
         content: Text(
           'adminDev.duplicateWarning'.tr(namedArgs: {'task': sim}),
-          style: AppTypography.body(size: 13, color: AppColors.inkSoft),
+          style: AppTypography.body(size: 13, color: AppColors.lightInkSoft),
         ),
         actions: [
           TextButton(
@@ -921,27 +921,28 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     final go = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: AppColors.lightSurface,
         title: Row(children: [
           const Icon(LucideIcons.messageSquarePlus,
               size: 18, color: AppColors.teal),
           const SizedBox(width: 8),
           Expanded(
               child: Text('adminDev.refine.title'.tr(),
-                  style:
-                      AppTypography.display(size: 16, color: AppColors.ink))),
+                  style: AppTypography.display(
+                      size: 16, color: AppColors.lightInk))),
         ]),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           maxLines: 4,
           minLines: 2,
-          style: AppTypography.body(size: 13, color: AppColors.ink),
+          style: AppTypography.body(size: 13, color: AppColors.lightInk),
           decoration: InputDecoration(
             hintText: 'adminDev.refine.hint'.tr(),
-            hintStyle: AppTypography.body(size: 12, color: AppColors.mute),
+            hintStyle:
+                AppTypography.body(size: 12, color: AppColors.lightMute),
             filled: true,
-            fillColor: AppColors.elevated,
+            fillColor: AppColors.lightElevated,
             border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12)),
           ),
@@ -1281,28 +1282,29 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setLocal) => AlertDialog(
-          backgroundColor: AppColors.surface,
+          backgroundColor: AppColors.lightSurface,
           title: Text('adminDev.apiKeys.editTitle'.tr(),
-              style: AppTypography.display(size: 16, color: AppColors.ink)),
+              style:
+                  AppTypography.display(size: 16, color: AppColors.lightInk)),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
                 controller: serviceCtrl,
                 enabled: existing == null,
-                style: AppTypography.body(size: 13, color: AppColors.ink),
+                style: AppTypography.body(size: 13, color: AppColors.lightInk),
                 decoration: InputDecoration(
                   labelText: 'adminDev.apiKeys.service'.tr(),
                   hintText: 'tankerkoenig, openrouteservice …',
                   hintStyle:
-                      AppTypography.body(size: 11, color: AppColors.mute),
+                      AppTypography.body(size: 11, color: AppColors.lightMute),
                 ),
               ),
               const SizedBox(height: 8),
               TextField(
                 controller: keyCtrl,
                 obscureText: true,
-                style: AppTypography.body(size: 13, color: AppColors.ink),
+                style: AppTypography.body(size: 13, color: AppColors.lightInk),
                 decoration: InputDecoration(
                   labelText: existing == null
                       ? 'adminDev.apiKeys.key'.tr()
@@ -1312,15 +1314,15 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
               const SizedBox(height: 10),
               Row(children: [
                 const Icon(LucideIcons.calendarClock,
-                    size: 14, color: AppColors.mute),
+                    size: 14, color: AppColors.lightMute),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     expiry == null
                         ? 'adminDev.apiKeys.noExpiry'.tr()
                         : '${expiry!.day}.${expiry!.month}.${expiry!.year}',
-                    style:
-                        AppTypography.body(size: 12, color: AppColors.inkSoft),
+                    style: AppTypography.body(
+                        size: 12, color: AppColors.lightInkSoft),
                   ),
                 ),
                 TextButton(
@@ -1340,7 +1342,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
                   IconButton(
                     onPressed: () => setLocal(() => expiry = null),
                     icon: const Icon(LucideIcons.x, size: 14),
-                    color: AppColors.mute,
+                    color: AppColors.lightMute,
                   ),
               ]),
             ],
@@ -2164,11 +2166,11 @@ class _StatusBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(14, 8, 14, 8),
-      decoration: BoxDecoration(
-        color: AppColors.elevated,
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      decoration: const BoxDecoration(
+        color: AppColors.lightElevated,
         border: Border(
-          bottom: BorderSide(color: AppColors.line),
+          bottom: BorderSide(color: AppColors.lightLine),
         ),
       ),
       child: Row(
@@ -2373,14 +2375,14 @@ class _CategoryRow extends StatelessWidget {
         margin: const EdgeInsets.only(right: 6),
         padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 5),
         decoration: BoxDecoration(
-          color: active ? AppColors.teal : Colors.grey.shade50,
+          color: active ? AppColors.teal : AppColors.lightElevated,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: active
                 ? AppColors.teal
                 : (isNew
                     ? AppColors.teal.withValues(alpha: 0.4)
-                    : Colors.grey.shade200),
+                    : AppColors.lightLine),
           ),
         ),
         child: Row(
@@ -2444,10 +2446,10 @@ class _SeverityRow extends StatelessWidget {
               margin: const EdgeInsets.only(right: 6),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: active ? c.withValues(alpha: 0.14) : Colors.grey.shade50,
+                color: active ? c.withValues(alpha: 0.14) : AppColors.lightElevated,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: active ? c : Colors.grey.shade200,
+                  color: active ? c : AppColors.lightLine,
                 ),
               ),
               child: Text(
@@ -2494,7 +2496,7 @@ class _NotesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2521,7 +2523,7 @@ class _NotesCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.lightRaised,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text('${notes.length}',
@@ -2594,9 +2596,9 @@ class _NoteTile extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
       padding: const EdgeInsets.fromLTRB(12, 10, 8, 6),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.lightElevated,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2921,7 +2923,7 @@ class _SuggestionsHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: AppColors.lightRaised,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text('$count',
@@ -2992,7 +2994,7 @@ class _SectionLabel extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
             decoration: BoxDecoration(
-              color: Colors.grey.shade100,
+              color: AppColors.lightRaised,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text('$count',
@@ -3082,20 +3084,13 @@ class _SuggestionCard extends StatelessWidget {
         impact != null && effort != null && impact >= 4 && effort <= 2;
 
     final card = Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(13),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: selected ? AppColors.teal.withValues(alpha: 0.06) : Colors.white,
-        borderRadius: BorderRadius.circular(13),
-        border: Border(
-          left: BorderSide(color: sevColor, width: 3),
-          top: BorderSide(
-              color: selected ? AppColors.teal : Colors.transparent),
-          right: BorderSide(
-              color: selected ? AppColors.teal : Colors.transparent),
-          bottom: BorderSide(
-              color: selected ? AppColors.teal : Colors.transparent),
-        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+            color: selected ? AppColors.teal : AppColors.lightLine),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.04),
@@ -3247,7 +3242,7 @@ class _SuggestionCard extends StatelessWidget {
                   label: Text('adminDev.reject'.tr()),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.lightMute,
-                    side: BorderSide(color: Colors.grey.shade300),
+                    side: BorderSide(color: AppColors.lightLine),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 8),
                     textStyle: const TextStyle(fontSize: 12),
@@ -3402,7 +3397,7 @@ class _BatchBar extends StatelessWidget {
               label: Text('adminDev.reject'.tr()),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.lightMute,
-                side: BorderSide(color: Colors.grey.shade300),
+                side: BorderSide(color: AppColors.lightLine),
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 textStyle: const TextStyle(fontSize: 12),
               ),
@@ -3491,8 +3486,8 @@ class _TaskCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border(left: BorderSide(color: meta.color, width: 3)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.lightLine),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.05),
@@ -3930,7 +3925,7 @@ class _TaskDetailSheet extends StatelessWidget {
                 width: 40,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.lightLine,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -4132,7 +4127,7 @@ class _PipelineStepper extends StatelessWidget {
       case _Stage.error:
         return Colors.red.shade600;
       case _Stage.pending:
-        return Colors.grey.shade300;
+        return AppColors.lightGhost;
     }
   }
 
@@ -4194,7 +4189,7 @@ class _PipelineStepper extends StatelessWidget {
                   height: 1.5,
                   margin: const EdgeInsets.only(bottom: 14, left: 2, right: 2),
                   color: stages[i + 1] == _Stage.pending
-                      ? Colors.grey.shade300
+                      ? AppColors.lightGhost
                       : AppColors.teal.withValues(alpha: 0.5),
                 ),
               ),
@@ -4402,7 +4397,7 @@ class _InputBarState extends State<_InputBar> {
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        border: Border(top: BorderSide(color: AppColors.lightLine)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -4455,21 +4450,22 @@ class _InputBarState extends State<_InputBar> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: Colors.orange.shade50,
+                color: AppColors.amber.withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.orange.shade200),
+                border:
+                    Border.all(color: AppColors.amber.withValues(alpha: 0.35)),
               ),
               child: Row(
                 children: [
-                  Icon(LucideIcons.alertTriangle,
-                      size: 13, color: Colors.orange.shade700),
+                  const Icon(LucideIcons.alertTriangle,
+                      size: 13, color: AppColors.amberDeep),
                   const SizedBox(width: 6),
                   Expanded(
                     child: Text(
                       'adminDev.duplicateWarning'
                           .tr(namedArgs: {'task': dupWarning}),
                       style: AppTypography.body(
-                          size: 10, color: Colors.orange.shade800),
+                          size: 10, color: AppColors.amberDeep),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -4572,16 +4568,16 @@ class _InputBarState extends State<_InputBar> {
                     hintStyle: AppTypography.body(
                         size: 13, color: AppColors.lightMute),
                     filled: true,
-                    fillColor: Colors.grey.shade50,
+                    fillColor: AppColors.lightElevated,
                     contentPadding: const EdgeInsets.symmetric(
                         horizontal: 14, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(22),
-                      borderSide: BorderSide(color: Colors.grey.shade200),
+                      borderSide: BorderSide(color: AppColors.lightLine),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(22),
-                      borderSide: BorderSide(color: Colors.grey.shade200),
+                      borderSide: BorderSide(color: AppColors.lightLine),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(22),
@@ -4729,7 +4725,7 @@ class _DevChatSheetState extends State<_DevChatSheet> {
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: AppColors.lightLine,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -4806,7 +4802,7 @@ class _DevChatSheetState extends State<_DevChatSheet> {
                           : () => setState(() => _ready = false),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: AppColors.lightMute,
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: AppColors.lightLine),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 10),
                       ),
@@ -4819,7 +4815,7 @@ class _DevChatSheetState extends State<_DevChatSheet> {
               padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
               decoration: BoxDecoration(
                 color: Colors.white,
-                border: Border(top: BorderSide(color: Colors.grey.shade200)),
+                border: Border(top: BorderSide(color: AppColors.lightLine)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
@@ -4837,16 +4833,16 @@ class _DevChatSheetState extends State<_DevChatSheet> {
                         hintStyle: AppTypography.body(
                             size: 13, color: AppColors.lightMute),
                         filled: true,
-                        fillColor: Colors.grey.shade50,
+                        fillColor: AppColors.lightElevated,
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 14, vertical: 10),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide(color: Colors.grey.shade200),
+                          borderSide: BorderSide(color: AppColors.lightLine),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
-                          borderSide: BorderSide(color: Colors.grey.shade200),
+                          borderSide: BorderSide(color: AppColors.lightLine),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(22),
@@ -4892,7 +4888,7 @@ class _ChatBubble extends StatelessWidget {
           maxWidth: MediaQuery.of(context).size.width * 0.78,
         ),
         decoration: BoxDecoration(
-          color: isUser ? AppColors.teal : Colors.grey.shade100,
+          color: isUser ? AppColors.teal : AppColors.lightRaised,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(14),
             topRight: const Radius.circular(14),
@@ -4923,7 +4919,7 @@ class _ChatThinking extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: AppColors.lightRaised,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(
@@ -4998,7 +4994,7 @@ class _DiffSheetState extends State<_DiffSheet> {
             width: 40,
             height: 4,
             decoration: BoxDecoration(
-              color: Colors.grey.shade300,
+              color: AppColors.lightLine,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -5059,9 +5055,9 @@ class _DiffFileTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.lightElevated,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
@@ -5168,7 +5164,7 @@ class _ApiKeysCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         children: [
@@ -5304,7 +5300,7 @@ class _ChangelogCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         children: [
@@ -5418,7 +5414,7 @@ class _ChangelogCard extends StatelessWidget {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: AppColors.elevated,
+                                  color: AppColors.lightRaised,
                                   borderRadius: BorderRadius.circular(5),
                                 ),
                                 child: Text(name,
@@ -5517,7 +5513,7 @@ class _HealthAlertsCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey.shade200),
+                border: Border.all(color: AppColors.lightLine),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -5616,11 +5612,11 @@ class _AlertAction extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
-          color: primary ? AppColors.herzrot : Colors.grey.shade100,
+          color: primary ? AppColors.herzrot : AppColors.lightRaised,
           borderRadius: BorderRadius.circular(8),
           border: primary
               ? null
-              : Border.all(color: Colors.grey.shade300),
+              : Border.all(color: AppColors.lightLine),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -5667,7 +5663,7 @@ class _ModuleHealthCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         children: [
@@ -5736,7 +5732,7 @@ class _ModuleHealthCard extends StatelessWidget {
                       child: LinearProgressIndicator(
                         value: score / 100,
                         minHeight: 6,
-                        backgroundColor: Colors.grey.shade200,
+                        backgroundColor: AppColors.lightRaised,
                         valueColor: AlwaysStoppedAnimation(c),
                       ),
                     ),
@@ -5794,7 +5790,7 @@ class _AutopilotCard extends StatelessWidget {
         border: Border.all(
           color: enabled
               ? AppColors.teal.withValues(alpha: 0.4)
-              : Colors.grey.shade200,
+              : AppColors.lightLine,
         ),
       ),
       padding: const EdgeInsets.fromLTRB(13, 10, 8, 10),
@@ -5866,7 +5862,7 @@ class _RoadmapCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(13),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         children: [
@@ -6012,7 +6008,7 @@ class _RoadmapCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 6,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: AppColors.lightRaised,
               valueColor: AlwaysStoppedAnimation(color),
             ),
           ),
@@ -6057,7 +6053,7 @@ class _HealthCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -6144,9 +6140,9 @@ class _HealthCard extends StatelessWidget {
       width: 96,
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.lightElevated,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -6194,7 +6190,7 @@ class _SchedulesCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -6221,7 +6217,7 @@ class _SchedulesCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                     decoration: BoxDecoration(
-                      color: Colors.grey.shade100,
+                      color: AppColors.lightRaised,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text('${schedules.length}',
@@ -6299,9 +6295,9 @@ class _ScheduleTile extends StatelessWidget {
       margin: const EdgeInsets.fromLTRB(12, 8, 12, 0),
       padding: const EdgeInsets.fromLTRB(12, 8, 6, 6),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: AppColors.lightElevated,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: AppColors.lightLine),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -6442,7 +6438,7 @@ class _ScheduleSheetState extends State<_ScheduleSheet> {
                 height: 4,
                 margin: const EdgeInsets.only(bottom: 14),
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
+                  color: AppColors.lightLine,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -7157,7 +7153,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    color: AppColors.lightLine,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -7202,7 +7198,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
                   labelText: 'adminDev.edit.promptLabel'.tr(),
                   alignLabelWithHint: true,
                   filled: true,
-                  fillColor: Colors.grey.shade50,
+                  fillColor: AppColors.lightElevated,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -7239,7 +7235,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
                       selected: _model == m,
                       onSelected: (_) => setState(() => _model = m),
                       selectedColor: AppColors.teal.withValues(alpha: 0.25),
-                      backgroundColor: AppColors.elevated,
+                      backgroundColor: AppColors.lightRaised,
                     ),
                 ],
               ),
@@ -7259,7 +7255,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
                       selected: _epicId == null,
                       onSelected: (_) => setState(() => _epicId = null),
                       selectedColor: AppColors.teal.withValues(alpha: 0.25),
-                      backgroundColor: AppColors.elevated,
+                      backgroundColor: AppColors.lightRaised,
                     ),
                     for (final e in widget.epics)
                       ChoiceChip(
@@ -7269,7 +7265,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
                         onSelected: (_) =>
                             setState(() => _epicId = e['id'] as String?),
                         selectedColor: AppColors.teal.withValues(alpha: 0.25),
-                        backgroundColor: AppColors.elevated,
+                        backgroundColor: AppColors.lightRaised,
                       ),
                   ],
                 ),
