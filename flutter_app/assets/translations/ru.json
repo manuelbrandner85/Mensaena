@@ -1406,7 +1406,10 @@
       "no_changes": "Без изменений",
       "awaiting_review": "Ожидает одобрения",
       "cancelled": "Отменено",
-      "phased": "По этапам"
+      "phased": "По этапам",
+      "error_retry": "Ожидает повтора",
+      "patch_failed": "Сбой OTA-патча",
+      "live": "Уже в приложении"
     },
     "scanAnalyzing": "Анализ {file}",
     "scanFilesRead": "Проанализировано файлов: {count}",
@@ -1693,7 +1696,8 @@
     "moduleHealth": {
       "title": "Матрица здоровья модулей",
       "subscores": "Полнота {comp} · Качество {qual} · Тесты {tests}"
-    }
+    },
+    "retryBadge": "Попытка {n}/3"
   },
   "create": {
     "stepOf": "Шаг {i}/{n}",

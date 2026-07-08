@@ -1407,7 +1407,10 @@
       "no_changes": "Aucun changement",
       "awaiting_review": "En attente d’approbation",
       "cancelled": "Annulé",
-      "phased": "En phases"
+      "phased": "En phases",
+      "error_retry": "En attente de nouvel essai",
+      "patch_failed": "Échec du patch OTA",
+      "live": "En ligne dans l'app"
     },
     "scanAnalyzing": "Analyse de {file}",
     "scanFilesRead": "{count} fichiers analysés",
@@ -1694,7 +1697,8 @@
     "moduleHealth": {
       "title": "Matrice de santé des modules",
       "subscores": "Complétude {comp} · Qualité {qual} · Tests {tests}"
-    }
+    },
+    "retryBadge": "Essai {n}/3"
   },
   "create": {
     "stepOf": "Étape {i}/{n}",

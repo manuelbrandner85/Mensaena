@@ -1407,7 +1407,10 @@
       "no_changes": "No change",
       "awaiting_review": "Awaiting approval",
       "cancelled": "Cancelled",
-      "phased": "In phases"
+      "phased": "In phases",
+      "error_retry": "Awaiting retry",
+      "patch_failed": "OTA patch failed",
+      "live": "Live in the app"
     },
     "scanAnalyzing": "Analyzing {file}",
     "scanFilesRead": "{count} files analyzed",
@@ -1694,7 +1697,8 @@
     "moduleHealth": {
       "title": "Module health matrix",
       "subscores": "Completeness {comp} · Quality {qual} · Tests {tests}"
-    }
+    },
+    "retryBadge": "Attempt {n}/3"
   },
   "create": {
     "stepOf": "Step {i}/{n}",
