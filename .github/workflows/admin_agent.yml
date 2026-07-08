@@ -90,6 +90,8 @@ jobs:
           echo ".godmode_images/" >> .git/info/exclude
           # "Bereits erledigt"-Signal des Agents (A): nie committen.
           echo ".godmode_already_done.txt" >> .git/info/exclude
+          # Folge-Auftrags-Vorschläge des Agents (#7): nie committen.
+          echo ".godmode_followups.json" >> .git/info/exclude
           COUNT=$(node -e 'const a=JSON.parse(process.env.IMGS||"[]"); process.stdout.write(String(Array.isArray(a)?a.length:0))')
           echo "Bilder: $COUNT"
           [ "$COUNT" = "0" ] && exit 0
@@ -191,6 +193,17 @@ jobs:
             erledigt" statt eines vermeintlichen Fehlers. Unterscheide das klar
             von „konnte nichts tun" — Letzteres nur, wenn der Auftrag unklar/
             nicht umsetzbar ist (dann normal ohne diese Datei enden).
+
+            FOLGE-AUFTRÄGE (#7) — fällt dir beim Umsetzen angrenzende, sinnvolle
+            Arbeit auf, die AUSSERHALB dieses Auftrags liegt (NICHT mitmachen —
+            Scope halten!), dann halte sie fest, damit sie nicht verloren geht:
+            schreibe die Datei .godmode_followups.json als JSON-Array von
+            Objekten {"title","instruction","reason","category","impact","effort"}
+            (impact/effort je 1-5, category z. B. ui/feature/bug/performance/
+            i18n/database/security). MAX 3 Einträge, nur WIRKLICH wertvolle,
+            jede instruction für sich allein umsetzbar (mit Dateibezug). Keine
+            Dopplung deines aktuellen Auftrags. Datei NIEMALS committen — sie
+            wird maschinell als Vorschläge ins Dashboard übernommen.
 
             WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
             liegen, sieh sie dir ZUERST mit dem Read-Tool an. Diese Bilder
@@ -426,6 +439,50 @@ jobs:
           fi
           git push -u origin "$BRANCH" --force-with-lease || git push -u origin "$BRANCH" --force
           create_pr
+
+      # (#7) Folge-Auftrags-Vorschläge des Agents als Dashboard-Vorschläge
+      # übernehmen. Der Agent schreibt .godmode_followups.json (angrenzende,
+      # bewusst NICHT erledigte Arbeit). Jeder Eintrag wird ein pending-Vorschlag
+      # (kind='new'/'improvement', origin im Titel-Präfix erkennbar) → der Admin
+      # nimmt an oder lehnt ab. Best-effort, blockiert die Pipeline nie.
+      - name: Folge-Aufträge als Vorschläge übernehmen
+        if: always()
+        continue-on-error: true
+        env:
+          TASK_ID: ${{ inputs.task_id }}
+        run: |
+          FILE=".godmode_followups.json"
+          [ -f "$FILE" ] || { echo "Keine Folge-Aufträge."; exit 0; }
+          node -e '
+            const fs = require("fs");
+            let arr = [];
+            try { arr = JSON.parse(fs.readFileSync(".godmode_followups.json","utf8")); } catch (_) {}
+            if (!Array.isArray(arr)) arr = [];
+            const clamp = (v,d) => { const n = Number(v); return Number.isFinite(n) ? Math.min(5,Math.max(1,Math.round(n))) : d; };
+            const rows = arr.slice(0,3).map(x => ({
+              category: String(x.category || "feature").toLowerCase().replace(/[^a-z_]/g,"").slice(0,24) || "feature",
+              kind: "new",
+              severity: "low",
+              title: ("↪ " + String(x.title || "Folge-Auftrag")).slice(0,140),
+              description: String(x.reason || x.description || "").slice(0,400),
+              instruction: String(x.instruction || "").slice(0,1500),
+              reason: ("Folge-Auftrag aus Godmode-Task " + process.env.TASK_ID + ". " + String(x.reason||"")).slice(0,400),
+              impact: clamp(x.impact,3),
+              effort: clamp(x.effort,2),
+              status: "pending",
+            })).filter(r => r.instruction.length > 4);
+            fs.writeFileSync("/tmp/followups.json", JSON.stringify(rows));
+            console.log("Folge-Vorschläge:", rows.length);
+          '
+          COUNT=$(node -e 'try{process.stdout.write(String(JSON.parse(require("fs").readFileSync("/tmp/followups.json","utf8")).length))}catch{process.stdout.write("0")}')
+          [ "$COUNT" = "0" ] && { echo "Nichts zu übernehmen."; exit 0; }
+          curl -sS -X POST \
+            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_suggestions" \
+            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+            --data-binary @/tmp/followups.json \
+            && echo "✅ $COUNT Folge-Vorschlag/-Vorschläge übernommen." \
+            || echo "Übernahme fehlgeschlagen (nicht kritisch)."
 
       - name: Screenshots/Goldens als Artefakt sichern (best-effort)
         if: always()
