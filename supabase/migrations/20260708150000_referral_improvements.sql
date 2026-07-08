@@ -18,7 +18,7 @@ SECURITY DEFINER
 SET search_path = public
 STABLE
 AS $$
-  SELECT p.full_name
+  SELECT COALESCE(p.display_name, p.name)
   FROM public.referrals r
   JOIN public.profiles p ON p.id = r.inviter_id
   WHERE r.invite_code = p_code AND r.status = 'pending'
