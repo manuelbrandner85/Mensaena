@@ -2567,8 +2567,12 @@
     "linkCopied": "Link copiato.",
     "howItWorks": "Come funziona",
     "howItWorksBody": "1. Condividi il link — tramite WhatsApp, SMS o e-mail.\n2. Chi si registra viene collegato automaticamente al tuo account.\n3. Colleziona badge Bronzo, Argento, Oro e Leggenda.",
-    "shareMessage": "Unisciti a me su Mensaena — la piattaforma di aiuto tra vicini: {url}",
-    "shareSubject": "Invito a Mensaena"
+    "shareMessage": "Sono su Mensaena — l’app per il vero aiuto tra vicini (prestare attrezzi, trovare aiuto, eventi vicini). Unisciti, è gratis: {url}",
+    "shareSubject": "Invito a Mensaena",
+    "qrTitle": "Codice QR per invitare",
+    "qrHint": "I vicini scansionano il codice e si uniscono subito.",
+    "invitedBy": "{name} ti invita su Mensaena",
+    "invitedByGeneric": "Sei stato invitato su Mensaena"
   },
   "groups": {
     "rulesLabel": "Regole del gruppo (facoltativo)",

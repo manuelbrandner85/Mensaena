@@ -56,6 +56,9 @@ class _AuthScreenState extends State<AuthScreen>
   bool _resending = false;
   int _failCount = 0;
   DateTime? _lockUntil;
+  // V3: Name des Einladenden für den "… lädt dich ein"-Banner (aus ?ref=).
+  String? _inviterName;
+  bool _refPresent = false;
 
   /// Subscription for Supabase auth state — listens for PASSWORD_RECOVERY
   /// events from magic-link deep-links and switches UI to reset mode.
@@ -87,6 +90,24 @@ class _AuthScreenState extends State<AuthScreen>
         setState(() => _mode = _AuthMode.reset);
       }
     }, onError: handleAuthStreamError);
+
+    // V3: Einladungs-Code aus ?ref= auflösen → Name des Einladenden anzeigen.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _resolveInviter());
+  }
+
+  Future<void> _resolveInviter() async {
+    if (!mounted) return;
+    final ref = GoRouterState.of(context).uri.queryParameters['ref'] ??
+        GoRouterState.of(context).uri.queryParameters['invite'];
+    if (ref == null || ref.isEmpty) return;
+    setState(() => _refPresent = true);
+    try {
+      final name = await sb.rpc<dynamic>('referral_inviter_name',
+          params: {'p_code': ref});
+      if (!mounted) return;
+      final n = (name as String?)?.trim();
+      if (n != null && n.isNotEmpty) setState(() => _inviterName = n);
+    } catch (_) {}
   }
 
   @override
@@ -237,8 +258,10 @@ class _AuthScreenState extends State<AuthScreen>
           context.go('/dashboard');
           return;
         case _AuthMode.register:
+          // 'ref' ist der Standard; 'invite' als Fallback für ältere Links.
           final refCode = mounted
-              ? GoRouterState.of(context).uri.queryParameters['ref']
+              ? (GoRouterState.of(context).uri.queryParameters['ref'] ??
+                  GoRouterState.of(context).uri.queryParameters['invite'])
               : null;
           final res = await sb.auth.signUp(
             email: _emailCtrl.text.trim().toLowerCase(),
@@ -476,6 +499,45 @@ class _AuthScreenState extends State<AuthScreen>
                                 ),
                               ),
                               const SizedBox(height: 20),
+
+                              // V3: "… lädt dich zu Mensaena ein" — Social Proof
+                              // für Eingeladene (erhöht die Anmelde-Quote).
+                              if (isRegister && _refPresent) ...[
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 10),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.tealSoft
+                                        .withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                        color: AppColors.tealSoft
+                                            .withValues(alpha: 0.35)),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(LucideIcons.userPlus,
+                                          size: 15, color: AppColors.tealSoft),
+                                      const SizedBox(width: 8),
+                                      Expanded(
+                                        child: Text(
+                                          _inviterName != null
+                                              ? 'invite.invitedBy'.tr(
+                                                  namedArgs: {
+                                                      'name': _inviterName!
+                                                    })
+                                              : 'invite.invitedByGeneric'.tr(),
+                                          style: AppTypography.body(
+                                              size: 12,
+                                              color: AppColors.tealSoft,
+                                              weight: FontWeight.w600),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                              ],
 
                               if (_error != null)
                                 _AlertBanner(

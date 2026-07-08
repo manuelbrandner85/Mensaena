@@ -219,7 +219,8 @@ function AuthPage() {
       }).catch(err => console.warn('[welcome-email] trigger failed:', err))
     }
     const urlParams = new URLSearchParams(window.location.search)
-    const refCode = urlParams.get('ref')
+    // 'ref' ist Standard; 'invite' als Fallback für ältere Links.
+    const refCode = urlParams.get('ref') || urlParams.get('invite')
     if (refCode && data.user?.id) {
       try {
         await supabase.rpc('accept_referral', {
