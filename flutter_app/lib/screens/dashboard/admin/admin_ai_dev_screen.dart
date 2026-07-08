@@ -3777,7 +3777,7 @@ class _TaskCard extends StatelessWidget {
                 const SizedBox(width: 5),
                 Expanded(
                   child: Text(
-                    liveCount > 0 ? '$liveFile  ·  $liveCount' : liveFile!,
+                    liveCount > 0 ? '$liveFile  ·  $liveCount' : '$liveFile',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: AppTypography.body(
