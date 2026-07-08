@@ -1409,7 +1409,8 @@
       "phased": "In Phasen",
       "error_retry": "Wartet auf Retry",
       "patch_failed": "OTA-Patch fehlgeschlagen",
-      "live": "Live in der App"
+      "live": "Live in der App",
+      "already_done": "Bereits erledigt"
     },
     "scanAnalyzing": "Analysiere {file}",
     "scanFilesRead": "{count} Dateien analysiert",
@@ -1698,7 +1699,9 @@
       "subscores": "Vollständigkeit {comp} · Qualität {qual} · Tests {tests}"
     },
     "retryBadge": "Versuch {n}/3",
-    "location": "Zu finden"
+    "location": "Zu finden",
+    "alreadyDoneTitle": "Bereits erledigt",
+    "alreadyDoneWarning": "Ein ähnlicher Auftrag wurde bereits umgesetzt: „{task}\". Trotzdem erneut abschicken?"
   },
   "create": {
     "stepOf": "Schritt {i}/{n}",

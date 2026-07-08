@@ -1409,7 +1409,8 @@
       "phased": "Aşamalı",
       "error_retry": "Yeniden deneme bekliyor",
       "patch_failed": "OTA yaması başarısız",
-      "live": "Uygulamada canlı"
+      "live": "Uygulamada canlı",
+      "already_done": "Zaten yapıldı"
     },
     "scanAnalyzing": "{file} analiz ediliyor",
     "scanFilesRead": "{count} dosya analiz edildi",
@@ -1698,7 +1699,9 @@
       "subscores": "Tamlık {comp} · Kalite {qual} · Test {tests}"
     },
     "retryBadge": "Deneme {n}/3",
-    "location": "Nerede bulunur"
+    "location": "Nerede bulunur",
+    "alreadyDoneTitle": "Zaten yapıldı",
+    "alreadyDoneWarning": "Benzer bir görev zaten tamamlandı: “{task}”. Yine de gönderilsin mi?"
   },
   "create": {
     "stepOf": "Adım {i}/{n}",

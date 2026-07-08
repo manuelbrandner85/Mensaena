@@ -1410,7 +1410,8 @@
       "phased": "En fases",
       "error_retry": "Esperando reintento",
       "patch_failed": "Parche OTA fallido",
-      "live": "Activo en la app"
+      "live": "Activo en la app",
+      "already_done": "Ya realizado"
     },
     "scanAnalyzing": "Analizando {file}",
     "scanFilesRead": "{count} archivos analizados",
@@ -1699,7 +1700,9 @@
       "subscores": "Completitud {comp} · Calidad {qual} · Tests {tests}"
     },
     "retryBadge": "Intento {n}/3",
-    "location": "Dónde encontrarlo"
+    "location": "Dónde encontrarlo",
+    "alreadyDoneTitle": "Ya realizado",
+    "alreadyDoneWarning": "Una tarea similar ya se completó: «{task}». ¿Enviar de nuevo?"
   },
   "create": {
     "stepOf": "Paso {i}/{n}",
