@@ -18,6 +18,7 @@ import '../../repositories/mega_repositories.dart';
 import '../../services/supabase_service.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
+import '../../widgets/shared/error_state_widget.dart';
 
 /// Bündelt Mentorships + Partner-Profile in EINEM Provider — verhindert
 /// das List-as-family-key Bug (List.== ist Reference-Equality, würde bei
@@ -67,7 +68,14 @@ class MentorshipScreen extends ConsumerWidget {
       body: async.when(
         loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.bronze)),
-        error: (_, __) => const SizedBox.shrink(),
+        error: (_, __) => Center(
+          child: ErrorStateWidget(
+            onRetry: () {
+              ref.invalidate(myMentorshipsProvider);
+              ref.invalidate(_mentorshipWithPartnersProvider);
+            },
+          ),
+        ),
         data: (bundle) {
           final list = bundle.mentorships;
           if (list.isEmpty || me == null) {

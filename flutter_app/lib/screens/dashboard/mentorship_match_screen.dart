@@ -16,6 +16,7 @@ import '../../repositories/mega_repositories.dart';
 import '../../widgets/effects/glass_card.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/app_snackbar.dart';
+import '../../widgets/shared/error_state_widget.dart';
 
 class _MentorMatch {
   const _MentorMatch({
@@ -77,7 +78,11 @@ class MentorshipMatchScreen extends ConsumerWidget {
       body: async.when(
         loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.bronze)),
-        error: (_, __) => const SizedBox.shrink(),
+        error: (_, __) => Center(
+          child: ErrorStateWidget(
+            onRetry: () => ref.invalidate(_mentorMatchesProvider),
+          ),
+        ),
         data: (list) {
           if (list.isEmpty) {
             return Center(

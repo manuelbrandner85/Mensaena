@@ -13,6 +13,7 @@ import '../../../repositories/challenges_repository.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/skeleton_card.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 
 /// SKILL: mensaena-features
 /// Badges-Gallery — alle Badges der Plattform, eigene markiert.
@@ -62,7 +63,12 @@ class _BadgesScreenState extends ConsumerState<BadgesScreen> {
           },
           child: allAsync.when(
             loading: () => const SkeletonList(count: 5, itemHeight: 96),
-            error: (_, __) => _empty('errors.loadFailed'.tr()),
+            error: (_, __) => ErrorStateWidget(
+              onRetry: () {
+                ref.invalidate(allBadgesProvider);
+                ref.invalidate(myBadgesProvider);
+              },
+            ),
             data: (badges) {
               if (badges.isEmpty) {
                 return _empty('badges.empty'.tr());

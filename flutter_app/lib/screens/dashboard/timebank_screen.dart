@@ -12,6 +12,7 @@ import '../../services/supabase_service.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/user_picker_sheet.dart';
 import '../../widgets/shared/empty_state_widget.dart';
+import '../../widgets/shared/error_state_widget.dart';
 import '../../widgets/shared/skeleton_card.dart';
 import '../../widgets/shared/app_snackbar.dart';
 
@@ -56,15 +57,18 @@ class _TimebankScreenState extends ConsumerState<TimebankScreen> {
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              _BalanceCard(balance: balance),
+              _BalanceCard(
+                balance: balance,
+                onRetry: () => ref.invalidate(timebankBalanceProvider),
+              ),
               const SizedBox(height: 16),
               Text('timebank.history'.tr(), style: AppTypography.label(size: 10)),
               const SizedBox(height: 8),
               entries.when(
                 loading: () => const SkeletonList(count: 5, itemHeight: 96),
-                error: (e, _) => Text(
-                  'Fehler: $e',
-                  style: AppTypography.caption(),
+                error: (e, _) => ErrorStateWidget(
+                  compact: true,
+                  onRetry: () => ref.invalidate(timebankEntriesProvider),
                 ),
                 data: (list) {
                   if (list.isEmpty) {
@@ -346,8 +350,9 @@ class _CreateEntrySheetState extends State<_CreateEntrySheet> {
 }
 
 class _BalanceCard extends StatelessWidget {
-  const _BalanceCard({required this.balance});
+  const _BalanceCard({required this.balance, this.onRetry});
   final AsyncValue<TimebankBalance> balance;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -360,8 +365,7 @@ class _BalanceCard extends StatelessWidget {
       ),
       child: balance.when(
         loading: () => const SkeletonList(count: 5, itemHeight: 96),
-        error: (e, _) =>
-            Text('$e', style: AppTypography.caption()),
+        error: (e, _) => ErrorStateWidget(compact: true, onRetry: onRetry),
         data: (b) => Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

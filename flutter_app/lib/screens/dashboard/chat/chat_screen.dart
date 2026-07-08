@@ -30,6 +30,7 @@ import '../../../widgets/chat/vanish_mode_banner.dart';
 import '../../../widgets/chat/vanish_mode_sheet.dart';
 import '../../../widgets/effects/bloom.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/video_preview_modal.dart';
 import 'chat_input_bar.dart';
 import 'chat_live_banner.dart';
@@ -633,9 +634,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               child: stream.when(
                 loading: () => const _ChatBubbleSkeleton(count: 6),
                 error: (e, _) => Center(
-                  child: Text(
-                    'Fehler: $e',
-                    style: AppTypography.caption(),
+                  child: ErrorStateWidget(
+                    onRetry: () => ref.invalidate(
+                        messagesStreamProvider(widget.conversationId)),
                   ),
                 ),
                 data: (msgsRaw) {

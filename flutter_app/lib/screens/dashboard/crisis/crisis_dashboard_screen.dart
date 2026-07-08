@@ -16,6 +16,7 @@ import '../../../widgets/crisis/safe_checkin_button.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/filter_chip_bar.dart';
 import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
@@ -215,9 +216,9 @@ class _CrisisDashboardScreenState
                         color: AppColors.herzrot),
                   ),
                   error: (e, _) => Center(
-                    child: Text(
-                        'crisis.error'.tr(namedArgs: {'error': '$e'}),
-                        style: AppTypography.caption()),
+                    child: ErrorStateWidget(
+                      onRetry: () => ref.invalidate(activeCrisesProvider),
+                    ),
                   ),
                   data: (all) {
                     final list = _apply(all);

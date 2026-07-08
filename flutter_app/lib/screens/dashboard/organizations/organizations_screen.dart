@@ -25,6 +25,7 @@ import '../../../widgets/effects/tilt_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/editorial_module_header.dart';
 import '../../../widgets/shared/empty_state_card.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 import '../../../widgets/shared/location_map_view.dart';
 import '../../../widgets/shared/module_search_bar.dart';
 import '../../../widgets/shared/view_toggle.dart';
@@ -417,13 +418,8 @@ class _OrganizationsScreenState extends ConsumerState<OrganizationsScreen> {
           ),
         ),
         error: (e, _) => SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: EmptyStateCard(
-              icon: LucideIcons.alertTriangle,
-              title: 'common.error'.tr(),
-              description: '$e',
-            ),
+          child: ErrorStateWidget(
+            onRetry: () => ref.invalidate(orgSearchProvider(_searchArgs)),
           ),
         ),
         data: (raw) {

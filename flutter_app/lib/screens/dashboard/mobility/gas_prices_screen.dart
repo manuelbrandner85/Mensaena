@@ -19,6 +19,7 @@ import '../../../services/tankerkoenig_service.dart';
 import '../../../widgets/effects/animated_entrance.dart';
 import '../../../widgets/effects/glass_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 
 final _gasStationsProvider =
     FutureProvider.autoDispose<FuelPricesResult>((ref) async {
@@ -79,7 +80,11 @@ class GasPricesScreen extends ConsumerWidget {
       body: async.when(
         loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.bronze)),
-        error: (_, __) => const SizedBox.shrink(),
+        error: (_, __) => Center(
+          child: ErrorStateWidget(
+            onRetry: () => ref.invalidate(_gasStationsProvider),
+          ),
+        ),
         data: (result) {
           final stations = result.stations;
           if (stations.isEmpty) {

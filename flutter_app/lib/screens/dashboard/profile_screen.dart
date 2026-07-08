@@ -32,6 +32,7 @@ import '../../widgets/profile/friend_request_button.dart';
 import '../../widgets/profile/qr_share_sheet.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/empty_state_card.dart';
+import '../../widgets/shared/error_state_widget.dart';
 import '../../widgets/shared/verified_badge.dart';
 import '../../widgets/shared/post_card.dart';
 import '../../widgets/shared/sparkline.dart';
@@ -629,7 +630,9 @@ class _BadgesTab extends ConsumerWidget {
         child: CircularProgressIndicator(color: AppColors.amber),
       ),
       error: (_, __) => Center(
-        child: Text('profile.loadError'.tr(), style: AppTypography.caption()),
+        child: ErrorStateWidget(
+          onRetry: () => ref.invalidate(myBadgesProvider),
+        ),
       ),
       data: (mine) {
         if (mine.isEmpty) {
