@@ -119,209 +119,285 @@ jobs:
         working-directory: flutter_app
         run: flutter pub get || true
 
-      - name: Agent ausführen
-        uses: anthropics/claude-code-action@v1
+      # Agent läuft über den rohen claude-CLI statt der claude-code-action,
+      # damit ein Live-Fortschritt-Tailer (#4) den stream-json-Output mitliest
+      # und laufend current_file/analyzed_files/heartbeat nach admin_dev_tasks
+      # schreibt (Dashboard zeigt, welche Datei gerade bearbeitet wird). Der
+      # Tailer fängt zusätzlich das finale result-Event ein und schreibt es nach
+      # claude-execution-output.json — so funktioniert die V1-Auswertung unten
+      # unverändert. Delivery (Commit/Push/PR) macht der Fallback-Schritt.
+      - name: Setup Node (Agent-CLI)
+        uses: actions/setup-node@v4
         with:
-          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ secrets.AGENT_PAT }}
-          # Der Task-Watchdog (agent_task_watchdog.yml) stößt hängende/Retry-
-          # Aufträge via GITHUB_TOKEN neu an → Actor = github-actions[bot].
-          # Die Action blockiert Bot-Actor standardmäßig ("Workflow initiated
-          # by non-human actor") → jeder Watchdog-Retry scheiterte sofort.
-          # Diesen EINEN Bot bewusst erlauben: der Workflow läuft nur auf
-          # workflow_dispatch (nicht über Kommentare/PRs auslösbar) und der
-          # Dispatch braucht ohnehin actions:write — also kein neuer Angriffs-
-          # vektor. Manuelle Aufträge laufen weiterhin über den PAT (Mensch).
-          allowed_bots: 'github-actions[bot]'
-          # --max-turns 40 war zu niedrig: komplexere Auftraege liefen ins
-          # Limit (error_max_turns) BEVOR ein PR entstand → der Auftrag erreichte
-          # die App nie. Run #12 (task 73f174ad) scheiterte genau so: 40 Turns
-          # erschoepft, dazu 19 Permission-Denials die Turns verbrannten.
-          # bypassPermissions schaltet die Denials ab (isolierte CI-Sandbox mit
-          # PAT, kein interaktiver Kontext) — der Agent verschwendet keinen Turn
-          # mehr an Genehmigungen und kommt zuverlaessig bis zum PR.
-          claude_args: "--max-turns 150 --permission-mode bypassPermissions ${{ inputs.model != '' && format('--model {0}', inputs.model) || '--model claude-opus-4-8' }}"
-          prompt: |
-            Du bist der Mensaena-Entwicklungs-Agent. Arbeite gründlich und
-            high-end. Bei GRÖSSEREN Aufträgen (mehrere Dateien/Datenmodell):
-            skizziere ZUERST kurz eine Architektur (betroffene Dateien,
-            Datenmodell/Migration, Reihenfolge der Schritte) und setze sie dann
-            konsequent um. Kleine Aufträge direkt umsetzen — kein Overhead.
+          node-version: '20'
+      - name: Claude Code CLI installieren
+        run: npm install -g @anthropic-ai/claude-code
+      - name: Prompt + Fortschritt-Tailer schreiben
+        env:
+          INSTRUCTION: ${{ inputs.instruction }}
+        run: |
+          # Instruction als ENV (keine Interpolation ins Skript → keine Injection).
+          cat > /tmp/agent_prompt.txt <<'AGENT_PROMPT_A_9f3a2b'
+          Du bist der Mensaena-Entwicklungs-Agent. Arbeite gründlich und
+          high-end. Bei GRÖSSEREN Aufträgen (mehrere Dateien/Datenmodell):
+          skizziere ZUERST kurz eine Architektur (betroffene Dateien,
+          Datenmodell/Migration, Reihenfolge der Schritte) und setze sie dann
+          konsequent um. Kleine Aufträge direkt umsetzen — kein Overhead.
 
-            === AUFGABE ===
-            ${{ inputs.instruction }}
-            === ENDE AUFGABE ===
+          === AUFGABE ===
+          AGENT_PROMPT_A_9f3a2b
+          printf '%s\n' "$INSTRUCTION" >> /tmp/agent_prompt.txt
+          cat >> /tmp/agent_prompt.txt <<'AGENT_PROMPT_B_9f3a2b'
+          === ENDE AUFGABE ===
 
-            PROMPT-VERSTÄNDNIS — die Aufgabe kommt vom Admin oft wie eine
-            Chat-Nachricht: umgangssprachlich, knapp, mit Tippfehlern oder
-            Diktier-Fehlern ("eracheunungsbild" = Erscheinungsbild), ohne
-            Dateipfade. Das ist OK und erwartet. Deine Pflicht:
-            1. Interpretiere WOHLWOLLEND und professionell — erschließe die
-               INTENTION (was soll sich für den Nutzer ändern?), nicht den
-               Wortlaut. Korrigiere offensichtliche Vertipper stillschweigend.
-            2. Finde die betroffenen Stellen selbst (Grep/architecture-map),
-               statt Pfade im Auftrag zu erwarten.
-            3. Schreibe an den ANFANG der PR-Beschreibung 1-2 Sätze
-               "**Verstanden als:** …" — deine professionelle Interpretation
-               des Auftrags. So sieht der Admin sofort, ob du ihn richtig
-               verstanden hast.
-            4. Nur wenn der Auftrag WIRKLICH mehrdeutig ist (zwei plausible,
-               gegensätzliche Umsetzungen): wähle die wahrscheinlichere,
-               setze sie um und benenne die Alternative kurz im PR-Text.
-               NIEMALS wegen Unklarheit einfach nichts tun.
+          PROMPT-VERSTÄNDNIS — die Aufgabe kommt vom Admin oft wie eine
+          Chat-Nachricht: umgangssprachlich, knapp, mit Tippfehlern oder
+          Diktier-Fehlern ("eracheunungsbild" = Erscheinungsbild), ohne
+          Dateipfade. Das ist OK und erwartet. Deine Pflicht:
+          1. Interpretiere WOHLWOLLEND und professionell — erschließe die
+             INTENTION (was soll sich für den Nutzer ändern?), nicht den
+             Wortlaut. Korrigiere offensichtliche Vertipper stillschweigend.
+          2. Finde die betroffenen Stellen selbst (Grep/architecture-map),
+             statt Pfade im Auftrag zu erwarten.
+          3. Schreibe an den ANFANG der PR-Beschreibung 1-2 Sätze
+             "**Verstanden als:** …" — deine professionelle Interpretation
+             des Auftrags. So sieht der Admin sofort, ob du ihn richtig
+             verstanden hast.
+          4. Nur wenn der Auftrag WIRKLICH mehrdeutig ist (zwei plausible,
+             gegensätzliche Umsetzungen): wähle die wahrscheinlichere,
+             setze sie um und benenne die Alternative kurz im PR-Text.
+             NIEMALS wegen Unklarheit einfach nichts tun.
 
-            FUNDORT (Pflicht-Zeile, exaktes Format): Schreibe in JEDE
-            PR-Beschreibung eine eigene Zeile, die mit "📍 Zu finden:" beginnt
-            — sie sagt dem Admin, WO in der App die Änderung sichtbar ist.
-            Format = Navigationspfad mit "→", so wie ein Nutzer klickt:
-              📍 Zu finden: Dashboard → Teilen → Zeitbank
-              📍 Zu finden: Einstellungen → Atmosphäre → Live-Wetter
-              📍 Zu finden: Profil → Bearbeiten (neuer Schalter unten)
-            Bei NICHT sichtbaren Änderungen (CI, Datenbank, Refactoring ohne
-            UI) exakt: "📍 Zu finden: Nicht sichtbar (interne Änderung)".
-            Die Zeile wird maschinell extrahiert und im Dashboard an der
-            Auftragskarte + im Changelog angezeigt — Format nie variieren.
+          FUNDORT (Pflicht-Zeile, exaktes Format): Schreibe in JEDE
+          PR-Beschreibung eine eigene Zeile, die mit "📍 Zu finden:" beginnt
+          — sie sagt dem Admin, WO in der App die Änderung sichtbar ist.
+          Format = Navigationspfad mit "→", so wie ein Nutzer klickt:
+            📍 Zu finden: Dashboard → Teilen → Zeitbank
+            📍 Zu finden: Einstellungen → Atmosphäre → Live-Wetter
+            📍 Zu finden: Profil → Bearbeiten (neuer Schalter unten)
+          Bei NICHT sichtbaren Änderungen (CI, Datenbank, Refactoring ohne
+          UI) exakt: "📍 Zu finden: Nicht sichtbar (interne Änderung)".
+          Die Zeile wird maschinell extrahiert und im Dashboard an der
+          Auftragskarte + im Changelog angezeigt — Format nie variieren.
 
-            BEREITS ERLEDIGT — wenn du beim Lesen des Codes feststellst, dass
-            die geforderte Änderung SCHON umgesetzt ist (nichts zu tun): mache
-            KEINEN PR und schreibe stattdessen die Datei .godmode_already_done.txt
-            mit EINEM kurzen, verständlichen deutschen Satz, WO/WARUM es bereits
-            vorhanden ist (z. B. "Bereits umgesetzt: live_location_service.dart
-            Z.41 nutzt schon DateTime.now().toUtc().add(duration)."). Diese Datei
-            NIEMALS committen. So sieht der Admin im Dashboard sofort „bereits
-            erledigt" statt eines vermeintlichen Fehlers. Unterscheide das klar
-            von „konnte nichts tun" — Letzteres nur, wenn der Auftrag unklar/
-            nicht umsetzbar ist (dann normal ohne diese Datei enden).
+          BEREITS ERLEDIGT — wenn du beim Lesen des Codes feststellst, dass
+          die geforderte Änderung SCHON umgesetzt ist (nichts zu tun): mache
+          KEINEN PR und schreibe stattdessen die Datei .godmode_already_done.txt
+          mit EINEM kurzen, verständlichen deutschen Satz, WO/WARUM es bereits
+          vorhanden ist (z. B. "Bereits umgesetzt: live_location_service.dart
+          Z.41 nutzt schon DateTime.now().toUtc().add(duration)."). Diese Datei
+          NIEMALS committen. So sieht der Admin im Dashboard sofort „bereits
+          erledigt" statt eines vermeintlichen Fehlers. Unterscheide das klar
+          von „konnte nichts tun" — Letzteres nur, wenn der Auftrag unklar/
+          nicht umsetzbar ist (dann normal ohne diese Datei enden).
 
-            FOLGE-AUFTRÄGE (#7) — fällt dir beim Umsetzen angrenzende, sinnvolle
-            Arbeit auf, die AUSSERHALB dieses Auftrags liegt (NICHT mitmachen —
-            Scope halten!), dann halte sie fest, damit sie nicht verloren geht:
-            schreibe die Datei .godmode_followups.json als JSON-Array von
-            Objekten {"title","instruction","reason","category","impact","effort"}
-            (impact/effort je 1-5, category z. B. ui/feature/bug/performance/
-            i18n/database/security). MAX 3 Einträge, nur WIRKLICH wertvolle,
-            jede instruction für sich allein umsetzbar (mit Dateibezug). Keine
-            Dopplung deines aktuellen Auftrags. Datei NIEMALS committen — sie
-            wird maschinell als Vorschläge ins Dashboard übernommen.
+          FOLGE-AUFTRÄGE (#7) — fällt dir beim Umsetzen angrenzende, sinnvolle
+          Arbeit auf, die AUSSERHALB dieses Auftrags liegt (NICHT mitmachen —
+          Scope halten!), dann halte sie fest, damit sie nicht verloren geht:
+          schreibe die Datei .godmode_followups.json als JSON-Array von
+          Objekten {"title","instruction","reason","category","impact","effort"}
+          (impact/effort je 1-5, category z. B. ui/feature/bug/performance/
+          i18n/database/security). MAX 3 Einträge, nur WIRKLICH wertvolle,
+          jede instruction für sich allein umsetzbar (mit Dateibezug). Keine
+          Dopplung deines aktuellen Auftrags. Datei NIEMALS committen — sie
+          wird maschinell als Vorschläge ins Dashboard übernommen.
 
-            WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
-            liegen, sieh sie dir ZUERST mit dem Read-Tool an. Diese Bilder
-            NIEMALS committen.
+          VISUELLE VORSCHAU (#2, nur bei UI/UX-Aufträgen, best-effort): Nachdem die
+          UI-Änderung steht, versuche einen Screenshot des geänderten Screens zu
+          erzeugen — schreibe/aktualisiere dafür einen Golden-Test unter
+          flutter_app/test/golden/ (pumpWidget des Widgets, ggf. mit minimalen
+          Mock-Providern) und führe `cd flutter_app && flutter test --update-goldens
+          <dein_test>` aus, sodass ein PNG unter flutter_app/test/golden/ entsteht.
+          Gelingt das (komplexe Abhängigkeiten -> überspringen ist OK), erwähne im
+          PR-Text eine Zeile "Screenshot: Workflow-Artefakt godmode-screenshots-<id>"
+          und den Golden-Pfad. Kein Zwang — nie den Auftrag daran scheitern lassen.
 
-            Ablauf (so kurz wie möglich):
-            1. Lies CLAUDE.md (Pflichtregeln), docs/godmode/conventions.md
-               (echte AppColors/Widgets/APIs + bekannte Stolperfallen UND
-               bewährte Patterns) und docs/godmode/architecture-map.md
-               (Modul-Struktur, Datenfluss, Cinema-Gating, Auth/Push/i18n-
-               Konventionen) + die beteiligten Dateien (gezielt lesen, nicht
-               den ganzen Codebase).
-            2. Branch erstellen: agent/task-${{ inputs.task_id }}
-            3. Änderungen umsetzen. Nutze NUR Symbole, die laut conventions.md
-               bzw. per Code-Grep wirklich existieren — niemals raten.
-            4. PFLICHT-GATE vor dem Commit (wenn Dart-Dateien geändert):
-               Führe `cd flutter_app && flutter analyze` aus. Das CI nutzt
-               `--no-fatal-infos`, d. h. **error- UND warning-Zeilen sind fatal**
-               (nur `info` ist erlaubt). Behebe JEDE error/warning und führe
-               analyze erneut aus, bis KEINE error/warning mehr erscheint.
-               Committe NIEMALS mit verbleibenden errors/warnings — genau daran
-               sind zuletzt mehrere Aufträge rot geworden (erfundene Symbole wie
-               `Color.toARGB32`, `ShimmerSkeleton`, `AppColors.primary`,
-               `LucideIcons.euroSign`). Verwende NUR Symbole, die wirklich
-               existieren (per Grep im Code verifizieren statt raten).
-               Danach die Projekt-Guards
-               `python3 scripts/check_stream_limits.py` +
-               `python3 scripts/check_ui_supabase.py` +
-               `python3 scripts/check_design_i18n.py` grün bekommen (Letzterer
-               verbietet emerald/neue hartcodierte Farben und erzwingt i18n-Key-
-               Parität). Für jeden neuen `.tr()`-Key sicherstellen, dass er in
-               ALLEN 7 Übersetzungs-Dateien existiert. Wenn Tests geändert/ergänzt:
-               `flutter test` lokal grün.
-            5. SELBST-REVIEW: Lies deinen kompletten Diff (`git diff`) noch einmal
-               kritisch durch wie ein Code-Reviewer: Logikfehler, vergessene
-               Edge-Cases (null/leer/Fehlerzustand), Regelverstöße (i18n, Streams,
-               Design, Secrets), unnötige/überflüssige Änderungen. Bessere nach,
-               BEVOR du den PR erstellst.
-               DESIGN-GATE (nur bei UI/Design-Aufgaben): vergleiche den neuen/
-               geänderten Screen konkret mit 2-3 bestehenden Premium-Screens
-               (z. B. Onboarding, Profil, Settings) — gleiche Spacing-Rhythmik,
-               gleiche Typo-Hierarchie, gleiche Card-/Button-Sprache, gleiche
-               Motion-Sparsamkeit? Wirkt er GENAUSO hochwertig, oder fällt er
-               dagegen ab? Wenn er abfällt: konkret nachbessern, nicht nur
-               abnicken.
-            6. Commit + Push + PR gegen main erstellen.
+          WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
+          liegen, sieh sie dir ZUERST mit dem Read-Tool an. Diese Bilder
+          NIEMALS committen.
 
-            Effizienz-Regeln:
-            - Lese NUR Dateien, die du wirklich brauchst (Glob/Grep statt
-              blind alle Files lesen).
-            - Verändere NIEMALS pubspec.yaml Version ohne explizite Anweisung.
-            - Für Breaking-Changes: füge [mandatory] in die Commit-Message ein.
+          Ablauf (so kurz wie möglich):
+          1. Lies CLAUDE.md (Pflichtregeln), docs/godmode/conventions.md
+             (echte AppColors/Widgets/APIs + bekannte Stolperfallen UND
+             bewährte Patterns) und docs/godmode/architecture-map.md
+             (Modul-Struktur, Datenfluss, Cinema-Gating, Auth/Push/i18n-
+             Konventionen) + die beteiligten Dateien (gezielt lesen, nicht
+             den ganzen Codebase).
+          2. Branch erstellen: agent/task-${{ inputs.task_id }}
+          3. Änderungen umsetzen. Nutze NUR Symbole, die laut conventions.md
+             bzw. per Code-Grep wirklich existieren — niemals raten.
+          4. PFLICHT-GATE vor dem Commit (wenn Dart-Dateien geändert):
+             Führe `cd flutter_app && flutter analyze` aus. Das CI nutzt
+             `--no-fatal-infos`, d. h. **error- UND warning-Zeilen sind fatal**
+             (nur `info` ist erlaubt). Behebe JEDE error/warning und führe
+             analyze erneut aus, bis KEINE error/warning mehr erscheint.
+             Committe NIEMALS mit verbleibenden errors/warnings — genau daran
+             sind zuletzt mehrere Aufträge rot geworden (erfundene Symbole wie
+             `Color.toARGB32`, `ShimmerSkeleton`, `AppColors.primary`,
+             `LucideIcons.euroSign`). Verwende NUR Symbole, die wirklich
+             existieren (per Grep im Code verifizieren statt raten).
+             Danach die Projekt-Guards
+             `python3 scripts/check_stream_limits.py` +
+             `python3 scripts/check_ui_supabase.py` +
+             `python3 scripts/check_design_i18n.py` grün bekommen (Letzterer
+             verbietet emerald/neue hartcodierte Farben und erzwingt i18n-Key-
+             Parität). Für jeden neuen `.tr()`-Key sicherstellen, dass er in
+             ALLEN 7 Übersetzungs-Dateien existiert. Wenn Tests geändert/ergänzt:
+             `flutter test` lokal grün.
+          5. SELBST-REVIEW: Lies deinen kompletten Diff (`git diff`) noch einmal
+             kritisch durch wie ein Code-Reviewer: Logikfehler, vergessene
+             Edge-Cases (null/leer/Fehlerzustand), Regelverstöße (i18n, Streams,
+             Design, Secrets), unnötige/überflüssige Änderungen. Bessere nach,
+             BEVOR du den PR erstellst.
+             DESIGN-GATE (nur bei UI/Design-Aufgaben): vergleiche den neuen/
+             geänderten Screen konkret mit 2-3 bestehenden Premium-Screens
+             (z. B. Onboarding, Profil, Settings) — gleiche Spacing-Rhythmik,
+             gleiche Typo-Hierarchie, gleiche Card-/Button-Sprache, gleiche
+             Motion-Sparsamkeit? Wirkt er GENAUSO hochwertig, oder fällt er
+             dagegen ab? Wenn er abfällt: konkret nachbessern, nicht nur
+             abnicken.
+          6. Commit + Push + PR gegen main erstellen.
 
-            Verbindliche Regeln (CLAUDE.md):
-            - i18n: JEDER neue UI-String via .tr() in ALLEN 7 JSON-Dateien
-              (flutter_app/assets/translations/{de,en,it,es,fr,tr,ru}.json).
-            - Supabase-Streams: IMMER .limit() + autoDispose.
-            - Design: primary/teal, KEINE emerald-Farben.
-            - NIEMALS Secrets/Tokens/Keys in den Code.
-            - Tests: für NEUE Repositories/Services/reine Dart-Logik passende
-              Unit-Tests unter flutter_app/test/ anlegen (reine Logik, KEINE
-              Netzwerk-/Supabase-Calls; ggf. mocken). Reine UI-Tweaks brauchen keine.
+          Effizienz-Regeln:
+          - Lese NUR Dateien, die du wirklich brauchst (Glob/Grep statt
+            blind alle Files lesen).
+          - Verändere NIEMALS pubspec.yaml Version ohne explizite Anweisung.
+          - Für Breaking-Changes: füge [mandatory] in die Commit-Message ein.
 
-            Spezialisierung — die AUFGABE beginnt oft mit einem Kategorie-Präfix
-            aus der Dashboard-Chipleiste, GENAU einer dieser Strings:
-            "[UI/UX]", "[Feature]", "[Bugfix]", "[Performance]",
-            "[i18n/Translations]", "[Database]", "[Security]", "[Configuration]"
-            (oder ein selbstgelernter eigener Kategorie-Name). Erkennst du eines
-            dieser Präfixe, ist DAS deine PRIMÄRE Fachbrille (nicht raten) — die
-            anderen Regeln unten gelten trotzdem zusätzlich, wo relevant. Kein
-            Präfix → Brille anhand der Aufgabe selbst wählen.
+          Verbindliche Regeln (CLAUDE.md):
+          - i18n: JEDER neue UI-String via .tr() in ALLEN 7 JSON-Dateien
+            (flutter_app/assets/translations/{de,en,it,es,fr,tr,ru}.json).
+          - Supabase-Streams: IMMER .limit() + autoDispose.
+          - Design: primary/teal, KEINE emerald-Farben.
+          - NIEMALS Secrets/Tokens/Keys in den Code.
+          - Tests: für NEUE Repositories/Services/reine Dart-Logik passende
+            Unit-Tests unter flutter_app/test/ anlegen (reine Logik, KEINE
+            Netzwerk-/Supabase-Calls; ggf. mocken). Reine UI-Tweaks brauchen keine.
 
-            - "[UI/UX]": Ziel elegant, professionell, subtil, viel Weißraum. Nur
-              AppColors-Tokens (kein hartes Color(0x…)), konsistente Cards/
-              Buttons/Abstände, dezente Animationen. PFLICHT: rufe VOR dem
-              Schreiben von Code das Skill-Tool mit "impeccable" auf (Modus je
-              nach Aufgabe: polish/audit/animate/typeset/colorize — passend
-              wählen) UND bei Animationen/Transitions zusätzlich
-              "emil-design-eng". Wende die dortigen Prinzipien tatsächlich an,
-              orientiere dich zusätzlich an bestehenden Premium-Screens
-              (Onboarding/Profil/Settings).
-            - "[Security]": RLS für jeden neuen Tabellenzugriff, Eingaben
-              validieren, keine fremden Nutzerdaten exponieren, Secrets nur via
-              Secrets.
-            - "[Performance]": Rebuilds minimieren (const, Keys), Streams mit
-              .limit() + autoDispose, keine N+1-Queries, Bilder cachen.
-            - "[i18n/Translations]": jeder String via .tr() in allen 7 JSON-
-              Dateien, natürliche Sprache je Land (keine Wort-für-Wort-
-              Maschinenübersetzung).
-            - "[Database]": Migration idempotent (IF NOT EXISTS/OR REPLACE),
-              eindeutiger 14-stelliger Versions-Timestamp NEUER als die letzte
-              Datei in supabase/migrations/ (Guard
-              `check_migration_timestamps.py` prüft das im PR), RLS
-              standardmäßig mitdenken.
-            - "[Configuration]": CI/Workflow-Änderungen sparsam und mit
-              Kommentar, warum — dieser Bereich betrifft die gesamte Pipeline
-              für alle künftigen Aufträge.
+          Spezialisierung — die AUFGABE beginnt oft mit einem Kategorie-Präfix
+          aus der Dashboard-Chipleiste, GENAU einer dieser Strings:
+          "[UI/UX]", "[Feature]", "[Bugfix]", "[Performance]",
+          "[i18n/Translations]", "[Database]", "[Security]", "[Configuration]"
+          (oder ein selbstgelernter eigener Kategorie-Name). Erkennst du eines
+          dieser Präfixe, ist DAS deine PRIMÄRE Fachbrille (nicht raten) — die
+          anderen Regeln unten gelten trotzdem zusätzlich, wo relevant. Kein
+          Präfix → Brille anhand der Aufgabe selbst wählen.
 
-            Auto-Doku: Wenn du die Architektur spürbar änderst (neues Modul, neue
-            Tabelle/Edge-Function, neuer Pipeline-Schritt), aktualisiere die
-            passende Doku knapp mit (CLAUDE.md bzw. docs/godmode/*) — im selben PR.
+          - "[UI/UX]": Ziel elegant, professionell, subtil, viel Weißraum. Nur
+            AppColors-Tokens (kein hartes Color(0x…)), konsistente Cards/
+            Buttons/Abstände, dezente Animationen. PFLICHT: rufe VOR dem
+            Schreiben von Code das Skill-Tool mit "impeccable" auf (Modus je
+            nach Aufgabe: polish/audit/animate/typeset/colorize — passend
+            wählen) UND bei Animationen/Transitions zusätzlich
+            "emil-design-eng". Wende die dortigen Prinzipien tatsächlich an,
+            orientiere dich zusätzlich an bestehenden Premium-Screens
+            (Onboarding/Profil/Settings).
+          - "[Security]": RLS für jeden neuen Tabellenzugriff, Eingaben
+            validieren, keine fremden Nutzerdaten exponieren, Secrets nur via
+            Secrets.
+          - "[Performance]": Rebuilds minimieren (const, Keys), Streams mit
+            .limit() + autoDispose, keine N+1-Queries, Bilder cachen.
+          - "[i18n/Translations]": jeder String via .tr() in allen 7 JSON-
+            Dateien, natürliche Sprache je Land (keine Wort-für-Wort-
+            Maschinenübersetzung).
+          - "[Database]": Migration idempotent (IF NOT EXISTS/OR REPLACE),
+            eindeutiger 14-stelliger Versions-Timestamp NEUER als die letzte
+            Datei in supabase/migrations/ (Guard
+            `check_migration_timestamps.py` prüft das im PR), RLS
+            standardmäßig mitdenken.
+          - "[Configuration]": CI/Workflow-Änderungen sparsam und mit
+            Kommentar, warum — dieser Bereich betrifft die gesamte Pipeline
+            für alle künftigen Aufträge.
 
-            Ressourcen-Katalog (High-End):
-            - Lies docs/godmode/resources.md. BEVORZUGE die dort gelisteten
-              KOSTENLOSEN APIs (möglichst ohne Key) und bewährten Open-Source-
-              Pakete, statt Funktionen von Grund auf neu zu erfinden. API-Keys
-              nur via Secrets, niemals im Code.
-            - Bei unbekannten Paketen/APIs ZUERST die AKTUELLE Doku recherchieren
-              (WebFetch/WebSearch, pub.dev), dann integrieren — keine veralteten
-              Annahmen.
-            - Neue NATIVE Dependencies brauchen einen Versions-Bump (kein OTA);
-              reine Dart-Pakete sind unkritisch. Im Zweifel ohne neue Dependency
-              lösen.
-            - Du darfst GitHub nach Referenz-Implementierungen/Snippets suchen
-              (WebSearch + Code-Suche). Bevorzuge permissive Lizenzen
-              (MIT/Apache/BSD); übernimm KEINEN GPL/AGPL-Code 1:1. Nenne genutzte
-              Quellen kurz im PR-Text.
+          Auto-Doku: Wenn du die Architektur spürbar änderst (neues Modul, neue
+          Tabelle/Edge-Function, neuer Pipeline-Schritt), aktualisiere die
+          passende Doku knapp mit (CLAUDE.md bzw. docs/godmode/*) — im selben PR.
 
+          Ressourcen-Katalog (High-End):
+          - Lies docs/godmode/resources.md. BEVORZUGE die dort gelisteten
+            KOSTENLOSEN APIs (möglichst ohne Key) und bewährten Open-Source-
+            Pakete, statt Funktionen von Grund auf neu zu erfinden. API-Keys
+            nur via Secrets, niemals im Code.
+          - Bei unbekannten Paketen/APIs ZUERST die AKTUELLE Doku recherchieren
+            (WebFetch/WebSearch, pub.dev), dann integrieren — keine veralteten
+            Annahmen.
+          - Neue NATIVE Dependencies brauchen einen Versions-Bump (kein OTA);
+            reine Dart-Pakete sind unkritisch. Im Zweifel ohne neue Dependency
+            lösen.
+          - Du darfst GitHub nach Referenz-Implementierungen/Snippets suchen
+            (WebSearch + Code-Suche). Bevorzuge permissive Lizenzen
+            (MIT/Apache/BSD); übernimm KEINEN GPL/AGPL-Code 1:1. Nenne genutzte
+            Quellen kurz im PR-Text.
+
+          PIPELINE-HINWEIS: Mache die Code-Änderungen im Working-Tree (+ flutter analyze
+          und die Guards). Du darfst committen/pushen/PR erstellen; falls du das nicht
+          tust, übernimmt die Pipeline Commit + Push + PR automatisch. Beende NIEMALS,
+          ohne die Änderungen tatsächlich in Dateien geschrieben zu haben.
+          AGENT_PROMPT_B_9f3a2b
+          cat > /tmp/agent_tailer.js <<'AGENT_TAILER_9f3a2b'
+          const https = require('https');
+          const readline = require('readline');
+          const fs = require('fs');
+          const REF = process.env.SUPABASE_REF;
+          const SRK = process.env.SRK;
+          const TASK_ID = process.env.TASK_ID;
+          const OUT = (process.env.RUNNER_TEMP || '/tmp') + '/claude-execution-output.json';
+          let analyzed = 0, lastFile = '', lastSent = 0;
+          function patch(fields) {
+            const data = JSON.stringify({ ...fields, updated_at: new Date().toISOString() });
+            const req = https.request({ method: 'PATCH', hostname: REF + '.supabase.co',
+              path: '/rest/v1/admin_dev_tasks?id=eq.' + TASK_ID,
+              headers: { apikey: SRK, Authorization: 'Bearer ' + SRK, 'Content-Type': 'application/json',
+                Prefer: 'return=minimal', 'Content-Length': Buffer.byteLength(data) } },
+              (res) => res.resume());
+            req.on('error', () => {}); req.write(data); req.end();
+          }
+          function send(force) {
+            const now = Date.now(); if (!force && now - lastSent < 2500) return; lastSent = now;
+            patch({ phase: 'coding', current_file: lastFile.slice(0, 300), analyzed_files: analyzed,
+              heartbeat_at: new Date().toISOString() });
+          }
+          function shorten(p) { if (!p) return '';
+            const i = p.indexOf('flutter_app/'); const j = p.indexOf('supabase/');
+            if (i >= 0) return p.slice(i); if (j >= 0) return p.slice(j); return p; }
+          const hb = setInterval(() => send(true), 5000); hb.unref();
+          const rl = readline.createInterface({ input: process.stdin });
+          rl.on('line', (line) => {
+            process.stdout.write(line + '\n');
+            let ev; try { ev = JSON.parse(line); } catch (_) { return; }
+            if (ev && ev.type === 'result') { try { fs.writeFileSync(OUT, JSON.stringify([ev])); } catch (_) {} }
+            if (ev && ev.type === 'assistant' && ev.message && Array.isArray(ev.message.content)) {
+              for (const b of ev.message.content) {
+                if (b && b.type === 'tool_use') {
+                  const inp = b.input || {}; const f = inp.file_path || inp.path || inp.pattern || '';
+                  if (['Edit','Write','MultiEdit','Read','Grep','Glob'].includes(b.name) && f) {
+                    analyzed++; lastFile = shorten(String(f)); send(false);
+                  }
+                }
+              }
+            }
+          });
+          rl.on('close', () => send(true));
+          AGENT_TAILER_9f3a2b
+          echo "Prompt + Tailer geschrieben ($(wc -l < /tmp/agent_prompt.txt) Zeilen)."
+      - name: Agent ausführen (CLI mit Live-Fortschritt)
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.AGENT_PAT }}
+          AGENT_MODEL: ${{ inputs.model != '' && inputs.model || 'claude-opus-4-8' }}
+        run: |
+          set +e
+          claude -p "$(cat /tmp/agent_prompt.txt)" \
+            --model "$AGENT_MODEL" \
+            --output-format stream-json --verbose \
+            --dangerously-skip-permissions \
+            --max-turns 150 \
+            2> /tmp/agent_err.log \
+            | node /tmp/agent_tailer.js > /tmp/agent_out.log
+          echo "Exit (pipe): ${PIPESTATUS[0]}"
+          echo "----- Agent-Fehlerausgabe (letzte 20 Zeilen) -----"
+          tail -n 20 /tmp/agent_err.log || true
       # ── V1: Agent-Ergebnis ehrlich auswerten ────────────────────────────────
       # Die claude-code-action beendet sich auch bei API-Fehlern mit Exit 0 —
       # im Ausführungsprotokoll steht dann aber is_error:true (real passiert
