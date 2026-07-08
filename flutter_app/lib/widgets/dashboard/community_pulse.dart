@@ -30,7 +30,7 @@ class CommunityPulse extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.5),
         border: Border.all(color: AppColors.line),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

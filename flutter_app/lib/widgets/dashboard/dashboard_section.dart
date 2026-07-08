@@ -245,25 +245,16 @@ class CollapsibleSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final collapsed =
         ref.watch(collapsedSectionsProvider).contains(section.id);
+    // Symmetrische Karte statt Seitenstreifen + ungleicher Ecken (4/16 —
+    // wirkte schief und brach die Fluchtlinie). Die Sektionsfarbe spricht
+    // über Icon + Titel im Header, nicht über den Rahmen.
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.symmetric(vertical: 6),
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.6),
-        border: Border(
-          left: BorderSide(color: section.color, width: 3),
-          top: BorderSide(
-              color: AppColors.bronze.withValues(alpha: 0.15), width: 1),
-          right: BorderSide(
-              color: AppColors.bronze.withValues(alpha: 0.15), width: 1),
-          bottom: BorderSide(
-              color: AppColors.bronze.withValues(alpha: 0.15), width: 1),
-        ),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(4),
-          topRight: Radius.circular(16),
-          bottomLeft: Radius.circular(4),
-          bottomRight: Radius.circular(16),
-        ),
+        border: Border.all(
+            color: AppColors.bronze.withValues(alpha: 0.15)),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         children: [
@@ -272,10 +263,8 @@ class CollapsibleSection extends ConsumerWidget {
             onTap: () => ref
                 .read(collapsedSectionsProvider.notifier)
                 .toggle(section.id),
-            borderRadius: const BorderRadius.only(
-              topRight: Radius.circular(16),
-              topLeft: Radius.circular(4),
-            ),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(14)),
             child: Container(
               padding:
                   const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -286,9 +275,8 @@ class CollapsibleSection extends ConsumerWidget {
                     section.color.withValues(alpha: 0.05),
                   ],
                 ),
-                borderRadius: const BorderRadius.only(
-                  topRight: Radius.circular(15),
-                ),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(13)),
               ),
               child: Row(
                 children: [

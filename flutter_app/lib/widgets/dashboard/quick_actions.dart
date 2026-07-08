@@ -76,7 +76,7 @@ class QuickActions extends StatelessWidget {
       onTap: () => context.go(it.route),
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(12, 12, 10, 12),
+        padding: const EdgeInsets.all(12),
         // Welten-inspired stronger gradient + breiterer Glow-Schatten in der
         // Akzent-Farbe -- die Kachel "lebt". Innerer Highlight oben (Stack
         // unten) sorgt fuer die typische Glass-Lichtkante.
@@ -152,7 +152,7 @@ class QuickActions extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 color: it.accent.withValues(alpha: 0.20),
-                borderRadius: BorderRadius.circular(11),
+                borderRadius: BorderRadius.circular(12),
                 boxShadow: [
                   BoxShadow(
                     color: it.accent.withValues(alpha: 0.30),
