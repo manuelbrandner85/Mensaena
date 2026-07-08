@@ -36,6 +36,7 @@ import '../../services/supabase_service.dart';
 import '../../widgets/confirm_dialog.dart';
 import '../../widgets/layouts/dashboard_scaffold.dart';
 import '../../widgets/shared/battery_optimization_prompt.dart';
+import '../../widgets/shared/error_state_widget.dart';
 import '../../widgets/shared/release_notes_sheet.dart';
 import '../../widgets/shared/app_snackbar.dart';
 
@@ -401,7 +402,9 @@ class _NotifTabState extends ConsumerState<_NotifTab> {
         child: CircularProgressIndicator(color: AppColors.amber),
       ),
       error: (e, _) => Center(
-        child: Text('settings.errorPrefix'.tr(namedArgs: {'error': e.toString()}), style: AppTypography.caption()),
+        child: ErrorStateWidget(
+          onRetry: () => ref.invalidate(myNotifPrefsProvider),
+        ),
       ),
       data: (p) {
         _local ??= p;

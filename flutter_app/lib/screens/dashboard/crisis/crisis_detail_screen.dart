@@ -15,6 +15,7 @@ import '../../../repositories/ai_features_repository.dart';
 import '../../../repositories/crisis_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 
 /// SKILL: mensaena-features
 /// Crisis-Detail mit Realtime-Helper-Count + Update-Feed.
@@ -38,8 +39,9 @@ class CrisisDetailScreen extends ConsumerWidget {
             child: CircularProgressIndicator(color: AppColors.herzrot),
           ),
           error: (e, _) => Center(
-            child: Text('crisis.error'.tr(namedArgs: {'error': '$e'}),
-                style: AppTypography.caption()),
+            child: ErrorStateWidget(
+              onRetry: () => ref.invalidate(crisisDetailProvider(crisisId)),
+            ),
           ),
           data: (c) {
             if (c == null) {

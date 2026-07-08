@@ -16,6 +16,7 @@ import '../../../services/supabase_service.dart';
 import '../../../widgets/effects/shimmer_skeleton.dart';
 import '../../../widgets/effects/tilt_card.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 
 /// SKILL: mensaena-features + mensaena-design
 /// Phase O3 — Organisation-Detail-Screen.
@@ -959,9 +960,9 @@ class _OrganizationDetailScreenState
                 _ReviewSkeleton(),
               ],
             ),
-            error: (e, _) => Text(
-              '$e',
-              style: AppTypography.caption(color: AppColors.herzrot),
+            error: (e, _) => ErrorStateWidget(
+              compact: true,
+              onRetry: () => ref.invalidate(orgReviewsProvider(org.id)),
             ),
             data: (list) {
               if (list.isEmpty) return _buildNoReviews();

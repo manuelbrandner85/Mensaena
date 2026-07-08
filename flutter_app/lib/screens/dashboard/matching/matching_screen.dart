@@ -16,6 +16,7 @@ import '../../../repositories/matching_repository.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 
 // (Filter-Wert, i18n-Key) — Label wird zur Laufzeit via .tr() aufgelöst.
 const _filters = <(String, String)>[
@@ -136,7 +137,9 @@ class _MatchingScreenState extends ConsumerState<MatchingScreen> {
                         CircularProgressIndicator(color: AppColors.amber),
                   ),
                 ),
-                error: (_, __) => _empty('matching.loadError'.tr()),
+                error: (_, __) => ErrorStateWidget(
+                  onRetry: () => ref.invalidate(matchingListProvider),
+                ),
                 data: (matches) {
                   if (matches.isEmpty) {
                     return _empty(filter == 'all'

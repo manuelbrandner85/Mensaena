@@ -13,6 +13,7 @@ import '../../../widgets/effects/parallax_image_header.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
 import '../../../widgets/shared/premium_image.dart';
 import '../../../widgets/shared/app_snackbar.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 
 class GroupDetailScreen extends ConsumerStatefulWidget {
   const GroupDetailScreen({required this.groupId, super.key});
@@ -281,8 +282,12 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
           loading: () => const Center(
             child: CircularProgressIndicator(color: AppColors.amber),
           ),
-          error: (e, _) =>
-              Center(child: Text('$e', style: AppTypography.caption())),
+          error: (e, _) => Center(
+            child: ErrorStateWidget(
+              onRetry: () =>
+                  ref.invalidate(groupDetailProvider(widget.groupId)),
+            ),
+          ),
           data: (g) {
             if (g == null) {
               return Center(
@@ -481,8 +486,11 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                       const SizedBox(height: 8),
                       posts.when(
                         loading: () => const SizedBox.shrink(),
-                        error: (e, _) =>
-                            Text('$e', style: AppTypography.caption()),
+                        error: (e, _) => ErrorStateWidget(
+                          compact: true,
+                          onRetry: () => ref
+                              .invalidate(groupPostsProvider(widget.groupId)),
+                        ),
                         data: (list) {
                           if (list.isEmpty) {
                             return Text(

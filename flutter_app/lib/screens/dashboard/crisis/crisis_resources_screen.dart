@@ -11,6 +11,7 @@ import '../../../repositories/crisis_repository.dart';
 import '../../../services/locale_country_service.dart';
 import '../../../utils/safe_launch.dart';
 import '../../../widgets/layouts/dashboard_scaffold.dart';
+import '../../../widgets/shared/error_state_widget.dart';
 
 /// Bereinigt eine Telefonnummer für den `tel:`-Aufruf: entfernt Leerzeichen,
 /// Bindestriche und Klammern, damit der Dialer eine gültige Nummer erhält.
@@ -171,9 +172,9 @@ class _CrisisResourcesScreenState
                   child: CircularProgressIndicator(color: AppColors.herzrot),
                 ),
                 error: (e, _) => Center(
-                  child: Text(
-                    'crisis.resourceError'.tr(namedArgs: {'error': '$e'}),
-                    style: AppTypography.caption(),
+                  child: ErrorStateWidget(
+                    onRetry: () =>
+                        ref.invalidate(emergencyNumbersProvider(country)),
                   ),
                 ),
                 data: (list) {
