@@ -5088,5 +5088,13 @@
     "fillBoth": "Укажите откуда и куда",
     "myLocation": "Моё местоположение",
     "source": "Источник: Transitous / MOTIS (данные OpenStreetMap)"
+  },
+  "drafts": {
+    "restoreTitle": "Черновик найден",
+    "restoreSubtitle": "Продолжить с того места, где вы остановились?",
+    "restoreSubtitleAt": "Автосохранено: {time}. Продолжить?",
+    "restore": "Восстановить",
+    "discard": "Удалить",
+    "restored": "Черновик восстановлен"
   }
 }

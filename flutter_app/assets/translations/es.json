@@ -5089,5 +5089,13 @@
     "fillBoth": "Indica origen y destino",
     "myLocation": "Mi ubicación",
     "source": "Fuente: Transitous / MOTIS (datos OpenStreetMap)"
+  },
+  "drafts": {
+    "restoreTitle": "Borrador encontrado",
+    "restoreSubtitle": "¿Continuar donde lo dejaste?",
+    "restoreSubtitleAt": "Guardado automáticamente el {time}. ¿Continuar?",
+    "restore": "Restaurar",
+    "discard": "Descartar",
+    "restored": "Borrador restaurado"
   }
 }

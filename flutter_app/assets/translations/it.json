@@ -5089,5 +5089,13 @@
     "fillBoth": "Inserisci partenza e arrivo",
     "myLocation": "La mia posizione",
     "source": "Fonte: Transitous / MOTIS (dati OpenStreetMap)"
+  },
+  "drafts": {
+    "restoreTitle": "Bozza trovata",
+    "restoreSubtitle": "Riprendere da dove avevi lasciato?",
+    "restoreSubtitleAt": "Salvata automaticamente il {time}. Continuare?",
+    "restore": "Ripristina",
+    "discard": "Elimina",
+    "restored": "Bozza ripristinata"
   }
 }

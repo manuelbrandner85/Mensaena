@@ -5085,5 +5085,13 @@
     "fillBoth": "Bitte Start und Ziel angeben",
     "myLocation": "Mein Standort",
     "source": "Quelle: Transitous / MOTIS (OpenStreetMap-Daten)"
+  },
+  "drafts": {
+    "restoreTitle": "Entwurf gefunden",
+    "restoreSubtitle": "Dort weitermachen, wo du aufgehört hast?",
+    "restoreSubtitleAt": "Automatisch gespeichert am {time}. Weitermachen?",
+    "restore": "Wiederherstellen",
+    "discard": "Verwerfen",
+    "restored": "Entwurf wiederhergestellt"
   }
 }

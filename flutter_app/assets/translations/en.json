@@ -5086,5 +5086,13 @@
     "fillBoth": "Please enter origin and destination",
     "myLocation": "My location",
     "source": "Source: Transitous / MOTIS (OpenStreetMap data)"
+  },
+  "drafts": {
+    "restoreTitle": "Draft found",
+    "restoreSubtitle": "Pick up where you left off?",
+    "restoreSubtitleAt": "Auto-saved on {time}. Continue?",
+    "restore": "Restore",
+    "discard": "Discard",
+    "restored": "Draft restored"
   }
 }

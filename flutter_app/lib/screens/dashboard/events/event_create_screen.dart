@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -12,11 +13,13 @@ import '../../../config/theme/app_colors.dart';
 import '../../../config/theme/app_typography.dart';
 import '../../../widgets/forms/location_picker_field.dart';
 import '../../../repositories/events_repository.dart';
+import '../../../services/form_draft_service.dart';
 import '../../../services/haptics.dart';
 import '../../../widgets/effects/mini_confetti.dart';
 import '../../../services/location_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/forms/create_post_scaffold.dart';
+import '../../../widgets/forms/draft_restore_banner.dart';
 import '../../../widgets/shared/app_snackbar.dart';
 import '../../../utils/form_validators.dart';
 
@@ -88,6 +91,11 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
 
   bool _prefilled = false;
 
+  // ── Entwurf-Wiederherstellung (gleiches Muster wie Post-Draft) ──────────
+  static const String _draftType = 'event';
+  Timer? _draftTimer;
+  FormDraft? _pendingDraft;
+
   @override
   void initState() {
     super.initState();
@@ -97,10 +105,107 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       _isAllDay = true;
       _prefilled = true;
     }
+    _titleCtrl.addListener(_scheduleDraftSave);
+    _descCtrl.addListener(_scheduleDraftSave);
+    // Kein Entwurf-Hinweis, wenn das Formular bereits gezielt vorbelegt wurde
+    // (z. B. aus einem Feiertags-Vorschlag) — dort ist ein neues Event gewollt.
+    if (widget.initialTitle == null && widget.initialDate == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadDraft());
+    }
+  }
+
+  Future<void> _loadDraft() async {
+    final draft = await FormDraftService.load(_draftType);
+    if (draft != null && mounted) {
+      setState(() => _pendingDraft = draft);
+    }
+  }
+
+  void _scheduleDraftSave() {
+    _draftTimer?.cancel();
+    _draftTimer = Timer(const Duration(seconds: 3), _saveDraft);
+  }
+
+  Future<void> _saveDraft() async {
+    if (_titleCtrl.text.trim().isEmpty && _descCtrl.text.trim().isEmpty) return;
+    await FormDraftService.save(_draftType, {
+      'title': _titleCtrl.text,
+      'description': _descCtrl.text,
+      'locationName': _locationNameCtrl.text,
+      'locationAddress': _locationAddressCtrl.text,
+      'maxAttendees': _maxAttendeesCtrl.text,
+      'cost': _costCtrl.text,
+      'whatToBring': _whatToBringCtrl.text,
+      'contact': _contactCtrl.text,
+      'onlineUrl': _onlineUrlCtrl.text,
+      'cohost': _cohostCtrl.text,
+      'category': _category,
+      'startDate': _startDate?.toIso8601String(),
+      'endDate': _endDate?.toIso8601String(),
+      'registrationDeadline': _registrationDeadline?.toIso8601String(),
+      'isAllDay': _isAllDay,
+      'isOnline': _isOnline,
+      'isFree': _isFree,
+      'isRecurring': _isRecurring,
+      'recurringPattern': _recurringPattern,
+      'lat': _lat,
+      'lng': _lng,
+    });
+  }
+
+  void _restoreDraft() {
+    final d = _pendingDraft;
+    if (d == null) return;
+    setState(() {
+      _titleCtrl.text = d.getString('title') ?? _titleCtrl.text;
+      _descCtrl.text = d.getString('description') ?? _descCtrl.text;
+      _locationNameCtrl.text =
+          d.getString('locationName') ?? _locationNameCtrl.text;
+      _locationAddressCtrl.text =
+          d.getString('locationAddress') ?? _locationAddressCtrl.text;
+      _maxAttendeesCtrl.text =
+          d.getString('maxAttendees') ?? _maxAttendeesCtrl.text;
+      _costCtrl.text = d.getString('cost') ?? _costCtrl.text;
+      _whatToBringCtrl.text =
+          d.getString('whatToBring') ?? _whatToBringCtrl.text;
+      _contactCtrl.text = d.getString('contact') ?? _contactCtrl.text;
+      _onlineUrlCtrl.text = d.getString('onlineUrl') ?? _onlineUrlCtrl.text;
+      _cohostCtrl.text = d.getString('cohost') ?? _cohostCtrl.text;
+      final cat = d.getString('category');
+      if (cat != null && _categories.any((c) => c.value == cat)) {
+        _category = cat;
+      }
+      final pattern = d.getString('recurringPattern');
+      if (pattern != null &&
+          (pattern == 'daily' ||
+              pattern == 'weekly' ||
+              pattern == 'monthly')) {
+        _recurringPattern = pattern;
+      }
+      _startDate = d.getDateTime('startDate') ?? _startDate;
+      _endDate = d.getDateTime('endDate') ?? _endDate;
+      _registrationDeadline =
+          d.getDateTime('registrationDeadline') ?? _registrationDeadline;
+      _isAllDay = d.getBool('isAllDay') ?? _isAllDay;
+      _isOnline = d.getBool('isOnline') ?? _isOnline;
+      _isFree = d.getBool('isFree') ?? _isFree;
+      _isRecurring = d.getBool('isRecurring') ?? _isRecurring;
+      _lat = d.getDouble('lat') ?? _lat;
+      _lng = d.getDouble('lng') ?? _lng;
+      _pendingDraft = null;
+    });
+    AppSnackBar.success(context, 'drafts.restored'.tr());
+  }
+
+  Future<void> _discardDraft() async {
+    await FormDraftService.clear(_draftType);
+    if (!mounted) return;
+    setState(() => _pendingDraft = null);
   }
 
   @override
   void dispose() {
+    _draftTimer?.cancel();
     _titleCtrl.dispose();
     _descCtrl.dispose();
     _locationNameCtrl.dispose();
@@ -354,6 +459,10 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
       setState(() => _error = 'events.createFailed'.tr());
       return;
     }
+    // Entwurf nach erfolgreichem Erstellen entfernen.
+    _draftTimer?.cancel();
+    await FormDraftService.clear(_draftType);
+    if (!mounted) return;
     Haptics.success();
     MiniConfetti.show(context);
     AppSnackBar.success(context, 'common.created'.tr());
@@ -376,6 +485,12 @@ class _EventCreateScreenState extends ConsumerState<EventCreateScreen> {
             icon: LucideIcons.calendar,
             returnRoute: '/dashboard/events',
             sections: [
+              if (_pendingDraft != null)
+                DraftRestoreBanner(
+                  savedAt: _pendingDraft!.savedAt,
+                  onRestore: _restoreDraft,
+                  onDiscard: _discardDraft,
+                ),
               if (_prefilled) _prefilledBanner(),
               _sectionCover(),
               _sectionTitleDesc(),
