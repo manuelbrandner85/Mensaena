@@ -38,8 +38,7 @@ class LiveLocationService {
       return false;
     }
     _conversationId = conversationId;
-    final now = DateTime.now().toUtc();
-    final expiresAt = now.add(duration);
+    final expiresAt = DateTime.now().toUtc().add(duration);
 
     Future<void> publish(Position pos) async {
       try {
