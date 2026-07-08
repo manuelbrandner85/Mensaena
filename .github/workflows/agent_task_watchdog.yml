@@ -1,0 +1,164 @@
+name: 🐕 Agent Task Watchdog
+
+# ════════════════════════════════════════════════════════════════════════
+# Heilt hängende/fehlgeschlagene Godmode-Aufträge — damit KEIN Auftrag mehr
+# still verpufft (Root-Cause-Analyse 2026-07-08: API-Sofort-Fehler wurden
+# als "no_changes" verbucht, hängende Workflows blieben ewig "running").
+#
+# Läuft alle 30 Minuten und übernimmt vier Aufgaben:
+#   1. RETRY-DISPATCHER (V2): Aufträge in status='error_retry' (Agent-API-
+#      Fehler, z. B. Abo-Nutzungslimit) erneut an admin_agent.yml übergeben —
+#      max. 3 Versuche, danach endgültig 'failed'. Die 30-Min-Kadenz ist
+#      bewusst: Abo-Limits resetten sich mit der Zeit, sofortiges Wiederholen
+#      würde nur erneut scheitern.
+#   2. STUCK-RUNNING: status='running' älter als 2 h → der Workflow (Timeout
+#      60 min) ist sicher tot (Runner-Crash o. ä.) → Retry oder failed.
+#   3. STUCK-QUEUED: status='queued' älter als 1 h → der Dispatch kam nie an
+#      (Edge-Function-Fehler, GitHub-Hiccup) → Retry oder failed.
+#   4. PR_OPEN-ABGLEICH: status='pr_open' älter als 30 min → echten PR-Zustand
+#      prüfen: gemergt → 'merged' (Live-Verify übernimmt), geschlossen ohne
+#      Merge → 'failed'. Offen mit laufendem CI → in Ruhe lassen (Automerge/
+#      Autofix sind zuständig).
+#
+# Dispatch läuft über das GITHUB_TOKEN (permissions: actions: write) —
+# workflow_dispatch ist von GitHubs Rekursions-Sperre ausgenommen.
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+  pull-requests: read
+
+concurrency:
+  group: agent-task-watchdog
+  cancel-in-progress: false
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+  SRK: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  REPO: ${{ github.repository }}
+
+jobs:
+  watchdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Aufträge heilen
+        run: |
+          set -uo pipefail
+          API="https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks"
+          AUTH=(-H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}")
+          NOW_2H=$(date -u -d '2 hours ago' +%FT%TZ)
+          NOW_1H=$(date -u -d '1 hour ago' +%FT%TZ)
+          NOW_30M=$(date -u -d '30 minutes ago' +%FT%TZ)
+
+          patch_task() { # $1=id  $2=json-body
+            curl -sS -X PATCH "${API}?id=eq.$1" "${AUTH[@]}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "$2" || true
+          }
+
+          # Auftrag erneut an admin_agent.yml übergeben (max. 3 Versuche).
+          # Baut den Dispatch-Body via node — sichere Quotierung beliebiger
+          # Instruction-Texte. $1=id $2=retry_count(bisher) $3=grund
+          redispatch_or_fail() {
+            local id="$1" rc="$2" reason="$3"
+            case "$rc" in (*[!0-9]*|'') rc=0;; esac
+            if [ "$rc" -ge 3 ]; then
+              echo "  → Retry-Budget erschöpft ($rc) — failed."
+              ERRJ=$(printf '%s' "$reason (nach $rc Versuchen aufgegeben)" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(s)))')
+              patch_task "$id" "{\"status\":\"failed\",\"error\":${ERRJ},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+              return
+            fi
+            local next=$((rc + 1))
+            ROW=$(curl -sS "${API}?id=eq.${id}&select=instruction,image_urls,model" "${AUTH[@]}")
+            BODY=$(printf '%s' "$ROW" | NEXT="$next" TASK="$id" node -e '
+              let s=""; process.stdin.on("data",d=>s+=d).on("end",()=>{
+                try {
+                  const r = JSON.parse(s)[0] || {};
+                  const inputs = {
+                    instruction: String(r.instruction || ""),
+                    task_id: process.env.TASK,
+                    image_urls: JSON.stringify(Array.isArray(r.image_urls) ? r.image_urls : []),
+                    retry_count: process.env.NEXT,
+                  };
+                  if (r.model) inputs.model = String(r.model);
+                  process.stdout.write(JSON.stringify({ ref: "main", inputs }));
+                } catch { process.stdout.write(""); }
+              })')
+            if [ -z "$BODY" ]; then
+              echo "  → Konnte Auftragsdaten nicht laden — überspringe."
+              return
+            fi
+            HTTP=$(curl -sS -o /tmp/dispatch_out -w '%{http_code}' -X POST \
+              "https://api.github.com/repos/${REPO}/actions/workflows/admin_agent.yml/dispatches" \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -d "$BODY")
+            if [ "$HTTP" = "204" ]; then
+              echo "  → Re-Dispatch OK (Versuch $next/3)."
+              patch_task "$id" "{\"status\":\"queued\",\"retry_count\":${next},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            else
+              echo "  → Dispatch fehlgeschlagen (HTTP $HTTP): $(cat /tmp/dispatch_out | head -c 300)"
+            fi
+          }
+
+          # ── 1. error_retry → Re-Dispatch ─────────────────────────────────
+          echo "── error_retry-Aufträge ──"
+          curl -sS "${API}?status=eq.error_retry&select=id,retry_count&limit=10" "${AUTH[@]}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{JSON.parse(s).forEach(t=>console.log(t.id+" "+(t.retry_count||0)))}catch{}})' \
+            | while read -r id rc; do
+                [ -z "$id" ] && continue
+                echo "Task $id (bisher $rc Versuche):"
+                redispatch_or_fail "$id" "$rc" "Agent-API-Fehler"
+              done
+
+          # ── 2. running > 2 h = toter Workflow ────────────────────────────
+          echo "── hängende running-Aufträge ──"
+          curl -sS "${API}?status=eq.running&updated_at=lt.${NOW_2H}&select=id,retry_count&limit=10" "${AUTH[@]}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{JSON.parse(s).forEach(t=>console.log(t.id+" "+(t.retry_count||0)))}catch{}})' \
+            | while read -r id rc; do
+                [ -z "$id" ] && continue
+                echo "Task $id hängt in running (>2 h):"
+                redispatch_or_fail "$id" "$rc" "Workflow abgestürzt (running >2 h)"
+              done
+
+          # ── 3. queued > 1 h = Dispatch kam nie an ────────────────────────
+          echo "── hängende queued-Aufträge ──"
+          curl -sS "${API}?status=eq.queued&updated_at=lt.${NOW_1H}&select=id,retry_count&limit=10" "${AUTH[@]}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{JSON.parse(s).forEach(t=>console.log(t.id+" "+(t.retry_count||0)))}catch{}})' \
+            | while read -r id rc; do
+                [ -z "$id" ] && continue
+                echo "Task $id hängt in queued (>1 h):"
+                redispatch_or_fail "$id" "$rc" "Workflow-Start kam nie an (queued >1 h)"
+              done
+
+          # ── 4. pr_open mit Realität abgleichen ───────────────────────────
+          echo "── pr_open-Abgleich ──"
+          curl -sS "${API}?status=eq.pr_open&updated_at=lt.${NOW_30M}&select=id&limit=15" "${AUTH[@]}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{JSON.parse(s).forEach(t=>console.log(t.id))}catch{}})' \
+            | while read -r id; do
+                [ -z "$id" ] && continue
+                BRANCH="agent/task-${id}"
+                PR=$(gh pr list --repo "$REPO" --head "$BRANCH" --state all \
+                      --json state,url,mergeCommit --limit 1 2>/dev/null || echo '[]')
+                STATE=$(printf '%s' "$PR" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const p=JSON.parse(s)[0];process.stdout.write(p?p.state:"NONE")}catch{process.stdout.write("NONE")}})')
+                echo "Task $id → PR-Zustand: $STATE"
+                case "$STATE" in
+                  MERGED)
+                    patch_task "$id" "{\"status\":\"merged\",\"updated_at\":\"$(date -u +%FT%TZ)\"}" ;;
+                  CLOSED)
+                    patch_task "$id" "{\"status\":\"failed\",\"error\":\"PR wurde ohne Merge geschlossen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}" ;;
+                  NONE)
+                    patch_task "$id" "{\"status\":\"failed\",\"error\":\"Kein PR zum Auftrag gefunden (Branch ${BRANCH} fehlt).\",\"updated_at\":\"$(date -u +%FT%TZ)\"}" ;;
+                  *) : ;; # OPEN → Automerge/Autofix sind zuständig
+                esac
+              done
+
+          echo "Watchdog-Lauf abgeschlossen."

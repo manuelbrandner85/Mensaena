@@ -37,6 +37,10 @@ on:
         description: 'Optionales Claude-Modell (leer = Action-Default)'
         required: false
         default: ''
+      retry_count:
+        description: 'Wievielter Versuch (0 = Erstlauf; Watchdog zählt hoch)'
+        required: false
+        default: '0'
 
 permissions:
   contents: write
@@ -64,12 +68,16 @@ jobs:
           fetch-depth: 1
 
       - name: Status -> running
+        env:
+          RETRY_COUNT: ${{ inputs.retry_count }}
         run: |
+          RC="${RETRY_COUNT:-0}"
+          case "$RC" in (*[!0-9]*|'') RC=0;; esac
           curl -sS -X PATCH \
             "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
             -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
             -H "Content-Type: application/json" -H "Prefer: return=minimal" \
-            -d "{\"status\":\"running\",\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+            -d "{\"status\":\"running\",\"retry_count\":${RC},\"run_url\":\"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
       - name: Screenshots herunterladen (Vision)
         env:
@@ -249,6 +257,51 @@ jobs:
               (MIT/Apache/BSD); übernimm KEINEN GPL/AGPL-Code 1:1. Nenne genutzte
               Quellen kurz im PR-Text.
 
+      # ── V1: Agent-Ergebnis ehrlich auswerten ────────────────────────────────
+      # Die claude-code-action beendet sich auch bei API-Fehlern mit Exit 0 —
+      # im Ausführungsprotokoll steht dann aber is_error:true (real passiert
+      # am 2026-07-07: Fehler nach ~0,5 s, num_turns:1, Kosten $0 → Abo-Limit).
+      # Ohne diesen Schritt wurde so ein Lauf als "no_changes" verbucht und der
+      # Auftrag verpuffte still. Hier wird der Fehler erkannt + der Fehlertext
+      # extrahiert, damit die Status-Schritte unten korrekt routen können.
+      - name: Agent-Ergebnis auswerten
+        id: agent_result
+        if: always()
+        run: |
+          OUT="$RUNNER_TEMP/claude-execution-output.json"
+          IS_ERROR=false
+          ERR_TEXT=""
+          if [ -f "$OUT" ]; then
+            RESULT=$(node -e '
+              const fs = require("fs");
+              try {
+                const raw = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+                const msgs = Array.isArray(raw) ? raw : [raw];
+                const res = [...msgs].reverse().find(m => m && m.type === "result");
+                if (!res) { console.log(JSON.stringify({err:false, text:""})); process.exit(0); }
+                const err = res.is_error === true;
+                // Fehlertext: result-String, sonst Fehler-Objekte, sonst Kennzahlen.
+                let text = typeof res.result === "string" ? res.result : "";
+                if (!text && res.error) text = String(res.error);
+                if (err && !text) text = `API-Fehler im Turn ${res.num_turns} nach ${res.duration_ms} ms (Kosten $${res.total_cost_usd ?? 0}) — vermutlich Nutzungslimit/Overload.`;
+                console.log(JSON.stringify({err, text: text.slice(0, 600)}));
+              } catch (e) {
+                console.log(JSON.stringify({err:false, text:""}));
+              }
+            ' "$OUT")
+            IS_ERROR=$(printf '%s' "$RESULT" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(String(JSON.parse(s).err)))')
+            ERR_TEXT=$(printf '%s' "$RESULT" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.parse(s).text))')
+          else
+            echo "Kein Ausführungsprotokoll gefunden ($OUT) — überspringe Auswertung."
+          fi
+          echo "is_error=$IS_ERROR" >> "$GITHUB_OUTPUT"
+          {
+            echo "error_text<<__EOT__"
+            printf '%s\n' "$ERR_TEXT"
+            echo "__EOT__"
+          } >> "$GITHUB_OUTPUT"
+          echo "Agent-Ergebnis: is_error=$IS_ERROR ${ERR_TEXT:+— $ERR_TEXT}"
+
       # ── Fallback: Commit + Push + PR garantieren ────────────────────────────
       # Der Agent (claude-code-action) committet seine Änderungen per GitHub-API
       # (github-actions[bot], Commit-Signing) DIREKT auf den Branch
@@ -264,7 +317,9 @@ jobs:
       #   C) Nur lokale (uncommittete)       → committen, pushen, PR erstellen.
       #      Änderungen im Working-Tree
       - name: Fallback — Commit + Push + PR sicherstellen
-        if: success()
+        # Bei einem Agent-API-Fehler KEINEN Fallback-PR aus eventuell halb
+        # fertiger Arbeit bauen — der Auftrag geht stattdessen in den Retry.
+        if: success() && steps.agent_result.outputs.is_error != 'true'
         env:
           GH_TOKEN: ${{ secrets.AGENT_PAT }}
           BRANCH: agent/task-${{ inputs.task_id }}
@@ -364,8 +419,37 @@ jobs:
             -H "Content-Type: application/json" -H "Prefer: return=minimal" \
             -d "{\"status\":\"pr_open\",\"pr_url\":\"${{ steps.findpr.outputs.url }}\",\"pr_number\":${{ steps.findpr.outputs.number }},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
 
+      # V1/V2: Agent-API-Fehler ohne PR → NICHT als "no_changes" tarnen.
+      # retry_count < 3 → status 'error_retry' (der Task-Watchdog dispatcht
+      # den Auftrag automatisch neu, Abo-Limits resetten sich mit der Zeit).
+      # retry_count >= 3 → endgültig 'failed' mit echtem Fehlertext.
+      - name: Status -> error_retry / failed (Agent-API-Fehler)
+        if: steps.findpr.outputs.found == 'false' && steps.agent_result.outputs.is_error == 'true'
+        env:
+          RETRY_COUNT: ${{ inputs.retry_count }}
+          ERR_TEXT: ${{ steps.agent_result.outputs.error_text }}
+        run: |
+          RC="${RETRY_COUNT:-0}"
+          case "$RC" in (*[!0-9]*|'') RC=0;; esac
+          ERR_JSON=$(printf '%s' "$ERR_TEXT" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(s||"Agent-API-Fehler (kein Fehlertext)")))')
+          if [ "$RC" -lt 3 ]; then
+            echo "API-Fehler, Versuch $RC/3 — Auftrag geht in error_retry (Watchdog wiederholt)."
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "{\"status\":\"error_retry\",\"error\":${ERR_JSON},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          else
+            echo "API-Fehler und Retry-Budget (3) erschöpft — endgültig failed."
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "{\"status\":\"failed\",\"error\":${ERR_JSON},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          fi
+
       - name: Status -> no_changes
-        if: steps.findpr.outputs.found == 'false'
+        if: steps.findpr.outputs.found == 'false' && steps.agent_result.outputs.is_error != 'true'
         run: |
           curl -sS -X PATCH \
             "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \

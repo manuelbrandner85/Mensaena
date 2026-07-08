@@ -1,0 +1,88 @@
+name: 📡 Agent Live-Verify
+
+# ════════════════════════════════════════════════════════════════════════
+# Definition of Done = IN DER APP, nicht nur gemergt.
+#
+# Bisher endete die Godmode-Pipeline bei status='merged' — ob der Shorebird-
+# OTA-Patch (bzw. Web-/Supabase-Deploy) den Merge wirklich ausgeliefert hat,
+# wurde nie zurückgemeldet; der Pipeline-Stepper im Dashboard blieb ewig auf
+# "OTA läuft". Dieser Workflow schließt die Lücke:
+#
+#   * Auslieferungs-Run GRÜN (Shorebird-Patch / Web-Deploy / Supabase-Deploy
+#     auf main) → alle Aufträge, die VOR dem Run-Start gemergt waren, werden
+#     'live' (live_at + live_run_url).
+#   * Shorebird-Patch ROT → gemergte Aufträge werden 'patch_failed' mit
+#     Run-Link als Fehlertext — sichtbar im Dashboard statt still kaputt.
+#
+# Bewusst pragmatisch: Aufträge werden nicht datei-genau einem Deploy-Pfad
+# zugeordnet (nicht getrackt). Ein gemergter Nicht-Flutter-Auftrag wird durch
+# den nächsten grünen Deploy ebenfalls 'live' — korrekt, denn seine eigene
+# Auslieferung (deploy.yml/supabase.yml) lief bei seinem Merge bereits.
+# ════════════════════════════════════════════════════════════════════════
+
+on:
+  workflow_run:
+    workflows:
+      - '🚀 Shorebird OTA Patch'
+      - 'Deploy to Cloudflare Workers'
+      - 'Supabase Migrations & Functions'
+    types: [completed]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: agent-live-verify
+  cancel-in-progress: false
+
+env:
+  SUPABASE_REF: gyqujitkvymlmgroovch
+  SRK: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+jobs:
+  verify:
+    # Nur Läufe auf main sind Auslieferungen.
+    if: github.event.workflow_run.head_branch == 'main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Merged-Aufträge auf live/patch_failed setzen
+        env:
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          WF_NAME: ${{ github.event.workflow_run.name }}
+          RUN_URL: ${{ github.event.workflow_run.html_url }}
+          RUN_STARTED: ${{ github.event.workflow_run.run_started_at }}
+        run: |
+          set -uo pipefail
+          API="https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks"
+          AUTH=(-H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}")
+          NOW=$(date -u +%FT%TZ)
+
+          if [ "$CONCLUSION" = "success" ]; then
+            # Alle Aufträge, die vor dem Run-Start gemergt waren, sind jetzt
+            # nachweislich ausgeliefert. updated_at-Filter verhindert, dass
+            # ein WÄHREND des Runs gemergter Auftrag fälschlich live wird
+            # (der fängt den nächsten Auslieferungs-Run). patch_failed zählt
+            # mit: ein späterer GRÜNER Patch liefert kumulativ auch die
+            # Änderungen des zuvor roten Patches aus.
+            echo "Auslieferung grün ($WF_NAME) — markiere merged/patch_failed → live."
+            curl -sS -X PATCH \
+              "${API}?status=in.(merged,patch_failed)&updated_at=lt.${RUN_STARTED}" \
+              "${AUTH[@]}" \
+              -H "Content-Type: application/json" -H "Prefer: return=representation" \
+              -d "{\"status\":\"live\",\"live_at\":\"${NOW}\",\"live_run_url\":\"${RUN_URL}\",\"updated_at\":\"${NOW}\"}" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log("→ "+JSON.parse(s).length+" Auftrag/Aufträge live")}catch{console.log("→ 0 Aufträge live")}})'
+          elif [ "$CONCLUSION" = "failure" ] && [ "$WF_NAME" = "🚀 Shorebird OTA Patch" ]; then
+            # Nur der OTA-Patch-Pfad meldet einen harten Auslieferungs-Fehler
+            # zurück (deploy/supabase-Fehler haben eigene Alarme und betreffen
+            # gemergte Flutter-Aufträge nicht).
+            echo "OTA-Patch ROT — markiere merged → patch_failed."
+            curl -sS -X PATCH \
+              "${API}?status=eq.merged&updated_at=lt.${RUN_STARTED}" \
+              "${AUTH[@]}" \
+              -H "Content-Type: application/json" -H "Prefer: return=representation" \
+              -d "{\"status\":\"patch_failed\",\"error\":\"OTA-Patch fehlgeschlagen: ${RUN_URL}\",\"updated_at\":\"${NOW}\"}" \
+              | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{console.log("→ "+JSON.parse(s).length+" Auftrag/Aufträge patch_failed")}catch{console.log("→ 0 Aufträge betroffen")}})'
+          else
+            echo "Kein relevanter Abschluss ($WF_NAME → $CONCLUSION) — nichts zu tun."
+          fi

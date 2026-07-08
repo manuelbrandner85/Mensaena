@@ -270,6 +270,8 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
             s == 'running' ||
             s == 'phased' ||
             s == 'pr_open' ||
+            // Wartet auf automatischen Watchdog-Retry → weiterhin aktiv.
+            s == 'error_retry' ||
             s == 'awaiting_review';
       }).length;
 
@@ -322,7 +324,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
   // Ein abgeschlossener Auftrag ist löschbar.
   bool _deletable(String? status) =>
       status == 'merged' ||
+      status == 'live' ||
       status == 'failed' ||
+      status == 'patch_failed' ||
       status == 'no_changes' ||
       status == 'cancelled';
 
@@ -427,6 +431,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
               s == 'running' ||
               s == 'pr_open' ||
               s == 'awaiting_review' ||
+              s == 'error_retry' ||
               s == 'phased';
         })
         .map((t) => (t['instruction'] as String?) ?? '')
@@ -1983,10 +1988,12 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
             status == 'pr_open' ||
             status == 'awaiting_review');
     final isReview = status == 'awaiting_review' && id != null;
-    final canRetry =
-        id != null && (status == 'failed' || status == 'no_changes');
+    final canRetry = id != null &&
+        (status == 'failed' ||
+            status == 'no_changes' ||
+            status == 'patch_failed');
     final canRollback = id != null &&
-        status == 'merged' &&
+        (status == 'merged' || status == 'live') &&
         (t['merge_commit_sha'] as String?) != null &&
         (t['origin'] as String?) != 'rollback';
     final canRefine =
@@ -3512,6 +3519,17 @@ class _TaskCard extends StatelessWidget {
                   color: AppColors.trust,
                 ),
               ],
+              // Retry-Zähler: sichtbar, sobald der Watchdog den Auftrag
+              // mindestens einmal erneut angestoßen hat (max. 3 Versuche).
+              if (((task['retry_count'] as num?)?.toInt() ?? 0) > 0) ...[
+                const SizedBox(width: 6),
+                _Badge(
+                  text: 'adminDev.retryBadge'.tr(namedArgs: {
+                    'n': '${(task['retry_count'] as num?)?.toInt() ?? 0}',
+                  }),
+                  color: AppColors.amber,
+                ),
+              ],
               if (imageCount > 0) ...[
                 const SizedBox(width: 6),
                 const Icon(LucideIcons.image, size: 12, color: AppColors.lightMute),
@@ -3584,7 +3602,7 @@ class _TaskCard extends StatelessWidget {
             const SizedBox(height: 8),
             ...List.generate((task['plan'] as List).length, (i) {
               final step = (task['plan'] as List)[i].toString();
-              final done = status == 'merged';
+              final done = status == 'merged' || status == 'live';
               return Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
@@ -3615,7 +3633,7 @@ class _TaskCard extends StatelessWidget {
               if (phases is List && phases.isNotEmpty) {
                 final total = phases.length;
                 final current = (p['current'] as num?)?.toInt() ?? 0;
-                final allDone = status == 'merged';
+                final allDone = status == 'merged' || status == 'live';
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Column(
@@ -3833,6 +3851,8 @@ class _TaskCard extends StatelessWidget {
 
   _StatusMeta _statusMeta(String status) {
     switch (status) {
+      case 'live':
+        return const _StatusMeta(LucideIcons.radio, AppColors.leben);
       case 'merged':
         return const _StatusMeta(LucideIcons.checkCircle2, AppColors.leben);
       case 'phased':
@@ -3843,8 +3863,12 @@ class _TaskCard extends StatelessWidget {
         return const _StatusMeta(LucideIcons.eye, AppColors.amber);
       case 'running':
         return const _StatusMeta(LucideIcons.loader, AppColors.amber);
+      case 'error_retry':
+        return const _StatusMeta(LucideIcons.rotateCw, AppColors.amber);
       case 'failed':
         return const _StatusMeta(LucideIcons.xCircle, Colors.red);
+      case 'patch_failed':
+        return const _StatusMeta(LucideIcons.alertTriangle, Colors.red);
       case 'cancelled':
         return const _StatusMeta(LucideIcons.ban, AppColors.lightMute);
       case 'no_changes':
@@ -4068,6 +4092,24 @@ class _PipelineStepper extends StatelessWidget {
         s[2] = _Stage.done;
         s[3] = _Stage.done;
         s[4] = _Stage.active; // OTA läuft
+        break;
+      case 'live':
+        // Live-Verify hat die Auslieferung bestätigt → Pipeline komplett.
+        for (var i = 0; i < 5; i++) {
+          s[i] = _Stage.done;
+        }
+        break;
+      case 'patch_failed':
+        // Merge ok, aber der OTA-Patch-Run war rot.
+        s[0] = _Stage.done;
+        s[1] = _Stage.done;
+        s[2] = _Stage.done;
+        s[3] = _Stage.done;
+        s[4] = _Stage.error;
+        break;
+      case 'error_retry':
+        // Agent-API-Fehler — der Watchdog wiederholt automatisch.
+        s[0] = _Stage.active;
         break;
       case 'failed':
         s[0] = _Stage.error;

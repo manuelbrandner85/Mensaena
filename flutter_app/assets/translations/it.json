@@ -1407,7 +1407,10 @@
       "no_changes": "Nessuna modifica",
       "awaiting_review": "In attesa di approvazione",
       "cancelled": "Annullato",
-      "phased": "In fasi"
+      "phased": "In fasi",
+      "error_retry": "In attesa di nuovo tentativo",
+      "patch_failed": "Patch OTA non riuscita",
+      "live": "Attivo nell'app"
     },
     "scanAnalyzing": "Analisi di {file}",
     "scanFilesRead": "{count} file analizzati",
@@ -1694,7 +1697,8 @@
     "moduleHealth": {
       "title": "Matrice di salute moduli",
       "subscores": "Completezza {comp} · Qualità {qual} · Test {tests}"
-    }
+    },
+    "retryBadge": "Tentativo {n}/3"
   },
   "create": {
     "stepOf": "Passo {i}/{n}",
