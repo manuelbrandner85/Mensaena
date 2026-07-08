@@ -39,7 +39,6 @@ class _WeeklySummaryWidgetState extends State<WeeklySummaryWidget>
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.4),
         border: Border.all(color: AppColors.line),

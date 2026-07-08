@@ -69,7 +69,7 @@ class WeatherWidget extends ConsumerWidget {
             decoration: BoxDecoration(
               color: AppColors.surface.withValues(alpha: 0.5),
               border: Border.all(color: AppColors.line),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,7 +147,7 @@ class WeatherLocationCta extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(14),
         border:
             Border.all(color: AppColors.bronze.withValues(alpha: 0.4)),
       ),
