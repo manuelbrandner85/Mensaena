@@ -328,6 +328,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
       status == 'failed' ||
       status == 'patch_failed' ||
       status == 'no_changes' ||
+      status == 'already_done' ||
       status == 'cancelled';
 
   // Anzahl löschbarer (abgeschlossener) Aufträge.
@@ -422,8 +423,15 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
     }
   }
 
-  // Duplikat-/Konflikt-Check gegen AKTIVE Aufträge. true = fortfahren.
+  // Duplikat-/Konflikt-Check. true = fortfahren.
+  // (B) Prüft zwei Fälle: (1) ein ähnlicher Auftrag LÄUFT gerade, (2) ein
+  // ähnlicher Auftrag wurde kürzlich schon ERLEDIGT (merged/live/already_done)
+  // — verhindert, dass bereits Umgesetztes erneut abgeschickt wird und als
+  // Dead-End im Dashboard landet.
   Future<bool> _confirmNotDuplicate(String instruction) async {
+    String? instr(Map<String, dynamic> t) =>
+        (t['instruction'] as String?)?.trim();
+
     final active = _tasks
         .where((t) {
           final s = t['status'] as String?;
@@ -434,24 +442,47 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
               s == 'error_retry' ||
               s == 'phased';
         })
-        .map((t) => (t['instruction'] as String?) ?? '')
+        .map((t) => instr(t) ?? '')
         .where((x) => x.isNotEmpty);
-    final sim = similarInstruction(instruction, active);
-    if (sim == null || !mounted) return true;
+    // Kürzlich erfolgreich abgeschlossen (nicht failed/cancelled — die dürfen
+    // bewusst neu versucht werden).
+    final doneRecently = _tasks
+        .where((t) {
+          final s = t['status'] as String?;
+          return s == 'merged' ||
+              s == 'live' ||
+              s == 'already_done';
+        })
+        .map((t) => instr(t) ?? '')
+        .where((x) => x.isNotEmpty);
+
+    final simActive = similarInstruction(instruction, active);
+    final simDone =
+        simActive == null ? similarInstruction(instruction, doneRecently) : null;
+    if ((simActive == null && simDone == null) || !mounted) return true;
+
+    final isDone = simActive == null;
+    final match = simActive ?? simDone!;
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.lightSurface,
         title: Row(children: [
-          const Icon(LucideIcons.copy, size: 18, color: AppColors.amber),
+          Icon(isDone ? LucideIcons.checkCheck : LucideIcons.copy,
+              size: 18, color: isDone ? AppColors.leben : AppColors.amber),
           const SizedBox(width: 8),
           Expanded(
-              child: Text('adminDev.duplicateTitle'.tr(),
+              child: Text(
+                  (isDone
+                          ? 'adminDev.alreadyDoneTitle'
+                          : 'adminDev.duplicateTitle')
+                      .tr(),
                   style: AppTypography.display(
                       size: 16, color: AppColors.lightInk))),
         ]),
         content: Text(
-          'adminDev.duplicateWarning'.tr(namedArgs: {'task': sim}),
+          (isDone ? 'adminDev.alreadyDoneWarning' : 'adminDev.duplicateWarning')
+              .tr(namedArgs: {'task': match}),
           style: AppTypography.body(size: 13, color: AppColors.lightInkSoft),
         ),
         actions: [
@@ -460,7 +491,9 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
             child: Text('common.cancel'.tr()),
           ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: AppColors.amber),
+            style: FilledButton.styleFrom(
+                backgroundColor:
+                    isDone ? AppColors.leben : AppColors.amber),
             onPressed: () => Navigator.of(ctx).pop(true),
             child: Text('adminDev.duplicateProceed'.tr()),
           ),
@@ -3892,6 +3925,9 @@ class _TaskCard extends StatelessWidget {
         return const _StatusMeta(LucideIcons.alertTriangle, Colors.red);
       case 'cancelled':
         return const _StatusMeta(LucideIcons.ban, AppColors.lightMute);
+      case 'already_done':
+        // Bereits umgesetzt = Erfolg, kein Fehler → grünes Häkchen.
+        return const _StatusMeta(LucideIcons.checkCheck, AppColors.leben);
       case 'no_changes':
         return const _StatusMeta(LucideIcons.minusCircle, AppColors.lightMute);
       default:
@@ -4109,6 +4145,7 @@ class _PipelineStepper extends StatelessWidget {
         s[0] = _Stage.active;
         break;
       case 'no_changes':
+      case 'already_done':
         s[0] = _Stage.done;
         break;
       case 'pr_open':

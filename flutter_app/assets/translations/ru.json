@@ -1409,7 +1409,8 @@
       "phased": "По этапам",
       "error_retry": "Ожидает повтора",
       "patch_failed": "Сбой OTA-патча",
-      "live": "Уже в приложении"
+      "live": "Уже в приложении",
+      "already_done": "Уже сделано"
     },
     "scanAnalyzing": "Анализ {file}",
     "scanFilesRead": "Проанализировано файлов: {count}",
@@ -1698,7 +1699,9 @@
       "subscores": "Полнота {comp} · Качество {qual} · Тесты {tests}"
     },
     "retryBadge": "Попытка {n}/3",
-    "location": "Где найти"
+    "location": "Где найти",
+    "alreadyDoneTitle": "Уже сделано",
+    "alreadyDoneWarning": "Похожая задача уже выполнена: «{task}». Всё равно отправить?"
   },
   "create": {
     "stepOf": "Шаг {i}/{n}",

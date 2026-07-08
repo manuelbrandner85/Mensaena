@@ -88,6 +88,8 @@ jobs:
           # mit eincheckt — sie dienen nur als visueller Kontext.
           mkdir -p .godmode_images
           echo ".godmode_images/" >> .git/info/exclude
+          # "Bereits erledigt"-Signal des Agents (A): nie committen.
+          echo ".godmode_already_done.txt" >> .git/info/exclude
           COUNT=$(node -e 'const a=JSON.parse(process.env.IMGS||"[]"); process.stdout.write(String(Array.isArray(a)?a.length:0))')
           echo "Bilder: $COUNT"
           [ "$COUNT" = "0" ] && exit 0
@@ -178,6 +180,17 @@ jobs:
             UI) exakt: "📍 Zu finden: Nicht sichtbar (interne Änderung)".
             Die Zeile wird maschinell extrahiert und im Dashboard an der
             Auftragskarte + im Changelog angezeigt — Format nie variieren.
+
+            BEREITS ERLEDIGT — wenn du beim Lesen des Codes feststellst, dass
+            die geforderte Änderung SCHON umgesetzt ist (nichts zu tun): mache
+            KEINEN PR und schreibe stattdessen die Datei .godmode_already_done.txt
+            mit EINEM kurzen, verständlichen deutschen Satz, WO/WARUM es bereits
+            vorhanden ist (z. B. "Bereits umgesetzt: live_location_service.dart
+            Z.41 nutzt schon DateTime.now().toUtc().add(duration)."). Diese Datei
+            NIEMALS committen. So sieht der Admin im Dashboard sofort „bereits
+            erledigt" statt eines vermeintlichen Fehlers. Unterscheide das klar
+            von „konnte nichts tun" — Letzteres nur, wenn der Auftrag unklar/
+            nicht umsetzbar ist (dann normal ohne diese Datei enden).
 
             WICHTIG — Screenshots: Falls im Ordner .godmode_images/ Bilder
             liegen, sieh sie dir ZUERST mit dem Read-Tool an. Diese Bilder
@@ -487,14 +500,29 @@ jobs:
               -d "{\"status\":\"failed\",\"error\":${ERR_JSON},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
           fi
 
-      - name: Status -> no_changes
+      # (A) "Bereits erledigt" vs. echtes "nichts getan" unterscheiden.
+      # Hat der Agent .godmode_already_done.txt geschrieben, war die Änderung
+      # schon vorhanden → Status 'already_done' mit seiner Begründung (grünes
+      # Icon im Dashboard, sieht NICHT wie ein Fehler aus). Sonst 'no_changes'.
+      - name: Status -> already_done / no_changes
         if: steps.findpr.outputs.found == 'false' && steps.agent_result.outputs.is_error != 'true'
         run: |
-          curl -sS -X PATCH \
-            "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
-            -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
-            -H "Content-Type: application/json" -H "Prefer: return=minimal" \
-            -d "{\"status\":\"no_changes\",\"summary\":\"Der Agent hat keine Änderungen vorgenommen.\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          DONE_FILE=".godmode_already_done.txt"
+          if [ -f "$DONE_FILE" ] && [ -s "$DONE_FILE" ]; then
+            REASON=$(head -c 400 "$DONE_FILE" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(s.trim())))')
+            echo "Agent meldet: bereits erledigt — $REASON"
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "{\"status\":\"already_done\",\"summary\":${REASON},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          else
+            curl -sS -X PATCH \
+              "https://${SUPABASE_REF}.supabase.co/rest/v1/admin_dev_tasks?id=eq.${TASK_ID}" \
+              -H "apikey: ${SRK}" -H "Authorization: Bearer ${SRK}" \
+              -H "Content-Type: application/json" -H "Prefer: return=minimal" \
+              -d "{\"status\":\"no_changes\",\"summary\":\"Der Agent hat keine Änderungen vorgenommen (Auftrag unklar oder nicht umsetzbar).\",\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          fi
 
       - name: Status -> failed (bei Fehler)
         if: failure()
