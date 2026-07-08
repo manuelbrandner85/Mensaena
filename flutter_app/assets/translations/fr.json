@@ -1698,7 +1698,8 @@
       "title": "Matrice de santé des modules",
       "subscores": "Complétude {comp} · Qualité {qual} · Tests {tests}"
     },
-    "retryBadge": "Essai {n}/3"
+    "retryBadge": "Essai {n}/3",
+    "location": "Où le trouver"
   },
   "create": {
     "stepOf": "Étape {i}/{n}",

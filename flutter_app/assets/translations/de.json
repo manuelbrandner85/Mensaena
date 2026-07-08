@@ -1697,7 +1697,8 @@
       "title": "Modul-Health-Matrix",
       "subscores": "Vollständigkeit {comp} · Qualität {qual} · Tests {tests}"
     },
-    "retryBadge": "Versuch {n}/3"
+    "retryBadge": "Versuch {n}/3",
+    "location": "Zu finden"
   },
   "create": {
     "stepOf": "Schritt {i}/{n}",

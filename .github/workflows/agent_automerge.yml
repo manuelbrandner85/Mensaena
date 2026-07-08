@@ -191,16 +191,28 @@ jobs:
           # Kurz-Zusammenfassung = erste nicht-leere Zeile der PR-Beschreibung.
           PR_SUMMARY=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
                        --json body --jq '[.body | split("\n")[] | select(test("\\S"))][0] // ""' 2>/dev/null || echo "")
-          CL_BODY=$(TASK_ID="$TASK_ID" PR_TITLE="$PR_TITLE" PR_NUM="$PR_NUM" PR_FILES="$PR_FILES" PR_SUMMARY="$PR_SUMMARY" node -e '
+          # Fundort: "📍 Zu finden: <Pfad>"-Zeile aus dem PR-Body (Pflicht-
+          # Format aus admin_agent.yml) → Dashboard zeigt, WO in der App die
+          # Änderung sichtbar ist.
+          PR_LOCATION=$(gh pr view "$PR_NUM" --repo "${{ github.repository }}" \
+                       --json body --jq '[.body | split("\n")[] | select(test("Zu finden:"))][0] // ""' 2>/dev/null \
+                       | sed -E 's/.*Zu finden:[[:space:]]*//' | head -c 200)
+          if [ -n "$PR_LOCATION" ]; then
+            LOC_JSON=$(printf '%s' "$PR_LOCATION" | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>process.stdout.write(JSON.stringify(s)))')
+            patch_status "{\"location\":${LOC_JSON},\"updated_at\":\"$(date -u +%FT%TZ)\"}"
+          fi
+          CL_BODY=$(TASK_ID="$TASK_ID" PR_TITLE="$PR_TITLE" PR_NUM="$PR_NUM" PR_FILES="$PR_FILES" PR_SUMMARY="$PR_SUMMARY" PR_LOCATION="$PR_LOCATION" node -e '
             let files = [];
             try { files = JSON.parse(process.env.PR_FILES || "[]"); } catch (_) { files = []; }
             const summary = String(process.env.PR_SUMMARY || "").replace(/^#+\s*/, "").slice(0, 400) || null;
+            const location = String(process.env.PR_LOCATION || "").trim().slice(0, 200) || null;
             console.log(JSON.stringify({
               task_id: process.env.TASK_ID,
               title: String(process.env.PR_TITLE || "Godmode-Änderung").slice(0, 300),
               pr_number: Number(process.env.PR_NUM) || null,
               files: Array.isArray(files) ? files : [],
               summary,
+              location,
             }));
           ')
           curl -sS -X POST \

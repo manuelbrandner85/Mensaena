@@ -1698,7 +1698,8 @@
       "title": "Matriz de salud de módulos",
       "subscores": "Completitud {comp} · Calidad {qual} · Tests {tests}"
     },
-    "retryBadge": "Intento {n}/3"
+    "retryBadge": "Intento {n}/3",
+    "location": "Dónde encontrarlo"
   },
   "create": {
     "stepOf": "Paso {i}/{n}",

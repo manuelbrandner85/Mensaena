@@ -1697,7 +1697,8 @@
       "title": "Матрица здоровья модулей",
       "subscores": "Полнота {comp} · Качество {qual} · Тесты {tests}"
     },
-    "retryBadge": "Попытка {n}/3"
+    "retryBadge": "Попытка {n}/3",
+    "location": "Где найти"
   },
   "create": {
     "stepOf": "Шаг {i}/{n}",
