@@ -29,6 +29,7 @@ import '../navigation/app_drawer.dart';
 import '../navigation/notification_bell.dart';
 import '../shared/active_call_mini_player.dart';
 import '../shared/active_stream_mini_player.dart';
+import '../shared/offline_banner.dart';
 import '../assistant/mensaena_assistant_fab.dart';
 
 /// SKILL: flutter-build-responsive-layout + mensaena-design
@@ -371,6 +372,9 @@ class DashboardScaffold extends ConsumerWidget {
             children: [
               Column(
                 children: [
+                  // W2: globaler Offline-Hinweis — kollabiert automatisch,
+                  // sobald wieder Netz da ist.
+                  const OfflineBanner(),
                   const ZeitbankConfirmationBanner(),
                   // Auto-Banner: explizit gesetztes headerImage, sonst aus
                   // der aktiven Route (nur exakte Modul-Landing-Routen —
@@ -618,7 +622,16 @@ class _BottomItem extends StatelessWidget {
     // inaktiv = gedämpftes Papier (paper-dim).
     final glyphColor = active ? AppColors.bronze : AppColors.inkSoft;
     final labelColor = active ? AppColors.ink : AppColors.mute;
-    return InkWell(
+    // W3: Badge-Zahl (z. B. ungelesene Nachrichten) wird nur visuell als
+    // roter Punkt gezeigt — für Screenreader jetzt explizit im Label.
+    final semanticLabel = badgeCount > 0
+        ? '$label, ${badgeCount > 99 ? '99+' : badgeCount}'
+        : label;
+    return Semantics(
+      button: true,
+      selected: active,
+      label: semanticLabel,
+      child: InkWell(
       onTap: () {
         Haptics.select();
         context.go(route);
@@ -727,6 +740,7 @@ class _BottomItem extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }
