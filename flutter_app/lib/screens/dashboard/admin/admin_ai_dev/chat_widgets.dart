@@ -520,6 +520,7 @@ class _DevChatSheetState extends State<_DevChatSheet> {
                   ),
                   const Spacer(),
                   IconButton(
+                    tooltip: 'common.close'.tr(),
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(LucideIcons.x, size: 18),
                     color: AppColors.lightMute,
@@ -790,6 +791,7 @@ class _DiffSheetState extends State<_DiffSheet> {
                 ),
                 const Spacer(),
                 IconButton(
+                  tooltip: 'common.close'.tr(),
                   onPressed: () => Navigator.of(context).pop(),
                   icon: const Icon(LucideIcons.x, size: 18),
                   color: AppColors.lightMute,

@@ -1382,6 +1382,7 @@ class _AdminAiDevScreenState extends ConsumerState<AdminAiDevScreen>
                 ),
                 if (expiry != null)
                   IconButton(
+                    tooltip: 'common.remove'.tr(),
                     onPressed: () => setLocal(() => expiry = null),
                     icon: const Icon(LucideIcons.x, size: 14),
                     color: AppColors.lightMute,

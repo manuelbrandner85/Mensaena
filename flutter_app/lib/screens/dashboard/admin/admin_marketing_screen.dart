@@ -989,10 +989,12 @@ class _TemplatesTabState extends State<_TemplatesTab> {
                           ]),
                     ),
                     IconButton(
+                        tooltip: 'common.edit'.tr(),
                         onPressed: () => _edit(existing: r),
                         icon: const Icon(LucideIcons.pencil,
                             size: 16, color: AppColors.mute)),
                     IconButton(
+                        tooltip: 'common.delete'.tr(),
                         onPressed: () async {
                           await widget.repo.deleteTemplate(r['id'].toString());
                           if (mounted) _refresh();
@@ -1489,6 +1491,7 @@ class _ContentTabState extends State<_ContentTab> {
                             icon: const Icon(LucideIcons.share2,
                                 size: 16, color: AppColors.bronze)),
                         IconButton(
+                          tooltip: 'common.edit'.tr(),
                             onPressed: () => _edit(existing: r),
                             icon: const Icon(LucideIcons.pencil,
                                 size: 16, color: AppColors.mute)),
@@ -1503,6 +1506,7 @@ class _ContentTabState extends State<_ContentTab> {
                               icon: const Icon(LucideIcons.checkCircle2,
                                   size: 16, color: AppColors.leben)),
                         IconButton(
+                          tooltip: 'common.delete'.tr(),
                             onPressed: () async {
                               await widget.repo
                                   .deleteContentPlan(r['id'].toString());

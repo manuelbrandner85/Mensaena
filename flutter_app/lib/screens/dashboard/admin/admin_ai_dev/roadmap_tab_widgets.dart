@@ -149,6 +149,7 @@ class _RoadmapCard extends StatelessWidget {
                 onPressed: () => onEdit(e),
                 icon: const Icon(LucideIcons.pencil, size: 14),
                 color: AppColors.lightMute,
+                tooltip: 'common.edit'.tr(),
               ),
               const SizedBox(width: 8),
               IconButton(
@@ -158,6 +159,7 @@ class _RoadmapCard extends StatelessWidget {
                 onPressed: () => onDelete(id),
                 icon: const Icon(LucideIcons.trash2, size: 14),
                 color: AppColors.lightMute,
+                tooltip: 'common.delete'.tr(),
               ),
             ],
           ),
