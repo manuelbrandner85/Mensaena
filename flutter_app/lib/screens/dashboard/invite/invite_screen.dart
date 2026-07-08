@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../config/theme/app_colors.dart';
@@ -53,8 +54,12 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     }
   }
 
+  // WICHTIG: Parameter MUSS 'ref' heißen — sowohl auth_screen.dart (App) als
+  // auch src/app/auth/page.tsx (Web) lesen den Code aus ?ref=. Vorher stand
+  // hier ?invite=, das NIRGENDS gelesen wurde → keine Einladung wurde je
+  // zugeordnet (V1-Bugfix).
   String get _inviteUrl =>
-      _code != null ? '$_baseUrl/auth?invite=$_code' : _baseUrl;
+      _code != null ? '$_baseUrl/auth?mode=register&ref=$_code' : _baseUrl;
 
   Future<void> _copy() async {
     await Clipboard.setData(ClipboardData(text: _inviteUrl));
@@ -87,6 +92,10 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                   _statsRow(),
                   const SizedBox(height: 16),
                   _linkCard(),
+                  if (_code != null) ...[
+                    const SizedBox(height: 16),
+                    _qrCard(),
+                  ],
                   const SizedBox(height: 16),
                   _benefits(),
                 ],
@@ -218,6 +227,48 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // V2: QR-Code zum Einladen VOR ORT (Nachbarn scannen direkt) — nutzt den
+  // gleichen Einladungslink wie Copy/Share.
+  Widget _qrCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface.withValues(alpha: 0.6),
+        border: Border.all(color: AppColors.line),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              const Icon(LucideIcons.qrCode, size: 16, color: AppColors.amber),
+              const SizedBox(width: 8),
+              Text('invite.qrTitle'.tr(),
+                  style: AppTypography.label(size: 10, color: AppColors.amber)),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text('invite.qrHint'.tr(),
+              textAlign: TextAlign.center, style: AppTypography.caption()),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: QrImageView(
+              data: _inviteUrl,
+              version: QrVersions.auto,
+              size: 200,
+              backgroundColor: Colors.white,
+            ),
           ),
         ],
       ),

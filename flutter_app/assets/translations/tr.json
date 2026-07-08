@@ -2566,8 +2566,12 @@
     "linkCopied": "Bağlantı kopyalandı.",
     "howItWorks": "Nasıl çalışır",
     "howItWorksBody": "1. Bağlantıyı paylaş — WhatsApp, SMS veya e-posta ile.\n2. Kayıt olan herkes otomatik olarak hesabınla eşleşir.\n3. Bronz, Gümüş, Altın ve Efsane rozetlerini topla.",
-    "shareMessage": "Mensaena’ya katıl — komşuluk yardımlaşma platformu: {url}",
-    "shareSubject": "Mensaena daveti"
+    "shareMessage": "Mensaena’dayım — gerçek komşu yardımlaşması uygulaması (alet ödünç al, yardım bul, yakın etkinlikler). Sen de katıl, ücretsiz: {url}",
+    "shareSubject": "Mensaena daveti",
+    "qrTitle": "Davet için QR kodu",
+    "qrHint": "Komşular kodu tarar ve anında katılır.",
+    "invitedBy": "{name} seni Mensaena’ya davet ediyor",
+    "invitedByGeneric": "Mensaena’ya davet edildin"
   },
   "groups": {
     "rulesLabel": "Grup kuralları (isteğe bağlı)",

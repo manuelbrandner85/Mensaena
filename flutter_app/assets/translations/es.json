@@ -2567,8 +2567,12 @@
     "linkCopied": "Enlace copiado.",
     "howItWorks": "Cómo funciona",
     "howItWorksBody": "1. Comparte el enlace — por WhatsApp, SMS o correo.\n2. Quien se registre se vincula automáticamente a tu cuenta.\n3. Colecciona insignias Bronce, Plata, Oro y Leyenda.",
-    "shareMessage": "Únete a mí en Mensaena — la plataforma de ayuda vecinal: {url}",
-    "shareSubject": "Invitación a Mensaena"
+    "shareMessage": "Estoy en Mensaena — la app de ayuda vecinal real (prestar herramientas, encontrar ayuda, eventos cercanos). Únete, es gratis: {url}",
+    "shareSubject": "Invitación a Mensaena",
+    "qrTitle": "Código QR para invitar",
+    "qrHint": "Los vecinos escanean el código y se unen al instante.",
+    "invitedBy": "{name} te invita a Mensaena",
+    "invitedByGeneric": "Te han invitado a Mensaena"
   },
   "groups": {
     "rulesLabel": "Reglas del grupo (opcional)",
