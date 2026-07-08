@@ -187,5 +187,113 @@ Deno.serve(async (req) => {
     }
   } catch (_) { autopilot = 'error' }
 
-  return json({ ok: true, dispatched, autopilot })
+  // ── Regressions-Wächter (#1) ───────────────────────────────────────────────
+  // Nach einer Auslieferung ('live') prüft der Wächter, ob seit dem live_at
+  // ein NEUER Fehler auftaucht, den es im 24-h-Fenster DAVOR nicht gab. Wenn
+  // ja (mit genug Häufung), öffnet er EINEN Fix-Auftrag (origin='regression',
+  // await_review=true → nie Auto-Merge) und verweist auf den auslösenden PR.
+  // Konservativ: max. 1 Fix-Auftrag pro Lauf, nur bei klarer Häufung, jeder
+  // live-Auftrag wird genau einmal geprüft (regression_checked_at).
+  let regression = 'off'
+  try {
+    const { data: rset } = await admin
+      .from('godmode_settings')
+      .select('regression_watch_enabled').eq('id', 1).maybeSingle()
+    if (rset?.regression_watch_enabled !== false) {
+      regression = 'clean'
+      const sixAgo = new Date(Date.now() - 6 * 3600000).toISOString()
+      const oneAgo = new Date(Date.now() - 1 * 3600000).toISOString()
+      // Fertig ausgelieferte, noch ungeprüfte Aufträge (1–6 h alt: genug Zeit,
+      // dass echte Fehler aufgetaucht sind).
+      const { data: liveTasks } = await admin
+        .from('admin_dev_tasks')
+        .select('id,pr_number,location,live_at,instruction')
+        .eq('status', 'live')
+        .is('regression_checked_at', null)
+        .gte('live_at', sixAgo)
+        .lte('live_at', oneAgo)
+        .order('live_at', { ascending: true })
+        .limit(5)
+
+      // deno-lint-ignore no-explicit-any
+      const sig = (t: string, m: string) =>
+        `${(t || '?').slice(0, 40)} | ${(m || '').slice(0, 80)}`
+
+      for (const lt of (liveTasks ?? [])) {
+        const liveAt = new Date(lt.live_at).getTime()
+        const beforeFrom = new Date(liveAt - 24 * 3600000).toISOString()
+        const beforeTo = new Date(liveAt).toISOString()
+        // Basislinie: Fehler-Signaturen der 24 h VOR der Auslieferung.
+        const baseline = new Set<string>()
+        for (const src of [
+          { tbl: 'error_logs', t: 'error_type', m: 'message' },
+          { tbl: 'crash_logs', t: 'error_type', m: 'error_message' },
+        ]) {
+          const { data } = await admin.from(src.tbl)
+            .select(`${src.t},${src.m}`)
+            .gte('created_at', beforeFrom).lt('created_at', beforeTo).limit(1000)
+          // deno-lint-ignore no-explicit-any
+          for (const r of (data ?? []) as any[]) baseline.add(sig(r[src.t], r[src.m]))
+        }
+        // Nach der Auslieferung: neue Signaturen zählen.
+        const afterCount = new Map<string, number>()
+        for (const src of [
+          { tbl: 'error_logs', t: 'error_type', m: 'message' },
+          { tbl: 'crash_logs', t: 'error_type', m: 'error_message' },
+        ]) {
+          const { data } = await admin.from(src.tbl)
+            .select(`${src.t},${src.m}`)
+            .gte('created_at', beforeTo).limit(1000)
+          // deno-lint-ignore no-explicit-any
+          for (const r of (data ?? []) as any[]) {
+            const k = sig(r[src.t], r[src.m])
+            if (!baseline.has(k)) afterCount.set(k, (afterCount.get(k) ?? 0) + 1)
+          }
+        }
+        // Häufigste neue Signatur mit ≥4 Vorkommen = Verdacht.
+        let worst = ''; let worstN = 0
+        for (const [k, n] of afterCount) if (n > worstN) { worst = k; worstN = n }
+
+        // Auftrag als geprüft markieren (einmalig, egal ob Fund).
+        await admin.from('admin_dev_tasks')
+          .update({ regression_checked_at: nowIso })
+          .eq('id', lt.id)
+
+        if (worstN >= 4) {
+          const prRef = lt.pr_number ? `PR #${lt.pr_number}` : 'der letzten Änderung'
+          const loc = lt.location ? `\nBetroffener Bereich: ${lt.location}` : ''
+          const instr =
+            `[Bugfix] Mögliche Regression nach ${prRef}: Seit der Auslieferung ` +
+            `häuft sich ein Fehler, der im 24-h-Fenster davor NICHT auftrat ` +
+            `(${worstN}× seit ${lt.live_at}):\n\n${worst}\n${loc}\n\n` +
+            `Ursprünglicher Auftrag: "${String(lt.instruction || '').slice(0, 160)}".\n` +
+            `Untersuche, ob ${prRef} diesen Fehler verursacht, und behebe die ` +
+            `Ursache. Besteht KEIN Zusammenhang, schreibe .godmode_already_done.txt ` +
+            `mit kurzer Begründung statt eines PRs.`
+          const { data: fixTask } = await admin.from('admin_dev_tasks').insert({
+            instruction: instr,
+            status: 'queued',
+            origin: 'regression',
+            await_review: true,
+          }).select('id').single()
+          if (fixTask && token) {
+            await fetch(
+              `${GH_API}/actions/workflows/${GH_WORKFLOW}/dispatches`,
+              {
+                method: 'POST', headers: ghHeaders(token),
+                body: JSON.stringify({
+                  ref: GH_REF,
+                  inputs: { instruction: instr, task_id: fixTask.id, image_urls: '[]' },
+                }),
+              },
+            ).catch(() => null)
+            regression = 'fix_dispatched'
+          }
+          break // max. 1 Fix-Auftrag pro Lauf
+        }
+      }
+    }
+  } catch (_) { regression = 'error' }
+
+  return json({ ok: true, dispatched, autopilot, regression })
 })

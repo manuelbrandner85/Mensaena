@@ -109,13 +109,26 @@ jobs:
             fi
           }
 
-          # ── 1. error_retry → Re-Dispatch ─────────────────────────────────
-          echo "── error_retry-Aufträge ──"
-          curl -sS "${API}?status=eq.error_retry&select=id,retry_count&limit=10" "${AUTH[@]}" \
-            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{JSON.parse(s).forEach(t=>console.log(t.id+" "+(t.retry_count||0)))}catch{}})' \
-            | while read -r id rc; do
+          # ── 1. error_retry → Re-Dispatch mit exponentiellem Backoff (#3) ──
+          # API-Sofort-Fehler kommen fast immer vom Abo-Nutzungslimit/Overload.
+          # Sofort erneut zu dispatchen scheitert nur wieder und verbrennt
+          # Kapazität. Cooldown wächst mit der Versuchszahl: 30 min · 2^retry
+          # (→ 30/60/120 min). Erst wenn seit dem letzten Update genug Zeit
+          # vergangen ist, wird neu angestoßen. `updated_at` mitziehen für den
+          # Vergleich.
+          echo "── error_retry-Aufträge (mit Backoff) ──"
+          curl -sS "${API}?status=eq.error_retry&select=id,retry_count,updated_at&limit=10" "${AUTH[@]}" \
+            | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{JSON.parse(s).forEach(t=>console.log([t.id,(t.retry_count||0),t.updated_at||""].join("\t")))}catch{}})' \
+            | while IFS=$'\t' read -r id rc upd; do
                 [ -z "$id" ] && continue
-                echo "Task $id (bisher $rc Versuche):"
+                # Cooldown-Minuten = 30 * 2^rc (Deckel 240).
+                COOLDOWN=$(node -e 'const rc=Math.max(0,parseInt(process.argv[1]||"0",10));process.stdout.write(String(Math.min(30*Math.pow(2,rc),240)))' "$rc")
+                READY=$(node -e 'const u=Date.parse(process.argv[1]||"");const cd=parseInt(process.argv[2]||"0",10);if(!u){process.stdout.write("1");}else{process.stdout.write(((Date.now()-u)/60000>=cd)?"1":"0")}' "$upd" "$COOLDOWN")
+                if [ "$READY" != "1" ]; then
+                  echo "Task $id: Backoff aktiv (Versuch $rc, Cooldown ${COOLDOWN} min) — noch warten."
+                  continue
+                fi
+                echo "Task $id (bisher $rc Versuche, Cooldown ${COOLDOWN} min abgelaufen):"
                 redispatch_or_fail "$id" "$rc" "Agent-API-Fehler"
               done
 
