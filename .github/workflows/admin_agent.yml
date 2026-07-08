@@ -121,6 +121,15 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ secrets.AGENT_PAT }}
+          # Der Task-Watchdog (agent_task_watchdog.yml) stößt hängende/Retry-
+          # Aufträge via GITHUB_TOKEN neu an → Actor = github-actions[bot].
+          # Die Action blockiert Bot-Actor standardmäßig ("Workflow initiated
+          # by non-human actor") → jeder Watchdog-Retry scheiterte sofort.
+          # Diesen EINEN Bot bewusst erlauben: der Workflow läuft nur auf
+          # workflow_dispatch (nicht über Kommentare/PRs auslösbar) und der
+          # Dispatch braucht ohnehin actions:write — also kein neuer Angriffs-
+          # vektor. Manuelle Aufträge laufen weiterhin über den PAT (Mensch).
+          allowed_bots: 'github-actions[bot]'
           # --max-turns 40 war zu niedrig: komplexere Auftraege liefen ins
           # Limit (error_max_turns) BEVOR ein PR entstand → der Auftrag erreichte
           # die App nie. Run #12 (task 73f174ad) scheiterte genau so: 40 Turns
