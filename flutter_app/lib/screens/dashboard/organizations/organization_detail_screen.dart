@@ -56,6 +56,14 @@ class _OrganizationDetailScreenState
     _orgFuture = OrganizationsRepository.getById(widget.orgId);
   }
 
+  // Pull-to-Refresh: Organisation + Bewertungen neu laden.
+  Future<void> _reload() async {
+    final f = OrganizationsRepository.getById(widget.orgId);
+    setState(() => _orgFuture = f);
+    ref.invalidate(orgReviewsProvider(widget.orgId));
+    await f;
+  }
+
   @override
   void dispose() {
     _titleCtrl.dispose();
@@ -68,6 +76,7 @@ class _OrganizationDetailScreenState
     return DashboardScaffold(
       title: 'modules.organization'.tr(),
       currentRoute: '/dashboard/organizations',
+      onRefresh: _reload,
       body: SafeArea(
         child: FutureBuilder<Organization?>(
           future: _orgFuture,
@@ -145,6 +154,7 @@ class _OrganizationDetailScreenState
   Widget _buildContent(BuildContext context, Organization org) {
     final cat = getCategoryConfig(org.category);
     return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

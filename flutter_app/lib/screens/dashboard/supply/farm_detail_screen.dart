@@ -29,11 +29,19 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
     _future = FarmsRepository.getBySlug(widget.slug);
   }
 
+  // Pull-to-Refresh: laedt den Hof-Datensatz neu (frische Fotos/Angaben).
+  Future<void> _reload() async {
+    final f = FarmsRepository.getBySlug(widget.slug);
+    setState(() => _future = f);
+    await f;
+  }
+
   @override
   Widget build(BuildContext context) {
     return DashboardScaffold(
       title: 'modules.farm'.tr(),
       currentRoute: '/dashboard/supply',
+      onRefresh: _reload,
       body: SafeArea(
         child: FutureBuilder<FarmListing?>(
           future: _future,
@@ -51,6 +59,7 @@ class _FarmDetailScreenState extends ConsumerState<FarmDetailScreen> {
               );
             }
             return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
                 // Vorher wurde nur f.imageUrl (1 Bild) gezeigt, obwohl der
