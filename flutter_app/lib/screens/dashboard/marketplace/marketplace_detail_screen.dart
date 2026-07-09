@@ -74,6 +74,11 @@ class _MarketplaceDetailScreenState
     return DashboardScaffold(
       title: 'marketplace.listing'.tr(),
       currentRoute: '/dashboard/marketplace',
+      onRefresh: () async {
+        ref.invalidate(marketplaceDetailProvider(listingId));
+        ref.invalidate(marketplaceCommentsProvider(listingId));
+        ref.invalidate(savedListingIdsProvider);
+      },
       body: SafeArea(
         child: async.when(
           loading: () => const Center(
@@ -103,6 +108,7 @@ class _MarketplaceDetailScreenState
 
             return ListView(
               controller: _scroll,
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
                 _buildHero(l, isClaimed),

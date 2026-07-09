@@ -52,6 +52,13 @@ class WeatherScreen extends ConsumerWidget {
     return DashboardScaffold(
       title: 'weather.title'.tr(),
       currentRoute: '/dashboard/weather',
+      onRefresh: () async {
+        WeatherService.clearCache();
+        ref.invalidate(_weatherScreenCurrentProvider);
+        ref.invalidate(_weatherScreenForecastProvider);
+        ref.invalidate(_weatherScreenHourlyProvider);
+        ref.invalidate(_weatherScreenAqProvider);
+      },
       appBarActions: [
         IconButton(
           icon: const Icon(LucideIcons.refreshCw, size: 18),
@@ -67,6 +74,7 @@ class WeatherScreen extends ConsumerWidget {
       ],
       body: SafeArea(
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           children: [
             // ── Aktuelles Wetter ─────────────────────────────────────────

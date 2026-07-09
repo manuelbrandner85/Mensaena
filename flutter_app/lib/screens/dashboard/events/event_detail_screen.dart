@@ -111,6 +111,11 @@ class EventDetailScreen extends ConsumerWidget {
     return DashboardScaffold(
       title: ev.asData?.value?.title ?? 'events.title'.tr(),
       currentRoute: '/dashboard/events',
+      onRefresh: () async {
+        ref.invalidate(eventDetailProvider(eventId));
+        ref.invalidate(eventAttendeesProvider(eventId));
+        ref.invalidate(myRsvpProvider(eventId));
+      },
       body: SafeArea(
         child: ev.when(
           loading: () => const _DetailSkeleton(),
@@ -173,6 +178,7 @@ class _EventDetailBodyState extends ConsumerState<_EventDetailBody> {
 
     return SingleChildScrollView(
       controller: _scroll,
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -211,8 +211,10 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
   bool get _isAdmin => _myRole == 'admin';
   bool get _isModerator => _myRole == 'moderator' || _isAdmin;
 
-  Future<void> _load() async {
-    setState(() => _loading = true);
+  Future<void> _load({bool showSkeleton = true}) async {
+    // showSkeleton=false beim Pull-to-Refresh: die Liste bleibt sichtbar,
+    // nur der RefreshIndicator-Spinner zeigt den Ladevorgang.
+    if (showSkeleton) setState(() => _loading = true);
     try {
       // Server-side Pagination: lade nur die aktuelle Seite via offset+limit.
       // Search + Role-Filter laufen ebenfalls im RPC — verhindert dass User
@@ -668,6 +670,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
     return DashboardScaffold(
       title: 'admin.usersTitle'.tr(),
       currentRoute: '/dashboard/admin/users',
+      onRefresh: () => _load(showSkeleton: false),
       fab: FloatingActionButton.extended(
         backgroundColor: AppColors.bronze,
         foregroundColor: AppColors.voidColor,
@@ -741,6 +744,7 @@ class _AdminUsersScreenState extends ConsumerState<AdminUsersScreen> {
                           ),
                         )
                       : ListView.builder(
+                          physics: const AlwaysScrollableScrollPhysics(),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 4),
                           itemCount: _users.length,

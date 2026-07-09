@@ -277,6 +277,13 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
     return DashboardScaffold(
       title: 'groups.title'.tr(),
       currentRoute: '/dashboard/groups',
+      onRefresh: () async {
+        ref.invalidate(groupDetailProvider(widget.groupId));
+        ref.invalidate(groupPostsProvider(widget.groupId));
+        ref.invalidate(groupMembershipProvider(widget.groupId));
+        ref.invalidate(groupMyRoleProvider(widget.groupId));
+        ref.invalidate(groupMyJoinStatusProvider(widget.groupId));
+      },
       body: SafeArea(
         child: group.when(
           loading: () => const Center(
@@ -300,6 +307,7 @@ class _GroupDetailScreenState extends ConsumerState<GroupDetailScreen> {
                 Expanded(
                   child: ListView(
                     controller: _scroll,
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     children: [
                       if (g.bannerUrl != null)

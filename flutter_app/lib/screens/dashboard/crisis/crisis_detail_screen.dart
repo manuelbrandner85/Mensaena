@@ -33,6 +33,12 @@ class CrisisDetailScreen extends ConsumerWidget {
     return DashboardScaffold(
       title: 'modules.crisisDetail'.tr(),
       currentRoute: '/dashboard/crisis',
+      onRefresh: () async {
+        ref.invalidate(crisisDetailProvider(crisisId));
+        ref.invalidate(crisisHelpersStreamProvider(crisisId));
+        ref.invalidate(crisisUpdatesStreamProvider(crisisId));
+        ref.invalidate(crisisTasksStreamProvider(crisisId));
+      },
       body: SafeArea(
         child: crisis.when(
           loading: () => const Center(
@@ -51,6 +57,7 @@ class CrisisDetailScreen extends ConsumerWidget {
               );
             }
             return ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.all(16),
               children: [
                 _Header(crisis: c),

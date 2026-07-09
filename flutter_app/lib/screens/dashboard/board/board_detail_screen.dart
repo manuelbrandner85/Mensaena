@@ -59,6 +59,11 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
     return DashboardScaffold(
       title: 'board.title'.tr(),
       currentRoute: '/dashboard/board',
+      onRefresh: () async {
+        ref.invalidate(boardPostDetailProvider(widget.boardPostId));
+        ref.invalidate(boardCommentsProvider(widget.boardPostId));
+        ref.invalidate(boardIsPinnedProvider(widget.boardPostId));
+      },
       body: SafeArea(
         child: post.when(
           loading: () => const Center(
@@ -81,6 +86,7 @@ class _BoardDetailScreenState extends ConsumerState<BoardDetailScreen> {
               children: [
                 Expanded(
                   child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     children: [
                       Row(

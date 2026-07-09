@@ -79,12 +79,17 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     return DashboardScaffold(
       title: 'invite.title'.tr(),
       currentRoute: '/dashboard/invite',
+      // Pull-to-Refresh laedt den aktuellen Einladungs-Status neu
+      // (angenommen/ausstehend). _load() setzt _loading nicht erneut auf
+      // true → die Liste bleibt beim Ziehen sichtbar.
+      onRefresh: _load,
       body: SafeArea(
         child: _loading
             ? const Center(
                 child: CircularProgressIndicator(color: AppColors.amber),
               )
             : ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
                 padding: const EdgeInsets.all(16),
                 children: [
                   _header(),

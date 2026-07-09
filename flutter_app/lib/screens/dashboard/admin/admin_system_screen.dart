@@ -77,8 +77,12 @@ class _AdminSystemScreenState extends ConsumerState<AdminSystemScreen> {
     return DashboardScaffold(
       title: 'admin.systemTitle'.tr(),
       currentRoute: '/dashboard/admin/system',
+      onRefresh: () async {
+        ref.invalidate(adminStatsProvider);
+      },
       body: SafeArea(
         child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
           children: [
             _cleanupSection(),
