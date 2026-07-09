@@ -126,6 +126,7 @@ class _RouteCard extends StatelessWidget {
             ),
           ),
           IconButton(
+            tooltip: 'common.delete'.tr(),
             onPressed: onDelete,
             icon: const Icon(LucideIcons.trash2, size: 16),
             color: AppColors.lightMute,

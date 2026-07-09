@@ -125,6 +125,7 @@ class _PromptEditSheetState extends State<_PromptEditSheet> {
                     ),
                   ),
                   IconButton(
+                    tooltip: 'common.close'.tr(),
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(LucideIcons.x, size: 18),
                     color: AppColors.lightMute,
