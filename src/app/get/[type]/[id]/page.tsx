@@ -22,7 +22,19 @@ export default function SmartLinkPage() {
   const id = String(params?.id ?? '')
   const [triedApp, setTriedApp] = useState(false)
 
-  const deepLink = `mensaena://dashboard/${type}/${id}`
+  const isInvite = type === 'invite'
+  // Einladungscode zielt auf die Registrierung (mit "eingeladen von"-Banner),
+  // nicht auf einen Dashboard-Screen — eigenes Custom-Scheme-Ziel.
+  const deepLink = isInvite
+    ? `mensaena://auth?mode=register&ref=${id}`
+    : `mensaena://dashboard/${type}/${id}`
+  // Fallback ohne App: bei Einladungen NICHT auf den blanken APK-Download
+  // schicken (Code-Attribution ginge beim Seitenladen sonst verloren) —
+  // stattdessen die Web-Registrierung mit demselben Code öffnen, die den
+  // Referral genauso zuordnet.
+  const fallbackUrl = isInvite
+    ? `/auth?mode=register&ref=${id}`
+    : APK_DIRECT_URL
 
   function openApp() {
     setTriedApp(true)
@@ -30,7 +42,7 @@ export default function SmartLinkPage() {
     const goStore = () => {
       if (fellBack) return
       fellBack = true
-      window.location.href = APK_DIRECT_URL
+      window.location.href = fallbackUrl
     }
     // Wenn die App sich öffnet, wird die Seite in den Hintergrund gelegt →
     // Fallback abbrechen.
@@ -87,8 +99,12 @@ export default function SmartLinkPage() {
       <h1 style={{ fontSize: 22, margin: 0 }}>Mensaena öffnen</h1>
       <p style={{ maxWidth: 360, opacity: 0.8, lineHeight: 1.5, margin: 0 }}>
         {triedApp
-          ? 'App nicht installiert? Du wirst gleich zum Download weitergeleitet.'
-          : 'Öffne diesen Inhalt direkt in der Mensaena-App.'}
+          ? isInvite
+            ? 'App nicht installiert? Du wirst gleich zur Registrierung weitergeleitet — dein Einladungscode bleibt erhalten.'
+            : 'App nicht installiert? Du wirst gleich zum Download weitergeleitet.'
+          : isInvite
+            ? 'Öffne deine Einladung direkt in der Mensaena-App.'
+            : 'Öffne diesen Inhalt direkt in der Mensaena-App.'}
       </p>
       <button
         onClick={openApp}

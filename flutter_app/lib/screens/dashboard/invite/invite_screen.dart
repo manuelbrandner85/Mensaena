@@ -54,12 +54,18 @@ class _InviteScreenState extends ConsumerState<InviteScreen> {
     }
   }
 
+  // Smart-Share-Link statt direktem /auth-Link: /get/invite/<code> ist ein
+  // klickbarer https-Link, der bei installierter App (verifizierter Android
+  // App Link) SOFORT die App öffnet (Registrierung mit vorausgefülltem
+  // Einladungscode) statt der Website — bei fehlender App landet der
+  // Empfänger auf der Download-Seite, der Code bleibt für die Web-Registrierung
+  // erhalten (DeepLinkService.toInternalRoute + src/app/get/[type]/[id]).
   // WICHTIG: Parameter MUSS 'ref' heißen — sowohl auth_screen.dart (App) als
   // auch src/app/auth/page.tsx (Web) lesen den Code aus ?ref=. Vorher stand
   // hier ?invite=, das NIRGENDS gelesen wurde → keine Einladung wurde je
   // zugeordnet (V1-Bugfix).
   String get _inviteUrl =>
-      _code != null ? '$_baseUrl/auth?mode=register&ref=$_code' : _baseUrl;
+      _code != null ? '$_baseUrl/get/invite/$_code' : _baseUrl;
 
   Future<void> _copy() async {
     await Clipboard.setData(ClipboardData(text: _inviteUrl));
