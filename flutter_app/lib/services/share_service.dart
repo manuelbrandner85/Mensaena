@@ -107,12 +107,15 @@ class ShareService {
     }
   }
 
-  /// Mensaena-Einladung als pre-built Share-Text. Klickbarer https-Link auf
-  /// die Download-Seite (für Empfänger ohne App genau richtig).
+  /// Mensaena-Einladung als pre-built Share-Text. Klickbarer https-Link:
+  /// mit Code über den Smart-Share-Link /get/invite/<code> (App installiert
+  /// → öffnet direkt zur Registrierung mit vorausgefülltem Code; sonst
+  /// Download-Seite, Code bleibt für die Web-Registrierung erhalten).
+  /// Ohne Code (kein Referral-Kontext) direkt auf die Download-Seite.
   static String inviteText({String? referralCode}) {
     final url = referralCode == null
         ? 'https://www.mensaena.de/download'
-        : 'https://www.mensaena.de/download?ref=$referralCode';
+        : 'https://www.mensaena.de/get/invite/$referralCode';
     return 'Komm zu ${AppConfig.appName} – die Nachbarschafts-App.\n\n$url';
   }
 }

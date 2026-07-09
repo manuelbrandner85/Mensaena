@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 ///
 /// Mapping:
 ///   https://www.mensaena.de/dashboard/posts/<id> → /dashboard/posts/<id>
+///   https://www.mensaena.de/get/invite/<code>    → /auth?mode=register&ref=<code>
 ///   https://www.mensaena.de/auth?ref=<code>      → /auth?ref=<code>
 ///   mensaena://...                                → /...
 class DeepLinkService {
@@ -74,8 +75,15 @@ class DeepLinkService {
     var path = uri.path.isEmpty ? '/' : uri.path;
     // Smart-Share-Links: /get/<typ>/<id> ist nur der klickbare Außen-Link →
     // intern auf den echten Detail-Pfad /dashboard/<typ>/<id> abbilden.
+    // Ausnahme: /get/invite/<code> hat keinen Dashboard-Screen — das ist
+    // ein Einladungscode, der auf die Registrierung (mit Banner) zielt.
     if (path.startsWith('/get/')) {
-      path = '/dashboard/${path.substring('/get/'.length)}';
+      final rest = path.substring('/get/'.length);
+      final parts = rest.split('/');
+      if (parts.length >= 2 && parts[0] == 'invite') {
+        return '/auth?mode=register&ref=${parts[1]}';
+      }
+      path = '/dashboard/$rest';
     }
     return '$path$query';
   }
