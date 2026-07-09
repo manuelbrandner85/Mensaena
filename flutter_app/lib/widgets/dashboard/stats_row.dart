@@ -107,12 +107,14 @@ class _StatsRowState extends State<StatsRow> {
               height: 110,
               child: PageView.builder(
                 controller: _controller,
+                padEnds: false,
                 onPageChanged: (p) => setState(() => _page = p),
                 itemCount: cards.length,
                 itemBuilder: (context, i) {
                   return Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: AppSpacing.xxs),
+                    padding: EdgeInsets.only(
+                      right: i == cards.length - 1 ? 0 : AppSpacing.xs,
+                    ),
                     child: cards[i],
                   );
                 },
