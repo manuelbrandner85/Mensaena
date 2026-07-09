@@ -5088,5 +5088,13 @@
     "fillBoth": "Başlangıç ve hedef girin",
     "myLocation": "Konumum",
     "source": "Kaynak: Transitous / MOTIS (OpenStreetMap verileri)"
+  },
+  "drafts": {
+    "restoreTitle": "Taslak bulundu",
+    "restoreSubtitle": "Kaldığın yerden devam edelim mi?",
+    "restoreSubtitleAt": "{time} tarihinde otomatik kaydedildi. Devam edilsin mi?",
+    "restore": "Geri yükle",
+    "discard": "Sil",
+    "restored": "Taslak geri yüklendi"
   }
 }

@@ -16,6 +16,7 @@ import '../../../repositories/ai_features_repository.dart';
 import '../../../repositories/extra_repositories.dart';
 import '../../../repositories/marketplace_repository.dart';
 import '../../../repositories/profiles_repository.dart';
+import '../../../services/form_draft_service.dart';
 import '../../../services/haptics.dart';
 import '../../../services/location_service.dart';
 import '../../../widgets/effects/mini_confetti.dart';
@@ -23,6 +24,7 @@ import '../../../widgets/shared/app_snackbar.dart';
 import '../../../services/open_food_facts_service.dart';
 import '../../../services/supabase_service.dart';
 import '../../../widgets/forms/create_post_scaffold.dart';
+import '../../../widgets/forms/draft_restore_banner.dart';
 import '../../../widgets/forms/location_picker_field.dart';
 import '../../shared/barcode_scanner_screen.dart';
 import '../../../utils/form_validators.dart';
@@ -64,9 +66,16 @@ class _MarketplaceCreateScreenState
   double _radiusKm = 0; // 0 = egal
   DateTime? _expiresAt;
 
+  // ── Entwurf-Wiederherstellung (gleiches Muster wie Post-Draft) ──────────
+  static const String _draftType = 'marketplace';
+  Timer? _draftTimer;
+  FormDraft? _pendingDraft;
+
   @override
   void initState() {
     super.initState();
+    _title.addListener(_scheduleDraftSave);
+    _desc.addListener(_scheduleDraftSave);
     // Android verliert das gewählte Bild, wenn die Activity während der
     // geöffneten Galerie unter Speicherdruck zerstört wird (RAM-schwache
     // Geräte) → beim Wiederaufbau zurückholen, sonst „kein Bild, kein Fehler".
@@ -77,8 +86,80 @@ class _MarketplaceCreateScreenState
               lost.take(_maxImages - _images.length).map((x) => File(x.path)),
             ));
       }
+      await _loadDraft();
       await _prefillLocationFromProfile();
     });
+  }
+
+  // Zeigt nur den Hinweis-Banner an; das Formular wird erst auf Nutzerwunsch
+  // („Wiederherstellen") befüllt, um vorbelegte Felder nicht zu überschreiben.
+  Future<void> _loadDraft() async {
+    final draft = await FormDraftService.load(_draftType);
+    if (draft != null && mounted) {
+      setState(() => _pendingDraft = draft);
+    }
+  }
+
+  void _scheduleDraftSave() {
+    _draftTimer?.cancel();
+    _draftTimer = Timer(const Duration(seconds: 3), _saveDraft);
+  }
+
+  Future<void> _saveDraft() async {
+    // Nur speichern, wenn der Nutzer echten Inhalt eingegeben hat.
+    if (_title.text.trim().isEmpty && _desc.text.trim().isEmpty) return;
+    await FormDraftService.save(_draftType, {
+      'title': _title.text,
+      'description': _desc.text,
+      'location': _location.text,
+      'price': _price.text,
+      'tags': _tags.text,
+      'quantity': _quantity.text,
+      'listingType': _listingType,
+      'category': _category,
+      'condition': _condition,
+      'negotiable': _negotiable,
+      'shipping': _shipping,
+      'radiusKm': _radiusKm,
+      'expiresAt': _expiresAt?.toIso8601String(),
+      'lat': _lat,
+      'lng': _lng,
+    });
+  }
+
+  void _restoreDraft() {
+    final d = _pendingDraft;
+    if (d == null) return;
+    setState(() {
+      _title.text = d.getString('title') ?? _title.text;
+      _desc.text = d.getString('description') ?? _desc.text;
+      _location.text = d.getString('location') ?? _location.text;
+      _price.text = d.getString('price') ?? _price.text;
+      _tags.text = d.getString('tags') ?? _tags.text;
+      _quantity.text = d.getString('quantity') ?? _quantity.text;
+      // Dropdown-Werte nur übernehmen, wenn sie noch gültig sind (Schutz
+      // gegen veraltete Entwürfe → sonst assert im DropdownButtonFormField).
+      final lt = d.getString('listingType');
+      if (lt != null && _types.any((t) => t.value == lt)) _listingType = lt;
+      final cat = d.getString('category');
+      if (cat != null && _categories.containsKey(cat)) _category = cat;
+      final cond = d.getString('condition');
+      if (cond != null && _conditions.containsKey(cond)) _condition = cond;
+      _negotiable = d.getBool('negotiable') ?? _negotiable;
+      _shipping = d.getBool('shipping') ?? _shipping;
+      _radiusKm = (d.getDouble('radiusKm') ?? _radiusKm).clamp(0, 100);
+      _expiresAt = d.getDateTime('expiresAt') ?? _expiresAt;
+      _lat = d.getDouble('lat') ?? _lat;
+      _lng = d.getDouble('lng') ?? _lng;
+      _pendingDraft = null;
+    });
+    AppSnackBar.success(context, 'drafts.restored'.tr());
+  }
+
+  Future<void> _discardDraft() async {
+    await FormDraftService.clear(_draftType);
+    if (!mounted) return;
+    setState(() => _pendingDraft = null);
   }
 
   /// Smart-Default: Standort aus dem Profil-Heimatort vorbelegen (editierbar,
@@ -137,6 +218,7 @@ class _MarketplaceCreateScreenState
 
   @override
   void dispose() {
+    _draftTimer?.cancel();
     _title.dispose();
     _desc.dispose();
     _location.dispose();
@@ -432,6 +514,10 @@ class _MarketplaceCreateScreenState
       await MarketplaceRepository.updateImages(id, imageUrls);
     }
 
+    // Entwurf nach erfolgreichem Erstellen entfernen.
+    _draftTimer?.cancel();
+    await FormDraftService.clear(_draftType);
+
     if (!mounted) return;
     Haptics.success();
     MiniConfetti.show(context);
@@ -451,6 +537,12 @@ class _MarketplaceCreateScreenState
         icon: Icons.storefront,
         returnRoute: '/dashboard/marketplace',
         sections: [
+          if (_pendingDraft != null)
+            DraftRestoreBanner(
+              savedAt: _pendingDraft!.savedAt,
+              onRestore: _restoreDraft,
+              onDiscard: _discardDraft,
+            ),
           // ── Live-Vorschau: zeigt, wie die Anzeige in der Liste aussieht ──
           CreateCard(
             title: 'create.preview'.tr(),
