@@ -1,0 +1,40 @@
+name: Delete Mensaena app downloads
+
+# Mensaena eingestellt (2026-10-11): loescht ALLE GitHub-Releases samt APKs
+# und den zugehoerigen Git-Tags. Nicht umkehrbar.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/delete_app_downloads.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  delete:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Delete all releases and their tags
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          total=0
+          while true; do
+            tags=$(gh release list --repo "$REPO" --limit 100 --json tagName --jq '.[].tagName')
+            [ -z "$tags" ] && break
+            before=$total
+            for t in $tags; do
+              gh release delete "$t" --repo "$REPO" --yes --cleanup-tag && total=$((total+1))
+            done
+            [ "$total" = "$before" ] && { echo "::error::Keine Releases loeschbar (Rechte?)"; exit 1; }
+          done
+          echo "Geloeschte Releases: $total"
+          left=$(gh release list --repo "$REPO" --limit 5 --json tagName --jq 'length')
+          echo "Verbleibende Releases: $left"
+          [ "$left" = "0" ]

@@ -16,13 +16,7 @@ on:
         description: 'Branch mit dem zu patchenden Code'
         required: false
         default: 'main'
-  # Auto-Patch bei JEDEM Push auf main mit Dart-Änderung. Doppelte Patches
-  # (gleicher Code) sind harmlos — der Client ignoriert sie.
-  push:
-    branches:
-      - main
-    paths:
-      - 'flutter_app/**'
+  # Mensaena eingestellt (2026-10-11): Auto-Patch bei Push deaktiviert.
 
 permissions:
   contents: read
