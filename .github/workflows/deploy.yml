@@ -1,9 +1,13 @@
 name: Deploy to Cloudflare Workers
 
+# Website seit 2026-10-11 offline (siehe site_offline.yml).
+# Automatischer Deploy bei Push auf main ist deaktiviert, damit die Seite
+# nicht versehentlich wieder online geht. Zum Reaktivieren: manuell im
+# Actions-Tab starten oder den push-Trigger wieder einkommentieren.
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 # GITHUB_TOKEN braucht read-only contents-Permission fuer actions/checkout@v4,
