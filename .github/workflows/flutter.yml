@@ -6,20 +6,8 @@ name: Flutter Android Build
 # Filename `mensaena-release.apk` – damit der bestehende Self-Update-
 # Flow (version.json.apkUrl) die neue App ausliefert.
 # Capacitor-Workflow android.yml ist deaktiviert.
+# Mensaena eingestellt (2026-10-11): automatische Trigger deaktiviert, nur noch manuell.
 on:
-  push:
-    branches:
-      - main
-      - 'claude/capacitor-to-flutter-migration-**'
-    paths:
-      - 'flutter_app/**'
-      - '.github/workflows/flutter.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'flutter_app/**'
-      - '.github/workflows/flutter.yml'
   workflow_dispatch:
 
 jobs:

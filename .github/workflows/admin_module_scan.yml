@@ -12,19 +12,13 @@ name: 🧠 Module Intelligence Scan
 #          SUPABASE_SERVICE_ROLE_KEY.
 # ════════════════════════════════════════════════════════════════════════
 
+# Mensaena eingestellt (2026-10-11): automatische Trigger deaktiviert, nur noch manuell.
 on:
   workflow_dispatch:
     inputs:
       scan_id:
         description: 'admin_module_scan_runs.id (UUID)'
         required: true
-  # Automatischer Cron-Scan: alle 30 Min, 12:00–18:00 Uhr deutscher Zeit.
-  # GitHub-Cron läuft in UTC ohne Sommer-/Winterzeit → fest auf Sommer (CEST,
-  # UTC+2): 10:00–16:00 UTC = 12:00–18:00 Uhr lokal. Im Winter (CET) verschiebt
-  # sich das Fenster lokal auf 11:00–17:00 Uhr.
-  schedule:
-    - cron: '0,30 10-15 * * *'  # 12:00–17:30 Uhr lokal (Sommer)
-    - cron: '0 16 * * *'        # 18:00 Uhr lokal (Sommer)
 
 permissions:
   contents: read

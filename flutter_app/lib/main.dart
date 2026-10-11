@@ -31,6 +31,7 @@ import 'services/shorebird_patch_service.dart';
 import 'services/sleep_reminder_service.dart';
 import 'services/supabase_service.dart';
 import 'repositories/wave_final_repositories.dart';
+import 'screens/misc/app_discontinued_screen.dart';
 
 /// SKILL: mensaena-architektur
 /// Bootstrap — Performance-optimiert:
@@ -47,8 +48,17 @@ import 'repositories/wave_final_repositories.dart';
 @pragma('vm:entry-point')
 void overlayMain() => incomingCallOverlayEntry();
 
+/// Mensaena wurde am 2026-10-11 eingestellt. Die App zeigt nur noch den
+/// Abschluss-Screen; Supabase, Push, Calls usw. werden nicht mehr gestartet.
+const bool kAppDiscontinued = true;
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (kAppDiscontinued) {
+    runApp(const AppDiscontinuedApp());
+    return;
+  }
 
   // CRASH-FIX (App-langsam-/crasht-Report): Image-Cache eng deckeln.
   // Default-Flutter: 1000 Bilder / 100 MB. Auf Low-RAM-Android-Geräten

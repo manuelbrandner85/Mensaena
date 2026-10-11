@@ -24,9 +24,8 @@ name: 🐕 Agent Task Watchdog
 # workflow_dispatch ist von GitHubs Rekursions-Sperre ausgenommen.
 # ════════════════════════════════════════════════════════════════════════
 
+# Mensaena eingestellt (2026-10-11): automatische Trigger deaktiviert, nur noch manuell.
 on:
-  schedule:
-    - cron: '*/30 * * * *'
   workflow_dispatch:
 
 permissions:

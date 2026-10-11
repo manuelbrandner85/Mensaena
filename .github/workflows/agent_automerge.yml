@@ -17,10 +17,9 @@ name: ✅ Agent Auto-Merge
 # Backoff, falls doch ein kurzzeitiges Secondary-Limit auftritt.
 # ════════════════════════════════════════════════════════════════════════
 
+# Mensaena eingestellt (2026-10-11): automatische Trigger deaktiviert, nur noch manuell.
 on:
-  workflow_run:
-    workflows: ["Flutter Android Build"]
-    types: [completed]
+  workflow_dispatch:
 
 permissions:
   contents: write

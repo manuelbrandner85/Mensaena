@@ -13,10 +13,9 @@ name: 🔧 Agent Auto-Fix (rotes CI)
 #          SUPABASE_SERVICE_ROLE_KEY.
 # ════════════════════════════════════════════════════════════════════════
 
+# Mensaena eingestellt (2026-10-11): automatische Trigger deaktiviert, nur noch manuell.
 on:
-  workflow_run:
-    workflows: ["Flutter Android Build"]
-    types: [completed]
+  workflow_dispatch:
 
 permissions:
   contents: write

@@ -22,10 +22,9 @@ name: ✅ Agent Auto-Merge (ohne Flutter-CI)
 # Automatik (OTA-Dispatch) greifen kann.
 # ════════════════════════════════════════════════════════════════════════
 
+# Mensaena eingestellt (2026-10-11): automatische Trigger deaktiviert, nur noch manuell.
 on:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write

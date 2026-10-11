@@ -1,14 +1,7 @@
 name: Supabase Migrations & Functions
 
+# Mensaena eingestellt (2026-10-11): automatische Trigger deaktiviert, nur noch manuell.
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'supabase/migrations/**'
-      - 'supabase/functions/**'
-      - 'supabase/config.toml'
-      - '.github/workflows/supabase.yml'
   workflow_dispatch:
 
 permissions:

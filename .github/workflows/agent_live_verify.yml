@@ -20,13 +20,9 @@ name: 📡 Agent Live-Verify
 # Auslieferung (deploy.yml/supabase.yml) lief bei seinem Merge bereits.
 # ════════════════════════════════════════════════════════════════════════
 
+# Mensaena eingestellt (2026-10-11): automatische Trigger deaktiviert, nur noch manuell.
 on:
-  workflow_run:
-    workflows:
-      - '🚀 Shorebird OTA Patch'
-      - 'Deploy to Cloudflare Workers'
-      - 'Supabase Migrations & Functions'
-    types: [completed]
+  workflow_dispatch:
 
 permissions:
   contents: read
